@@ -1,0 +1,420 @@
+﻿customAttributes.add(buildCustomAttribute(ItemCA.MEASURE_UNIT.getCode(), unit.getMeasureUnitValue()));
+
+if (StringUtils.isNotBlank(deliveryGuid)) {
+customAttributes.add(buildCustomAttribute(ItemCA.SHIPPING_ERP_GUID.getCode(), deliveryGuid));
+}
+
+if (positionCode != null) {
+customAttributes.add(buildCustomAttribute(ItemCA.POSITION_CODE.getCode(), positionCode.toString()));
+}
+
+return ItemDto.builder()
+.customAttributes(customAttributes)
+.weight(weight)
+.quantity(quantity)
+.productId(productId)
+.build();
+}
+
+private CustomAttributesDto buildCustomAttribute(String name, String value) {
+return CustomAttributesDto.builder()
+.name(name)
+.value(value)
+.build();
+}
+
+
+private void verifyShippingAttr(CountEnum expectedValue, CustomAttributesDto result) {
+Assertions.assertEquals("shippingCountEnum", result.getName());
+if (expectedValue == null) {
+Assertions.assertNull(expectedValue);
+} else {
+Assertions.assertEquals(expectedValue.toString(), result.getValue());
+}
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfOrderMapperImplTest.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping.ShippingDto;
+import ru.liga.evraz.aggregation.domain.enums.DeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpDeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentStatus;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.SfDeliveryMethod;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+class SfOrderMapperImplTest {
+private static final SfOrderMapperImpl sfOrderMapperImpl = new SfOrderMapperImpl();
+
+@Test
+public void mapToShippingDto_SfDeliveryTypeFromOrderWithoutErpDeliveryOrWithManyErpDeliveries() {
+testOrderDeliveryMethods(Collections.emptyList());
+testOrderDeliveryMethods(Arrays.asList(ErpDelivery.builder().build(), ErpDelivery.builder().build()));
+testOrderDeliveryMethods(Arrays.asList(ErpDelivery.builder().build(), ErpDelivery.builder().build(), ErpDelivery.builder().build()));
+}
+
+private void testOrderDeliveryMethods(List<ErpDelivery> erpDeliveries) {
+ShippingDto shippingDto = sfOrderMapperImpl.mapToShippingDto(buildOrder(ErpDeliveryMethod.PICKUP_FROM_OUR_WAREHOUSE), erpDeliveries);
+Assertions.assertEquals(SfDeliveryMethod.PICKUP_IN_STORE.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+shippingDto = sfOrderMapperImpl.mapToShippingDto(buildOrder(ErpDeliveryMethod.DELIVERY_BY_RAILWAY_TRANSPORT), erpDeliveries);
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_RAILWAY_SERVICE.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+shippingDto = sfOrderMapperImpl.mapToShippingDto(buildOrder(ErpDeliveryMethod.DESCRIPTION_OF_THE_TRANSPORT_SERVICE), erpDeliveries);
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_AUTO_SERVICE.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+List<ErpDeliveryMethod> otherMethods = except(ErpDeliveryMethod.values(),
+ErpDeliveryMethod.PICKUP_FROM_OUR_WAREHOUSE,
+ErpDeliveryMethod.DELIVERY_BY_RAILWAY_TRANSPORT,
+ErpDeliveryMethod.DESCRIPTION_OF_THE_TRANSPORT_SERVICE
+);
+for (ErpDeliveryMethod method : otherMethods) {
+shippingDto = sfOrderMapperImpl.mapToShippingDto(buildOrder(method), erpDeliveries);
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_OTHER.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+}
+}
+
+@Test
+public void mapOrderAddress() {
+final var order = buildOrder("   order address  ");
+final var customAttributesDtos = sfOrderMapperImpl.mapOrderCustomAttributes(order);
+Assertions.assertAll(
+() -> Assertions.assertTrue(CollectionUtils.isNotEmpty(customAttributesDtos)),
+() -> Assertions.assertEquals(1, customAttributesDtos.stream()
+.filter(cad -> "address".equals(cad.getName())
+&& CustomAttributesDto.CustomAttributeSource.ORDER.equals(cad.getCustomAttributeSource()))
+.toList().size()),
+() -> Assertions.assertEquals("order address", customAttributesDtos.stream()
+.filter(cad -> "address".equals(cad.getName())
+&& CustomAttributesDto.CustomAttributeSource.ORDER.equals(cad.getCustomAttributeSource()))
+.findFirst().get().getValue())
+);
+}
+
+@Test
+public void mapOrderDeliveryAddress() {
+final var addressCustomAttributeName = "address";
+
+List<CustomAttributesDto> ca1 = new ArrayList<>(){};
+ca1.add(buildOrderAddressCustomAttribute("       "));
+final var erpDelivery1 = buildErpDelivery("     ");
+final var result1 = sfOrderMapperImpl.getListDeliveryCustomAttributes(erpDelivery1, ca1);
+Assertions.assertAll(
+() -> Assertions.assertFalse(CollectionUtils.isEmpty(result1)),
+() -> Assertions.assertEquals(15, result1.size(),
+"ÐžÐ¶Ð¸Ð´Ð°ÐµÑ‚ÑÑ 15 Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð½Ð° Ð²Ñ‹Ñ…Ð¾Ð´Ðµ. ÐŸÑƒÑÑ‚Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð½Ðµ Ð¿Ð¾Ð´Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ñ‹Ð¼ Ð¸Ð· Ð—ÐÐŸ"),
+() -> Assertions.assertEquals(0, result1.stream()
+.filter(cad -> addressCustomAttributeName.equals(cad.getName()))
+.toList().size(), "ÐŸÑƒÑÑ‚Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð½Ðµ Ð¿Ð¾Ð´Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ñ‹Ð¼ Ð¸Ð· Ð—ÐÐŸ"),
+() -> Assertions.assertFalse(result1.stream()
+.anyMatch(cad -> addressCustomAttributeName.equals(cad.getName())))
+);
+
+List<CustomAttributesDto> ca2 = new ArrayList<>(){};
+ca2.add(buildOrderAddressCustomAttribute("order address"));
+final var erpDelivery2 = buildErpDelivery("     ");
+final var result2 = sfOrderMapperImpl.getListDeliveryCustomAttributes(erpDelivery2, ca2);
+Assertions.assertAll(
+() -> Assertions.assertFalse(CollectionUtils.isEmpty(result2)),
+() -> Assertions.assertEquals(15, result2.size(),
+"ÐžÐ¶Ð¸Ð´Ð°ÐµÑ‚ÑÑ 15 Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð½Ð° Ð²Ñ‹Ñ…Ð¾Ð´Ðµ. ÐŸÑƒÑÑ‚Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð½Ðµ Ð¿Ð¾Ð´Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ñ‹Ð¼ Ð¸Ð· Ð—ÐÐŸ"),
+() -> Assertions.assertEquals(0, result2.stream()
+.filter(cad -> addressCustomAttributeName.equals(cad.getName()))
+.toList().size(), "ÐŸÑƒÑÑ‚Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð½Ðµ Ð¿Ð¾Ð´Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ñ‹Ð¼ Ð¸Ð· Ð—ÐÐŸ"),
+() -> Assertions.assertEquals(1, ca2.stream().filter(cad -> addressCustomAttributeName.equals(cad.getName())).toList().size()),
+() -> Assertions.assertEquals("order address", ca2.stream()
+.filter(cad -> addressCustomAttributeName.equals(cad.getName()))
+.findFirst().get().getValue()
+)
+);
+
+List<CustomAttributesDto> ca3 = new ArrayList<>(){};
+ca3.add(buildOrderAddressCustomAttribute("       "));
+final var erpDelivery3 = buildErpDelivery("  delivery address   ");
+final var result3 = sfOrderMapperImpl.getListDeliveryCustomAttributes(erpDelivery3, ca3);
+Assertions.assertAll(
+() -> Assertions.assertFalse(CollectionUtils.isEmpty(result1)),
+() -> Assertions.assertEquals(16, result3.size(),
+"ÐžÐ¶Ð¸Ð´Ð°ÐµÑ‚ÑÑ 16 Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð½Ð° Ð²Ñ‹Ñ…Ð¾Ð´Ðµ. Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¸Ð· Ð·Ð°ÐºÐ°Ð·Ð° Ð¿Ð¾Ð´Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ Ð¿ÑƒÑÑ‚Ñ‹Ð¼ Ð¸Ð· Ð—ÐÐŸ"),
+() -> Assertions.assertEquals(1, result3.stream()
+.filter(cad -> addressCustomAttributeName.equals(cad.getName()))
+.toList().size(), "Ð˜Ð· Ð—ÐÐŸ Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½ ÐšÐ Ñ Ð½Ð°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ address"),
+() -> Assertions.assertEquals("delivery address", result3.stream()
+.filter(cad -> addressCustomAttributeName.equals(cad.getName()))
+.findFirst().get().getValue())
+);
+}
+
+@Test
+public void mapToShippingDto_SfDeliveryTypeFromDeliveryWhenOnlyOneDelivery() {
+// test value from order without delivery
+Order order = buildOrder(ErpDeliveryMethod.OUR_TRANSPORTATION_SERVICE_TO_THE_CLIENT);
+ShippingDto shippingDto = sfOrderMapperImpl.mapToShippingDto(order, Collections.emptyList());
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_OTHER.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+// test value from delivery
+shippingDto = sfOrderMapperImpl.mapToShippingDto(order, Collections.singletonList(buildDelivery(DeliveryMethod.PICKUP)));
+Assertions.assertEquals(SfDeliveryMethod.PICKUP_IN_STORE.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+shippingDto = sfOrderMapperImpl.mapToShippingDto(order, Collections.singletonList(buildDelivery(DeliveryMethod.RAILWAY_DELIVERY)));
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_RAILWAY_SERVICE.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+shippingDto = sfOrderMapperImpl.mapToShippingDto(order, Collections.singletonList(buildDelivery(DeliveryMethod.DISCRETION_OF_THE_TRANSPORT_SERVICE)));
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_AUTO_SERVICE.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+
+List<DeliveryMethod> otherMethods = except(DeliveryMethod.values(),
+DeliveryMethod.RAILWAY_DELIVERY,
+DeliveryMethod.DISCRETION_OF_THE_TRANSPORT_SERVICE,
+DeliveryMethod.PICKUP
+);
+for (DeliveryMethod method : otherMethods) {
+shippingDto = sfOrderMapperImpl.mapToShippingDto(order, Collections.singletonList(buildDelivery(method)));
+Assertions.assertEquals(SfDeliveryMethod.DELIVERY_OTHER.getSfDeliveryTypeValue(), shippingDto.getDeliveryTypeId());
+}
+}
+
+private static <T> List<T> except(T[] all, T... exceptValues) {
+List<Object> except = List.of(exceptValues);
+return Stream.of(all)
+.filter(method -> !except.contains(method))
+.collect(Collectors.toList());
+}
+
+private static Order buildOrder(ErpDeliveryMethod deliveryMethod) {
+Order order = new Order();
+order.setDeliveryMethod(deliveryMethod);
+
+return order;
+}
+
+private static Order buildOrder(String address) {
+Order order = new Order();
+order.setAddress(address);
+// Next fields are required
+order.setOrderType(true);
+order.setDocumentStatus(OrderDocumentStatus.ACCEPTED);
+order.setDocumentType(OrderDocumentType.CLIENT_ORDER);
+order.setDeliveryMethod(ErpDeliveryMethod.PICKUP_FROM_OUR_WAREHOUSE);
+return order;
+}
+
+private static ErpDelivery buildDelivery(DeliveryMethod deliveryMethod) {
+return ErpDelivery.builder()
+.deliveryMethod(deliveryMethod)
+.build();
+}
+
+private static ErpDelivery buildErpDelivery(String address) {
+return ErpDelivery.builder()
+.address(address)
+// Next fields are required
+.deliveryMethod(DeliveryMethod.PICKUP)
+.carDeliveryDateTimeFrom(LocalDateTime.now().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)))
+.carDeliveryDateTimeTo(LocalDateTime.now().atZone(ZoneId.ofOffset("UTC", ZoneOffset.UTC)))
+.build();
+}
+
+private static CustomAttributesDto buildOrderAddressCustomAttribute(String address) {
+return CustomAttributesDto.builder()
+.name("address")
+.value(address)
+.customAttributeSource(CustomAttributesDto.CustomAttributeSource.ORDER)
+.build();
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/adapter/db/OrderTransactionRepositoryImplTest.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.partner.PartnerEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+import ru.liga.evraz.aggregation.application.config.ErpMigrationBlackListConfig;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@ExtendWith(MockitoExtension.class)
+class OrderTransactionRepositoryImplTest {
+
+private static final String TEST_ORDER_ERP_GUID = "test_order_erp_guid";
+private static final String TEST_CLIENT_ERP_GUID = "test_client_guid";
+@Mock
+private OrderJpaRepository orderJpaRepo;
+
+@Mock
+private ErpMigrationBlackListConfig migrationBlackListConfig;
+
+@Mock
+private OrderTransactionJpaRepository orderTransactionJpaRepo;
+
+@Test
+@DisplayName(("Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½Ð·Ð°ÐºÑ†Ð¸Ð¸, ÐºÐ¾Ð³Ð´Ð° Ð½ÐµÑ‚ Ð±Ð°Ð·Ð¾Ð²Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°"))
+void saveWithoutOrderBasic_ShouldSendFalse() {
+OrderTransactionRepositoryImpl orderTransactionRepo = new OrderTransactionRepositoryImpl(
+orderTransactionJpaRepo, orderJpaRepo, migrationBlackListConfig);
+
+final var orderTransactionEntity = buildOrderTransactionEntity(TEST_ORDER_ERP_GUID);
+
+Mockito.when(orderTransactionJpaRepo.save(orderTransactionEntity))
+.thenReturn(orderTransactionEntity);
+
+final var savedTransaction = orderTransactionRepo.save(orderTransactionEntity);
+Assertions.assertNotNull(savedTransaction);
+Assertions.assertFalse(savedTransaction.getShouldSend());
+}
+
+@Test
+@DisplayName(("Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½Ð·Ð°ÐºÑ†Ð¸Ð¸, ÐºÐ¾Ð³Ð´Ð° ÐµÑÑ‚ÑŒ Ð±Ð°Ð·Ð¾Ð²Ð¾Ð¹ Ñ‡Ð°ÑÑ‚ÑŒ Ð·Ð°ÐºÐ°Ð·Ð°"))
+void saveWithOrderBasic_ShouldSendTrue() {
+OrderTransactionRepositoryImpl orderTransactionRepo = new OrderTransactionRepositoryImpl(
+orderTransactionJpaRepo, orderJpaRepo, migrationBlackListConfig);
+
+final var orderTransactionEntity = buildOrderTransactionEntity(TEST_ORDER_ERP_GUID);
+
+Mockito.when(orderTransactionJpaRepo.save(orderTransactionEntity))
+.thenReturn(orderTransactionEntity);
+Mockito.when(orderJpaRepo.findByErpGuid(TEST_ORDER_ERP_GUID))
+.thenReturn(buildMockedOptionalOrderEntity());
+
+final var savedTransaction = orderTransactionRepo.save(orderTransactionEntity);
+Assertions.assertNotNull(savedTransaction);
+Assertions.assertTrue(savedTransaction.getShouldSend());
+}
+
+@Test
+@DisplayName(("Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½Ð·Ð°ÐºÑ†Ð¸Ð¸, ÐºÐ¾Ð³Ð´Ð° ÐµÑÑ‚ÑŒ Ð±Ð°Ð·Ð¾Ð²Ð°Ñ Ñ‡Ð°ÑÑ‚ÑŒ Ð·Ð°ÐºÐ°Ð·Ð°, clientGuid Ð¸Ð· Ñ‡ÐµÑ€Ð½Ð¾Ð³Ð¾ ÑÐ¿Ð¸ÑÐºÐ°"))
+void saveWithOrderBasic_clientGuidInBlackList() {
+OrderTransactionRepositoryImpl orderTransactionRepo = new OrderTransactionRepositoryImpl(
+orderTransactionJpaRepo, orderJpaRepo, migrationBlackListConfig);
+
+final var orderTransactionEntity = buildOrderTransactionEntity(TEST_ORDER_ERP_GUID);
+
+Mockito.when(orderTransactionJpaRepo.save(orderTransactionEntity))
+.thenReturn(orderTransactionEntity);
+Mockito.when(migrationBlackListConfig.getClientGuids())
+.thenReturn(List.of(TEST_CLIENT_ERP_GUID));
+Mockito.when(orderJpaRepo.findByErpGuid(TEST_ORDER_ERP_GUID))
+.thenReturn(buildMockedOptionalOrderEntity());
+
+final var savedTransaction = orderTransactionRepo.save(orderTransactionEntity);
+Assertions.assertNotNull(savedTransaction);
+Assertions.assertFalse(savedTransaction.getShouldSend());
+}
+
+private static Optional<OrderEntity> buildMockedOptionalOrderEntity() {
+final var orderEntity = new OrderEntity();
+orderEntity.setId("test_id");
+orderEntity.setErpGuid(TEST_ORDER_ERP_GUID);
+orderEntity.setPartner(buildMockedPartnerEntity());
+return Optional.of(orderEntity);
+}
+
+private static PartnerEntity buildMockedPartnerEntity() {
+final var partnerEntity = new PartnerEntity();
+partnerEntity.setClientGuid(TEST_CLIENT_ERP_GUID);
+return partnerEntity;
+}
+
+private static OrderTransactionEntity buildOrderTransactionEntity(String orderErpGuid) {
+return OrderTransactionEntity.builder()
+.transactionId(UUID.randomUUID().toString())
+.newEntity(true)
+.erpGuid(orderErpGuid)
+.shouldSend(true)
+.build();
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/Validation.properties
+Content: Skipped binary file
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/application-local.yml
+Content:
+spring:
+swagger:
+local: true
+main:
+banner-mode: off
+mvc:
+pathmatch:
+matching-strategy: ant_path_matcher
+datasource:
+hikari:
+connectionTimeout: 20000
+maximumPoolSize: 7
+minimum-idle: 2
+idle-timeout: 10000
+url: jdbc:postgresql://localhost:5433/postgres
+username: postgres
+password: LexusLX570LFA
+jpa:
+hibernate:
+ddl-auto: none
+show-sql: true
+liquibase:
+change-log: classpath:db/main-changelog.xml
+enabled: true
+url: ${spring.datasource.url}
+user: ${spring.datasource.username}
+password: ${spring.datasource.password}
+default-schema: public
+
+cloud:
+integrationToken:
+evraz_oms_dev: 'eyJhbGciOiJIUzUxMiJ9.eyJ0ZW5hbnRJZCI6ImV2cmF6X29tc19kZXYiLCJ1c2VySWQiOiJldnJhel9vbXNfZGV2LWV2cmF6X2Rldl9pbnQiLCJyb2xlIjoiSU5URUdSQVRJT04iLCJsb2dpbiI6ImV2cmF6X2Rldl9pbnQiLCJ2ZXJzaW9uIjowLCJhdXRoVHlwZSI6Im9tc0NyZWRlbnRpYWxzIiwiZXhwIjo0ODI5MTE5MjEwLCJzdWIiOiJldnJhel9vbXNfZGV2LWV2cmF6X2Rldl9pbnQifQ.D7mHHm7i85M-b2hv4MOEUM-byHUBNQLdI7Uj_9oQAtH7q2yw0ltkeKsD4bpczlYHhK6NsyV9TKJEZ-LoU27YPA'
+
+feign:
+erpAdapter:
+name: 'erp-adapter'
+hystrix:
+enabled: false
+client:
+config:
+#      example-service:
+#        retryer: com.starfish24.config.feign.FeignRetryer
+default:
+connectTimeout: 10000
+readTimeout: 40000
+loggerLevel: full
+
+discovery:
+restClient:
+connectTimeout: 10000
+readTimeout: 40000
+
+management:
+server:
+port: 1${server.port}
+endpoints:
+web:

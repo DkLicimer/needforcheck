@@ -1,0 +1,402 @@
+﻿final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEMS_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEMS_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEMS_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDERS_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SET_CANCELLATION_REASON)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SET_CANCELLATION_REASON);
+dispatcherDatas.add(
+ORDER_SET_CANCELLATION_REASON.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SET_CANCELLATION_REASON, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (StringUtils.isNotBlank(pathTemplateParameters.get("expected_starfish_order_id").toString())) {
+final Pair<Resource, Resource> req2resp = Pair.of(
+null,
+new ByteArrayResource("Order is deleted".getBytes(StandardCharsets.UTF_8)));
+dispatcherDatas.add(
+ORDER_DELETE.buildDispatcherData(
+req2resp, HttpMethod.DELETE,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DELETE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+var dispatcher = new StarfishOrderDispatcher(dispatcherDatas);
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+protected void initBpmScenario(Map<BpmPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<BpmPath, HttpStatus> pathsToExpectedHttpStatus,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(BPM_SEND_MESSAGE)) {
+final var resourceResourcePair = pathToExpectedResources.get(BPM_SEND_MESSAGE);
+dispatcherDatas.add(
+BPM_SEND_MESSAGE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(BPM_SEND_MESSAGE, HttpStatus.OK),
+pathTemplateParameters));
+}
+var dispatcher = new BpmDispatcher(dispatcherDatas);
+bpmServer.setDispatcher(dispatcher);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/application/service/impl/OrderCopyLinkServiceImplTest.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.time.ZonedDateTime;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = OrderCopyLinkServiceImplTest.OrderCopyLinkServiceImplTestConfiguration.class)
+class OrderCopyLinkServiceImplTest {
+private static final String ORDER_ID = "test-id";
+@Autowired
+private OrderCopyLinkServiceImpl service;
+
+@Autowired
+private OrderRepository orderRepository;
+
+@AfterEach
+public void resetMock() {
+Mockito.reset(orderRepository);
+}
+
+@Test
+void buildLink_testCorrectLink() {
+mockOrder(buildOrder("IN00-123456", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=IN00-123456&date=10.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+}
+
+@Test
+void buildLink_testTimeZone() {
+// next day by timezone
+mockOrder(buildOrder("IN00-123456", "2023-10-10T20:59Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=IN00-123456&date=10.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("IN00-123456", "2023-10-10T20:59Z", "UTC +07", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=IN00-123456&date=11.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+
+// prev day by timezone
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", "UTC -03", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=IN00-123456&date=09.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+
+// null on incorrect timezone
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", "UTC -99", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", "UTC +ab", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+}
+
+@Test
+public void buildLink_testEmptyData() {
+// null on empty attributes
+mockOrder(buildOrder(null, "2023-10-10T02:59Z", "UTC -03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+mockOrder(buildOrder("IN00-123456", null, "UTC -03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", null, "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", "UTC -03", null, "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", "UTC -03", "partner-guid", null, false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+}
+
+@Test
+public void buildLink_testDeletedOrDeletedMark() {
+mockOrder(buildOrder("IN00-123456", null, "UTC -03", "partner-guid", "customer-guid", true, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+mockOrder(buildOrder("IN00-123456", "2023-10-10T02:59Z", null, "partner-guid", "customer-guid", false, true));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+}
+
+@Test
+public void buildLink_documentIdFormat() {
+mockOrder(buildOrder("Ð˜Ð00-123456", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=%D0%98%D0%9D00-123456&date=10.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("IN00-123456", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=IN00-123456&date=10.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("PP12-123456", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertEquals("https://preprod.evraz.market/operator/basket/?orderuid=PP12-123456&date=10.10.2023&entityid=partner-guid%23customer-guid",
+service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("PP123-123456", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("PP12-1234567", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("PP12-12345", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("PP120123456", "2023-10-10T15:00Z", "UTC +03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+
+
+mockOrder(buildOrder(null, "2023-10-10T02:59Z", "UTC -03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+
+mockOrder(buildOrder("documentId", "2023-10-10T02:59Z", "UTC -03", "partner-guid", "customer-guid", false, false));
+Assertions.assertNull(service.buildLink(ORDER_ID));
+}
+
+private void mockOrder(Order order) {
+Mockito.reset(orderRepository);
+Mockito.when(orderRepository.getByStarfishOrderId(ORDER_ID))
+.thenReturn(order);
+}
+
+private Order buildOrder(String documentId, String documentDateTime, String timeZone, String partnerGuid, String customerGuid, boolean deleted, boolean deletedMark) {
+Order order = new Order();
+order.setDocumentId(documentId);
+order.setDocumentDateTime(documentDateTime != null ? ZonedDateTime.parse(documentDateTime) : null);
+order.setDocumentTimeZone(timeZone);
+order.setPartnerGuid(partnerGuid);
+order.setCustomerGuid(customerGuid);
+order.setDeleted(deleted);
+order.setDeletedMark(deletedMark);
+
+return order;
+}
+
+@TestConfiguration
+public static class OrderCopyLinkServiceImplTestConfiguration {
+@Bean
+public OrderCopyLinkServiceImpl orderCopyLinkService(OrderRepository orderRepository) {
+return new OrderCopyLinkServiceImpl(orderRepository);
+}
+
+@Bean
+public OrderRepository orderRepository() {
+return Mockito.mock(OrderRepository.class);
+}
+}
+
+
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/adapter/http/out/service/OrderAttributeHelperTest.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.domain.model.DeliveryItem;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CountEnum;
+import ru.liga.evraz.aggregation.domain.model.product.MeasureUnit;
+import ru.liga.evraz.aggregation.domain.model.product.SkuStatus;
+import ru.liga.evraz.aggregation.sf.ItemCA;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+class OrderAttributeHelperTest {
+private static final SkuStatus ACTIVE_STATUS = SkuStatus.RESERVE_IN_WAREHOUSE;
+private static final SkuStatus INACTIVE_STATUS = SkuStatus.CANCELED;
+private static final String TEST_ORDER_ERP_GUID = "test-order";
+private static final String TEST_DELIVERY_GUID = "test-delivery";
+
+
+@Test
+public void calculateShippingCount_NoneOnEmptyProducts() {
+verifyShippingAttr(CountEnum.NONE, OrderAttributeHelper.calculateShippingCount(buildOrder(Collections.emptyList()), null));
+}
+
+@Test
+public void calculateShippingCount_NoneOnAllProductsInactive() {
+List<ItemDto> items = Arrays.asList(buildItem(INACTIVE_STATUS), buildItem(INACTIVE_STATUS));
+List<ErpDelivery> deliveries = Collections.singletonList(buildDelivery(Collections.emptyList()));
+CustomAttributesDto allInactive = OrderAttributeHelper.calculateShippingCount(buildOrder(items), deliveries);
+Assertions.assertEquals(CountEnum.NONE.toString(), allInactive.getValue());
+
+items = Arrays.asList(buildItem(INACTIVE_STATUS), buildItem(INACTIVE_STATUS), buildItem(ACTIVE_STATUS));
+deliveries = Collections.singletonList(buildDelivery(Collections.emptyList()));
+CustomAttributesDto withActiveProduct = OrderAttributeHelper.calculateShippingCount(buildOrder(items), deliveries);
+
+Assertions.assertNotEquals(CountEnum.NONE.toString(), withActiveProduct.getValue());
+}
+
+
+
+@Test
+public void calculateShippingCount_NoZnpWhenNoDelivery() {
+List<ItemDto> items = Collections.singletonList(buildItem(ACTIVE_STATUS));
+CustomAttributesDto withoutDelivery = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.emptyList());
+Assertions.assertEquals(CountEnum.NO_ZNP.toString(), withoutDelivery.getValue());
+
+// and NONE has the highest priority
+items = Collections.singletonList(buildItem(INACTIVE_STATUS));
+CustomAttributesDto wihtoutDeliveryAndActiveProducts = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.emptyList());
+Assertions.assertEquals(CountEnum.NONE.toString(), wihtoutDeliveryAndActiveProducts.getValue());
+}
+
+@Test
+public void calculateShippingCount_ManyWhenItemsInDifferentDelivery() {
+List<ItemDto> items = Arrays.asList(buildItem(ACTIVE_STATUS, "delivery_1"), buildItem(ACTIVE_STATUS, "delivery_2"));
+CustomAttributesDto inDifferentDelivery = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.emptyList());
+Assertions.assertEquals(CountEnum.MANY.toString(), inDifferentDelivery.getValue());
+}
+
+@Test
+public void calculateShippingCount_OneWhenItemsInSameDeliveryAndQuantityMatch() {
+List<ItemDto> items = Arrays.asList(buildItem(5L, "sku1", ACTIVE_STATUS, TEST_DELIVERY_GUID, 2.5d, 1L));
+List<DeliveryItem> deliveryItems = Collections.singletonList(buildDeliveryItem(5, "sku1", 5d));
+
+CustomAttributesDto result = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.singletonList(buildDelivery(deliveryItems)));
+Assertions.assertEquals(CountEnum.ONE.toString(), result.getValue());
+
+// less quantity
+items = Arrays.asList(buildItem(5L, "sku1", ACTIVE_STATUS, TEST_DELIVERY_GUID, 2.5d, 1L));
+deliveryItems = Collections.singletonList(buildDeliveryItem(5, "sku1", 2.49d));
+
+result = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.singletonList(buildDelivery(deliveryItems)));
+Assertions.assertEquals(CountEnum.MANY.toString(), result.getValue());
+
+// different sku id
+items = Arrays.asList(buildItem(5L, "sku1", ACTIVE_STATUS, TEST_DELIVERY_GUID, 2.5d, 1L));
+deliveryItems = Collections.singletonList(buildDeliveryItem(5, "sku2", 5d));
+
+result = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.singletonList(buildDelivery(deliveryItems)));
+Assertions.assertEquals(CountEnum.MANY.toString(), result.getValue());
+
+// different position code
+items = Arrays.asList(buildItem(5L, "sku1", ACTIVE_STATUS, TEST_DELIVERY_GUID, 2.5d, 1L));
+deliveryItems = Collections.singletonList(buildDeliveryItem(6, "sku1", 5d));
+
+result = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.singletonList(buildDelivery(deliveryItems)));
+Assertions.assertEquals(CountEnum.MANY.toString(), result.getValue());
+
+// on same quantity
+items = Arrays.asList(buildItem(5L, "sku1", ACTIVE_STATUS, TEST_DELIVERY_GUID, 2.5d, 1L));
+deliveryItems = Collections.singletonList(buildDeliveryItem(5, "sku1", 2.5d));
+
+result = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.singletonList(buildDelivery(deliveryItems)));
+Assertions.assertEquals(CountEnum.ONE.toString(), result.getValue());
+
+// on same quantity (double precision)
+items = Arrays.asList(buildItem(5L, "sku1", ACTIVE_STATUS, TEST_DELIVERY_GUID, 2.5d, 1L));
+deliveryItems = Collections.singletonList(buildDeliveryItem(5, "sku1", 2.4999999999d));
+
+result = OrderAttributeHelper.calculateShippingCount(buildOrder(items), Collections.singletonList(buildDelivery(deliveryItems)));
+Assertions.assertEquals(CountEnum.ONE.toString(), result.getValue());
+}
+
+private ErpDelivery buildDelivery(List<DeliveryItem> items) {
+DeliveryOrder order = DeliveryOrder.builder()
+.erpOrderGuid(TEST_ORDER_ERP_GUID)
+.deliveryItems(items)
+.build();
+
+return ErpDelivery.builder()
+.erpGuid(TEST_DELIVERY_GUID)
+.orders(Collections.singletonList(order))
+.build();
+}
+
+private DeliveryItem buildDeliveryItem(Integer orderPositionCode, String skuId, Double quantity) {
+return DeliveryItem.builder()
+.skuId(skuId)
+.orderPositionCode(orderPositionCode)
+.quantity(quantity)
+.build();
+}
+
+private OrderCreateExtendedDto buildOrder(List<ItemDto> items) {
+return OrderCreateExtendedDto.builder()
+.orderErpGuid(TEST_ORDER_ERP_GUID)
+.items(items)
+.build();
+}
+
+
+private ItemDto buildItem(SkuStatus status) {
+return buildItem(status, null);
+}
+
+private ItemDto buildItem(SkuStatus status, String deliveryGuid) {
+return buildItem(null, null, status, deliveryGuid, null, null);
+}
+
+private ItemDto buildItem(Long positionCode, String productId, SkuStatus status, String deliveryGuid, Double weight, Long quantity) {
+List<CustomAttributesDto> customAttributes = new ArrayList<>();
+customAttributes.add(buildCustomAttribute(ItemCA.SKU_STATUS.getCode(), status.name()));
+
+MeasureUnit unit = weight != null ? MeasureUnit.KG : MeasureUnit.PIECE;

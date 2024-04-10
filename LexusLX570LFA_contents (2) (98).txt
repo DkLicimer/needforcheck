@@ -1,0 +1,447 @@
+﻿public ResponseEntity<ControllerResult> updateShipping(String sfOrderId, ShippingDto sfShippingDto) {
+log.info("POST /shipping/{}/update", sfOrderId);
+final var result = feignOrder.updateShipping(sfOrderId, sfShippingDto, null);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to update shipping",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+@Override
+public ResponseEntity<ShippingDto> createOrUpdateShipping(String sfOrderId, ShippingDto sfShippingDto) {
+log.info("PUT orders/{}/shipping", sfOrderId);
+final var result = feignOrder.createOrUpdateShipping(sfOrderId, sfShippingDto);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to createUpdate shipping",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+
+@Override
+public List<ItemDto> updateItems(String starfishOrderId, List<ItemDto> starfishOrderItems) {
+log.info("POST /item/{}/extendedlist", starfishOrderId);
+final var result = feignOrder.updateItems(starfishOrderId, starfishOrderItems, null);
+// TODO:: check response
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+return result.getBody();
+}
+
+@Override
+public List<ItemServiceDto> updateItemServices(String starfishOrderId, List<ItemServiceDto> starfishOrderItemServices) {
+log.info("POST /itemservice/{}/extendedlist", starfishOrderId);
+final var result = feignOrder.updateItemServices(starfishOrderId, starfishOrderItemServices);
+// TODO:: check response
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+return result.getBody();
+}
+
+@Override
+public ControllerResult updateCustomer(CustomerDto starfishCustomer) {
+log.info("POST /customer/{}", starfishCustomer.getId());
+final var result = feignOrder.updateCustomer(starfishCustomer.getId(), starfishCustomer);
+// TODO:: check response
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+return result.getBody();
+}
+
+@Override
+public List<CustomAttributesDto> getOrderCustomAttributes(String sfOrderId) {
+log.info("GET /{}/customattributes", sfOrderId);
+final var result = feignOrder.getOrderCustomAttributes(sfOrderId);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+return result.getBody();
+}
+
+@Override
+public Optional<OrderSearchDto> getOrderByStarfishOrderId(String sfOrderId) {
+log.info("GET /{}", sfOrderId);
+try {
+final var result = feignOrder.getOrderByStarfishOrderId(sfOrderId);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+return Optional.ofNullable(result.getBody());
+} catch (FeignException e) {
+log.error("Exception occurred while try to get order by sfOrderId = {}", sfOrderId, e);
+return Optional.empty();
+}
+}
+
+@Override
+public String findErpGuidByStarfishOrderId(String sfOrderId) {
+return orderRepo.getErpGuidByStarfishOrderId(sfOrderId);
+}
+
+@Override
+public ResponseEntity<LegalEntityDto> createLegalEntity(LegalEntityDto legalEntityDto) {
+log.info("POST customers/legalEntities", legalEntityDto.getId());
+final var result = feignOrder.createLegalEntity(legalEntityDto);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to create legal entity",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+
+@Override
+public ResponseEntity<LegalEntityDto> updateLegalEntity(LegalEntityDto legalEntityDto) {
+log.info("PUT customers/legalEntities/{}", legalEntityDto.getId());
+final var result = feignOrder.updateLegalEntity(legalEntityDto.getId(), legalEntityDto);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to update legal entity",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+
+@Override
+public ResponseEntity<LegalEntityDto> createOrUpdateLegalEntity(LegalEntityDto legalEntityDto) {
+log.info("POST customers/legalEntities/create-or-update", legalEntityDto.getId());
+final var result = feignOrder.createOrUpdateLegalEntity(legalEntityDto);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to createOrUpdate legal entity",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfProductMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CalculationInputFieldDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerService.CustomerServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.product.ProductDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.product.SkuDto;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSku;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSkuService;
+import ru.liga.evraz.aggregation.domain.model.product.SkuType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+interface SfProductMapper {
+Collection<ProductDto> mapToSfProductDto(Collection<ProductSku> source); // TODO:: Ð¼Ð¾Ð³ÑƒÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ñ‹
+
+default ProductDto map(ProductSku source) {
+if (source != null) {
+return ProductDto.builder()
+.active(true)
+.id(source.getId())
+.name(source.getName())
+.description(source.getTypeName())
+.shortDescription(source.getType())
+.sku(Collections.singletonList(SkuDto.builder()
+.id(source.getId())
+.name(source.getName())
+.build()))
+.build();
+}
+return null;
+}
+
+Collection<ProductSku> mapToProductSkuModel(Collection<ProductDto> source);
+
+default ProductSku map(ProductDto source) {
+if (source != null) {
+ProductSku.builder()
+.id(source.getId())
+.name(source.getName())
+.type(source.getShortDescription())
+.typeName(source.getDescription())
+.build();
+}
+return null;
+}
+
+Collection<CustomerServiceDto> mapToSfCustomerServiceDtos(Collection<ProductSkuService> source); // TODO:: Ð¼Ð¾Ð³ÑƒÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ñ‹
+
+default CustomerServiceDto mapToSfCustomerServiceDto(ProductSkuService source) {
+if (source != null) {
+return CustomerServiceDto.builder()
+.id(source.getId())
+.name(source.getName())
+.description(source.getTypeName())
+.anyProductsRelated(StringUtils.isNotBlank(source.getLinkedProductSkuId()))
+.productRelated(StringUtils.isNotBlank(source.getLinkedProductSkuId()))
+.calculationInputFields(buildCustomerServiceDto(source))
+.build();
+}
+return null;
+}
+
+private List<CalculationInputFieldDto> buildCustomerServiceDto(ProductSkuService source) {
+List<CalculationInputFieldDto> calculationInputFields = new ArrayList<>();
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("skuTypeName")
+.fieldName("Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹")
+.inputType("string")
+.build());
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("skuTypeDescription")
+.fieldName("Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸")
+.inputType("string")
+.build());
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("skuStatusDescription")
+.fieldName("Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡")
+.inputType("string")
+.build());
+if (SkuType.MP_SERVICE.name().equals(source.getType())) {
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("metalProcessingStartTimeDescription")
+.fieldName("Ð”Ð°Ñ‚Ð° ÐœÐŸ")
+.inputType("string")
+.build());
+}
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("measureUnit")
+.fieldName("Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ")
+.inputType("string")
+.build());
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("skuComment")
+.fieldName("ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹")
+.inputType("string")
+.build());
+calculationInputFields.add(CalculationInputFieldDto.builder()
+.fieldId("positionCancellationReason")
+.fieldName("ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹")
+.inputType("string")
+.build());
+return calculationInputFields;
+}
+
+Collection<ProductSkuService> mapCustomerServiceDtoToProductSkuModel(Collection<CustomerServiceDto> source);
+
+default ProductSkuService map(CustomerServiceDto source) {
+if (source != null) {
+ProductSku.builder()
+.id(source.getId())
+.name(source.getName())
+.typeName(source.getDescription())
+.build();
+}
+return null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfProductService.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import feign.FeignException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.ProductFeignClient;
+import ru.liga.evraz.aggregation.application.converter.ProductSkuModelMapper;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSku;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSkuService;
+import ru.liga.evraz.aggregation.domain.repository.OrderItemRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.isSkuItem;
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.isSkuService;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+class SfProductService implements ProductService {
+private final OrderItemRepository orderItemRepo;
+private final ProductFeignClient feignProduct;
+private final SfProductMapper productMapper;
+private final ProductSkuModelMapper productSkuMapper;
+
+
+@Override
+public ControllerResult createUpdateProductList(Collection<ProductSku> productSkus) {
+final var productDtos = productMapper.mapToSfProductDto(productSkus);
+log.info("Try to create/update productSkus : {}",
+productSkus.stream()
+.map(ProductSku::getId)
+.collect(Collectors.toSet()));
+final var sfOrderResponse = feignProduct.updateProduct(productDtos);
+return sfOrderResponse.getBody();
+}
+
+@Override
+public Collection<ProductSku> getProductByIds(Collection<String> productSkuIds) {
+final var productsByIds = feignProduct.getProductsByIds(productSkuIds);
+// TODO:: check for errors;
+final var result = productMapper.mapToProductSkuModel(productsByIds.getBody());
+return result;
+}
+
+@Override
+public ControllerResult createUpdateCustomerServiceList(Collection<ProductSkuService> services) {
+final var serviceDtos = productMapper.mapToSfCustomerServiceDtos(services);
+final var createUpdateResult = feignProduct.updateCustomerService(serviceDtos);
+return createUpdateResult.getBody();
+}
+
+@Override
+public Collection<ProductSkuService> getCustomerServiceList() {
+final var sfCustomerServices = feignProduct.getCustomerService();
+final var result = productMapper.mapCustomerServiceDtoToProductSkuModel(sfCustomerServices.getBody());
+return result;
+}
+
+@Override
+@Transactional(noRollbackFor = {FeignException.class})
+public ControllerResult updateCustomerServiceCatalogForOrderErpGuids(Set<String> orderErpGuids) {
+final var orderItemsByOrders = orderItemRepo.getOrderItemsByOrders(orderErpGuids);
+final var groupedByOrderErpGuid = orderItemsByOrders.stream()
+.collect(Collectors.groupingBy(orderItem -> orderItem.getOrder().getErpGuid()));
+
+final var itemServicesForUpdate = groupedByOrderErpGuid.entrySet().stream()
+.flatMap(entry -> {
+final var orderItems = entry.getValue();
+final var productItems = orderItems.stream()
+.filter(item -> isSkuItem(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+final var serviceItems = orderItems.stream()
+.filter(item -> isSkuService(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+if (CollectionUtils.isNotEmpty(serviceItems)) {
+return productSkuMapper.mapServices(serviceItems, productItems).stream();
+}
+return Stream.empty();
+}).collect(Collectors.toUnmodifiableSet());
+return createUpdateCustomerServiceList(itemServicesForUpdate);
+}
+
+@Override
+@Transactional(noRollbackFor = {FeignException.class})
+public ControllerResult updateCustomerServiceCatalogForOrderErpGuid(String orderErpGuid) {
+final var orderItems = orderItemRepo.getOrderItemsByOrder(orderErpGuid);
+
+final var productItems = orderItems.stream()
+.filter(item -> isSkuItem(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+final var serviceItems = orderItems.stream()
+.filter(item -> isSkuService(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+if (CollectionUtils.isNotEmpty(serviceItems)) {
+final var productSkuServices = productSkuMapper.mapServices(serviceItems, productItems);
+return createUpdateCustomerServiceList(productSkuServices);
+}
+log.info("No item services found for orderErpGuid {}", orderErpGuid);
+return ControllerResult.successResult(
+String.format("No item services found for orderErpGuid %s", orderErpGuid));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/kafka/OrderReloadProcessingService.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.kafka;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.application.event.ReloadOrderEvent;
+import ru.liga.evraz.aggregation.domain.model.OrderReloadDto;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class OrderReloadProcessingService {
+
+private final ApplicationEventPublisher eventPublisher;
+
+@KafkaListener(topics = "${aggregation.kafka.order-reload.request.topic}",
+concurrency = "${aggregation.kafka.concurrency}")
+public void process(ConsumerRecord<String, OrderReloadDto> r, Acknowledgment acknowledgment) {
+
+log.debug("got new info for reload order {}", r.value());
+final var orderErpGuid = r.value().getOrderErpGuid();
+eventPublisher.publishEvent(ReloadOrderEvent.builder().orderErpGuid(orderErpGuid).build());
+
+log.info("Start acknowledging ack! Topic: {}, Partition: {}, offset: {}", r.topic(), r.partition(), r.offset());
+acknowledgment.acknowledge();
+log.info("Acknowledged ack! Topic: {}, Partition: {}, offset: {}", r.topic(), r.partition(), r.offset());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/kafka/OrderReloadRecordInterceptor.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.kafka;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
+import org.springframework.kafka.listener.ConsumerAwareRecordInterceptor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import ru.liga.evraz.aggregation.domain.model.OrderReloadDto;
+import ru.liga.evraz.aggregation.security.UserDto;
+import ru.liga.evraz.aggregation.security.authentication.JwtTokenAuthentication;
+import ru.liga.evraz.aggregation.security.details.UserDetailsImpl;
+import ru.liga.evraz.aggregation.security.service.JwtTokenService;
+
+import static java.util.Objects.nonNull;
+
+@Slf4j
+@RequiredArgsConstructor
+public class OrderReloadRecordInterceptor implements ConsumerAwareRecordInterceptor<String, OrderReloadDto> {
+
+private final JwtTokenService jwtTokenService;
+
+@Override
+public ConsumerRecord<String, OrderReloadDto> intercept(ConsumerRecord<String, OrderReloadDto> r,
+Consumer<String, OrderReloadDto> consumer) {
+log.info("Intercept record: Topic: {}, Partition {}, Offset: {}", r.topic(), r.partition(), r.offset());
+Header auth = r.headers().lastHeader("Authorization");
+String token = nonNull(auth.value()) ? new String(auth.value()) : "";
+
+UserDto userDto = jwtTokenService.getUserDtoFromToken(token);
+JwtTokenAuthentication newAuth = new JwtTokenAuthentication(token);
+if (userDto.isFullyFilled()) {
+UserDetails userDetails = new UserDetailsImpl(userDto);
+newAuth.setUserDetails(userDetails);
+newAuth.setAuthenticated(true);
+}
+SecurityContextHolder.getContext().setAuthentication(newAuth);
+return r;
+}
+}
+
+

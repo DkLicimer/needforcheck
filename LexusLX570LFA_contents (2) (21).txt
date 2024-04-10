@@ -1,0 +1,536 @@
+﻿{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_with_OA.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "documentId"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "documentLink"
+},
+{
+"name": "contractType",
+"value": "FRAME_NON_STANDARD"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": "saleManagerResponsibleEmail@test.test"
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "test_erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "false"
+},
+{
+"name": "contractNumber",
+"value": "121212"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": ""
+},
+{
+"name": "erpPipeline",
+"value": ""
+},
+{
+"name": "omsPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "NONE"
+},
+{
+"name": "approvalProcessStatus",
+"value": "APPROVAL_PROCESS_IN_PROGRESS"
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": "2023-12-27T15:24:50Z"
+},
+{
+"name": "olurTaskSent",
+"value": "true"
+},
+{
+"name": "invoiceSent",
+"value": "true"
+},
+{
+"name": "paymentAmount",
+"value": "18900.57"
+},
+{
+"name": "shippingCountEnum",
+"value": "NO_ZNP"
+},
+{
+"name": "deliveryStatus",
+"value": ""
+},
+{
+"name": "logisticManagerResponsibleId",
+"value": ""
+},
+{
+"name": "transferred",
+"value": ""
+},
+{
+"name": "deliveryDriverPhone",
+"value": ""
+},
+{
+"name": "deliveryCarNumber",
+"value": ""
+},
+{
+"name": "deliveryDriverFullName",
+"value": ""
+},
+{
+"name": "paidQuantity",
+"value": ""
+},
+{
+"name": "licenseNumber",
+"value": ""
+},
+{
+"name": "deliveryPeriod",
+"value": ""
+},
+{
+"name": "pricesAgreed",
+"value": "true"
+},
+{
+"name": "reservationRemovalDate",
+"value": "2023-08-11"
+},
+{
+"name": "reservationExtensionReason",
+"value": "TARGET_ORDER"
+},
+{
+"name": "deliveryDocumentId",
+"value": ""
+},
+{
+"name": "deliveryDocumentLink",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFromDescription",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeToDescription",
+"value": ""
+},
+{
+"name": "shippingDeliveryMethod",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+},
+{
+"name": "shippingRecipientGuid",
+"value": ""
+},
+{
+"name": "deliveryTimeZone",
+"value": ""
+},
+{
+"name": "clientInn",
+"value": "test-client_inn"
+},
+{
+"name": "clientName",
+"value": "test-client_name"
+},
+{
+"name": "specificationApprovalRequired",
+"value": "false"
+},
+{
+"name": "address",
+"value": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ,  Ð´29"
+},
+{
+"name": "promissedDeliveryDate",
+"value": ""
+},
+{
+"name": "partnerGuid",
+"value": "order_partner_guid"
+},
+{
+"name": "documentTimeZone",
+"value": "UTC +07"
+},
+{
+"name": "dispatchWarehouseSlotBooked",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsNote",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoods",
+"value": ""
+},
+{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "true"
+},
+{
+"name": "requiredCall",
+"value": "false"
+},
+{
+"name": "branching",
+"value": "true"
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": "http://example.com"
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_with_OA2.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "documentId"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "documentLink"
+},
+{
+"name": "contractType",
+"value": "FRAME_NON_STANDARD"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": "saleManagerResponsibleEmail@test.test"
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "test_erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "true"
+},
+{
+"name": "contractNumber",
+"value": "Ð’Ð -32-18-Ð¾Ð´"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": "ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡"
+},
+{
+"name": "erpPipeline",
+"value": "true"
+},
+{
+"name": "omsPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "ONE"
+},
+{
+"name": "approvalProcessStatus",
+"value": "APPROVAL_PROCESS_IN_PROGRESS"
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": "true"
+},
+{
+"name": "invoiceSent",
+"value": "true"
+},
+{
+"name": "paymentAmount",
+"value": "18900.57"
+},
+{
+"name": "shippingCountEnum",
+"value": "NO_ZNP"
+},
+{
+"name": "deliveryCarNumber",
+"value": ""
+},
+{
+"name": "deliveryDriverPhone",
+"value": ""
+},
+{
+"name": "transferred",
+"value": ""
+},
+{
+"name": "logisticManagerResponsibleId",
+"value": ""
+},
+{
+"name": "deliveryStatus",
+"value": ""
+},
+{
+"name": "deliveryDriverFullName",
+"value": ""
+},
+{
+"name": "paidQuantity",
+"value": ""
+},
+{
+"name": "licenseNumber",
+"value": ""
+},
+{
+"name": "deliveryPeriod",
+"value": ""
+},
+{
+"name": "pricesAgreed",
+"value": ""
+},
+{
+"name": "reservationRemovalDate",
+"value": ""
+},
+{
+"name": "reservationExtensionReason",
+"value": ""
+},
+{
+"name": "deliveryDocumentId",
+"value": ""
+},
+{
+"name": "deliveryDocumentLink",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFromDescription",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeToDescription",
+"value": ""
+},
+{
+"name": "shippingDeliveryMethod",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+},
+{
+"name": "shippingRecipientGuid",
+"value": ""
+},
+{
+"name": "deliveryTimeZone",
+"value": ""
+},
+{
+"name": "clientInn",
+"value": "test-client_inn"
+},
+{
+"name": "clientName",
+"value": "test-client_name"
+},
+{
+"name": "specificationApprovalRequired",
+"value": ""
+},
+{
+"name": "address",

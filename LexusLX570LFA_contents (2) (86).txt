@@ -1,0 +1,449 @@
+﻿import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.application.converter.ErpTaskModelMapper;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+import ru.liga.evraz.aggregation.domain.model.command.ErpTaskCommand;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpTaskService;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Service
+@Validated
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateErpTaskUseCase {
+private final ErpTaskService erpTaskService;
+
+private final ErpTaskModelMapper erpTaskModelMapper;
+
+private final ErpTaskFeignWrapper erpTaskFeignWrapper;
+
+private final ErpTaskConverter erpTaskConverter;
+
+private final CommandRepository commandRepository;
+
+private final CommandMapper commandMapper;
+
+public CreateErpTaskCmdResult create(@Valid @NotNull CreateErpTaskCmd cmd) {
+if (checkTaskAlreadySent(cmd)) {
+log.warn("Erp task already created. OrderId: {}, taskType: {}", cmd.orderId(), cmd.taskType());
+return CreateErpTaskCmdResult.success(null);
+}
+
+ErpTask task = erpTaskService.create(erpTaskModelMapper.map(cmd));
+ErpTaskCommand erpCommand = commandRepository.createErpCommand(commandMapper.map(cmd, task));
+
+CreateErpTaskDto createErpTaskDto = erpTaskConverter.convertToDto(task, erpCommand.getCommandGuid());
+Boolean success = erpTaskFeignWrapper.sendErpTask(createErpTaskDto);
+if (success) {
+erpTaskService.markSent(task.getId());
+commandRepository.updateSendStatusByCommandGuid(erpCommand.getCommandGuid());
+return CreateErpTaskCmdResult.success(createErpTaskDto.getCommandGuid());
+}
+
+return CreateErpTaskCmdResult.error();
+}
+
+private boolean checkTaskAlreadySent(CreateErpTaskCmd cmd) {
+ErpTask task = erpTaskService.findFirstActiveByOrderAndType(cmd.orderId(), cmd.taskType());
+if (task != null) {
+if (!task.getSent()) {
+log.info("Task not sent, deactivate. Id: {}, type: {}, orderId: {}", task.getId(), task.getTaskType(), task.getOrderId());
+erpTaskService.deactivate(task.getId(), task.getCanceled());
+} else {
+return true;
+}
+}
+
+return false;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/usecase/CreateUpdateErpTaskStatusUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application.usecase;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.ErpTaskStatusCmd;
+import ru.liga.evraz.aggregation.domain.repository.ErpTaskService;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateUpdateErpTaskStatusUseCase {
+
+private final ErpTaskService erpTaskService;
+
+public void process(@NotNull @Valid ErpTaskStatusCmd cmd) {
+final var guid = cmd.getGuid();
+log.info("Received erp task status data with guid = {}", guid);
+
+erpTaskService.updateStatus(cmd);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/usecase/FindErpDeliveryUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application.usecase;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import java.util.Optional;
+
+@Service
+@Validated
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class FindErpDeliveryUseCase {
+private final ErpDeliveryRepository erpDeliveryRepository;
+
+public Optional<ErpDelivery> find(@Valid @NotEmpty String deliveryGuid) {
+return erpDeliveryRepository.findByErpGuidWithoutOrders(deliveryGuid);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/usecase/GenerateOrderCopyLinkUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application.usecase;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.service.OrderCopyLinkService;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN', 'USER')")
+public class GenerateOrderCopyLinkUseCase {
+private final OrderCopyLinkService orderCopyLinkService;
+
+public String generate(String sfOrderId) {
+String url = orderCopyLinkService.buildLink(sfOrderId);
+log.info("Order: {}, generated url: {}", sfOrderId, url);
+return url;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/ErpDeliveryService.java
+Content:
+package ru.liga.evraz.aggregation.application.service;
+
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+public interface ErpDeliveryService {
+void validateErpDelivery(ErpDelivery erpDelivery);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/OrderAttributeService.java
+Content:
+package ru.liga.evraz.aggregation.application.service;
+
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+
+public interface OrderAttributeService {
+void validateAttributeByOrder(OrderAttribute attribute, Order order);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/OrderCopyLinkService.java
+Content:
+package ru.liga.evraz.aggregation.application.service;
+
+public interface OrderCopyLinkService {
+String buildLink(String sfOrderId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/StarfishOrderEnricher.java
+Content:
+package ru.liga.evraz.aggregation.application.service;
+
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+
+import java.util.List;
+
+public interface StarfishOrderEnricher {
+
+
+void enrichOrderWithReserveAttribute(OrderCreateExtendedDto sfOrder, Order erpOrder);
+
+void enrichOrderWithSubdivisionNameAttribute(OrderCreateExtendedDto sfOrder, Order erpOrder);
+
+void enrichOrderCreateExtendedDtoWithOrderAttributes(OrderCreateExtendedDto sfOrder,
+List<OrderAttribute> orderAttributes,
+String orderErpGuid);
+
+void enrichOrderCreateExtendedDtoWithDelivery(OrderCreateExtendedDto sfOrder, ErpDelivery delivery, List<ErpDelivery> deliveryList);
+
+void enrichOrderCreateExtendedDtoWithDeliveryAttributes(OrderCreateExtendedDto sfOrder, ErpDelivery delivery,
+List<DeliveryAttribute> deliveryAttributes);
+
+void enrichOrderWithCalculatedAttributes(OrderCreateExtendedDto sfOrder, List<ErpDelivery> deliveryList);
+
+ErpDelivery getDeliveryDataIfExist(List<ErpDelivery> allDeliveriesForOrder);
+
+List<ErpDelivery> getAllDeliveryDataIfExist(String orderErpGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/StarfishOrderUpdateContextService.java
+Content:
+package ru.liga.evraz.aggregation.application.service;
+
+import ru.liga.evraz.aggregation.application.service.data.OrderUpdateContext;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+
+public interface StarfishOrderUpdateContextService {
+OrderUpdateContext createContext(Order erpOrder);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/StarfishUpdateService.java
+Content:
+package ru.liga.evraz.aggregation.application.service;
+
+import ru.liga.evraz.aggregation.application.service.data.OrderWithTransactionsDto;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+public interface StarfishUpdateService {
+CompletableFuture<Void> updateOrdersAndTransactions(List<OrderWithTransactionsDto> orders);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/impl/ErpDeliveryServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.application.service.ErpDeliveryService;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+import javax.validation.ValidationException;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ErpDeliveryServiceImpl implements ErpDeliveryService {
+
+@Override
+public void validateErpDelivery(ErpDelivery erpDelivery) {
+validateWarehouseId(erpDelivery);
+}
+
+private void validateWarehouseId(ErpDelivery erpDelivery) {
+if (StringUtils.isEmpty(erpDelivery.getWarehouseId())) {
+final var deliveryErpGuid = erpDelivery.getErpGuid();
+final var deliveryDocumentId = erpDelivery.getDeliveryDocumentId();
+final var orderErpGuids = Optional.ofNullable(erpDelivery.getOrders())
+.map(deliveryOrders -> deliveryOrders.stream()
+.map(DeliveryOrder::getErpOrderGuid)
+.collect(Collectors.joining(",")))
+.orElse("not found");
+
+throw new ValidationException("ErpDelivery. Validation Error. WarehouseId must not be null or empty, deliveryDocumentId: %s, deliveryErpGuid: %s, orderErpGuid(s):  %s"
+.formatted(deliveryDocumentId, deliveryErpGuid, orderErpGuids));
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/impl/OrderAttributeServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.application.config.ValidationProperties;
+import ru.liga.evraz.aggregation.application.exception.BusinessException;
+import ru.liga.evraz.aggregation.application.service.OrderAttributeService;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+import ru.liga.evraz.aggregation.domain.model.product.SkuType;
+
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.util.Objects;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+class OrderAttributeServiceImpl implements OrderAttributeService {
+
+private static final String METAL_PROCESSING_START_TIME = "metalProcessingStartTime";
+private static final String METAL_PROCESSING_COMPLETED = "metalProcessingCompleted";
+private static final String APPROVAL_PROCESS_STATUS = "approvalProcessStatus";
+private static final String ORDER_PAID_ASSIGNMENT_DATE = "orderPaidAssignmentDate";
+
+private final ValidationProperties validationProperties;
+
+@Override
+public void validateAttributeByOrder(OrderAttribute attribute, Order order) {
+validateOrderPaidAssignmentDate(attribute); //TODO 291068 ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ Ð¿Ð¾ÑÐ»Ðµ Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´Ð° Ð½Ð° ÐµÐ´Ð¸Ð½Ñ‹Ð¹ ÐºÐ¾Ð½Ñ‚Ñ€Ð°ÐºÑ‚ Ð¿Ð¾ Ð¾Ð¿Ð»Ð°Ñ‚Ðµ Ð·Ð°ÐºÐ°Ð·Ð°
+
+validateApprovalStatus(attribute);
+
+final var isMetalProcessingStartTimeAttribute = Objects.equals(attribute.getName(), METAL_PROCESSING_START_TIME);
+
+validateMetalProcessingStartTime(attribute, isMetalProcessingStartTimeAttribute);
+
+// ÐÑ‚Ñ€Ð¸Ð±ÑƒÑ‚Ñ‹, Ð·Ð°Ð²Ð¸ÑÐ¸Ð¼Ñ‹Ðµ Ð¾Ñ‚ Ð·Ð°ÐºÐ°Ð·Ð°.
+if (Objects.nonNull(order)) {
+final var orderItem = order.getOrderItems().stream()
+.filter(elem -> elem.getPositionCode().equals(attribute.getPositionCode()))
+.findFirst()
+.orElse(null);
+
+validateMetalProcessingCompletedAttribute(attribute, orderItem, isMetalProcessingStartTimeAttribute);
+}
+}
+
+private static void validateOrderPaidAssignmentDate(OrderAttribute attribute) {
+final var attrName = attribute.getName();
+final var attrValue = attribute.getValue();
+
+if (ORDER_PAID_ASSIGNMENT_DATE.equalsIgnoreCase(attrName)) {
+try {
+new DateTimeFormatterBuilder()
+.append(DateTimeFormatter.ISO_LOCAL_DATE)
+.toFormatter()
+.withResolverStyle(ResolverStyle.STRICT)
+.parse(attrValue);
+} catch (DateTimeParseException e) {
+log.error("Failed to parse {}", attrName, e);
+throw new BusinessException("Unparsable date-time. Order attribute (name: %s, value: %s)"
+.formatted(attrName, attrValue));
+}
+}
+}
+
+private static void validateMetalProcessingStartTime(OrderAttribute attribute,
+boolean isMetalProcessingStartTimeAttribute) {
+if (isMetalProcessingStartTimeAttribute) {
+final var attrValue = attribute.getValue();
+final var attrName = attribute.getName();
+try {
+new DateTimeFormatterBuilder()
+.append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral("T")
+// time (hour/minute/seconds)
+.appendPattern("HH:mm:ss")
+// optional nanos, with 1-6 digits
+//.appendPattern("[.SSSSSS][.SSSSS][.SSSS][.SSS][.SS][.S]")
+// Ð”Ð°Ð½Ð½Ñ‹Ð¹ Ð¿Ð°Ñ‚Ñ‚ÐµÑ€Ð½ Ð¿Ð¾Ð´Ñ…Ð¾Ð´Ð¸Ñ‚ Ð¿Ð¾Ð´ ÑÐ»ÑƒÑ‡Ð°Ð¹ Ñ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ð¾Ð¼ 1C:ERP, ÐµÑÐ»Ð¸ Ð±ÑƒÐ´ÑƒÑ‚ Ð´Ñ€ÑƒÐ³Ð¸Ðµ ÑÐ¼. Ð²Ð°Ñ€Ð¸Ð°Ð½Ñ‚Ñ‹ Ð²Ñ‹ÑˆÐµ
+.appendPattern("[.SSS]")
+// offset
+.appendOffset("+HH:mm", "Z")
+// create formatter
+.toFormatter()
+.withResolverStyle(ResolverStyle.STRICT)
+.parse(attrValue);
+} catch (DateTimeParseException e) {
+log.error("Failed to parse {}", attrName, e);
+throw new BusinessException("Unparsable date-time. Order attribute (name: %s, value: %s, positionCode: %d)"
+.formatted(attrName, attrValue, attribute.getPositionCode()));
+}
+}
+}
+
+private static void validateMetalProcessingCompletedAttribute(OrderAttribute attribute, OrderItem orderItem,
+boolean isMetalProcessingStartTimeAttribute) {
+final var attrName = attribute.getName();
+if ((isMetalProcessingStartTimeAttribute || Objects.equals(
+attrName, METAL_PROCESSING_COMPLETED))
+&& (Objects.nonNull(orderItem)
+&& (!Objects.equals(orderItem.getSkuType(), SkuType.ITEM_GP)
+&& !Objects.equals(
+orderItem.getSkuType(), SkuType.MP_SERVICE)))) {
+throw new BusinessException("""
+Error occurred while trying to save/update order attribute with name - %s and positionCode - %s, not a valid skuType
+"""
+.formatted(attrName, attribute.getPositionCode()));
+}
+}
+
+private void validateApprovalStatus(OrderAttribute attribute) {
+final var attrName = attribute.getName();
+final var attrValue = attribute.getValue();
+
+if (attrName.equalsIgnoreCase(APPROVAL_PROCESS_STATUS)
+&& Boolean.FALSE.equals(checkApprovalProcessStatusValue(attrValue))) {
+throw new BusinessException("""
+Error occurred while trying to save/update order attribute with name - %s and value - %s, value is not valid
+"""
+.formatted(attrName, attrValue));
+}
+}
+
+private boolean checkApprovalProcessStatusValue(String field) {
+boolean matchFound = false;
+for (var allowedValue : validationProperties.approvalProcessStatusValidValues()) {
+if (field.equalsIgnoreCase(allowedValue)) {
+matchFound = true;
+break;
+}
+}
+return matchFound;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/impl/OrderCopyLinkServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;

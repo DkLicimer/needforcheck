@@ -1,0 +1,511 @@
+﻿"responsibleManager": "test_saleManagerResponsibleId",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_request_with_OA.json
+Content:
+{
+"clientOrderId": "documentId___27.12.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": true,
+"contactEmail": null,
+"contactPhone": null,
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": null,
+"totalCost": 485490.7,
+"payableCost": 485490.7,
+"currencyId": "RUB",
+"notification": null,
+"responsibleManager": "test_saleManagerResponsibleId",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_request_with_OA_for_deleted_olurSentTask.json
+Content:
+{
+"clientOrderId": "documentId___27.12.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": true,
+"contactEmail": null,
+"contactPhone": null,
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": "ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚",
+"totalCost": 0.0,
+"payableCost": 0.0,
+"currencyId": "RUB",
+"notification": null,
+"responsibleManager": "test_saleManagerResponsibleId",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_response.json
+Content:
+{
+
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_for_reload_order.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€",
+"middleName": null,
+"lastName": null,
+"phones": [
+"+7 (111) 111-11-11"
+],
+"emails": [
+"test@test.com"
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_oa_delete_request.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€",
+"middleName": null,
+"lastName": null,
+"phones": [
+"+7 (111) 111-11-11"
+],
+"emails": [
+"test@test.com"
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_oa_save_request.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€",
+"middleName": null,
+"lastName": null,
+"phones": [
+"+7 (111) 111-11-11"
+],
+"emails": [
+"test@test.com"
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_request.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"middleName": null,
+"lastName": null,
+"phones": [
+"+7 (111) 111-11-11"
+],
+"emails": [
+"customerEmail@test.test"
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_response.json
+Content:
+{
+"success": true,
+"message": "Customer is updated"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_without_contacts_request.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"middleName": null,
+"lastName": null,
+"phones": [
+],
+"emails": [
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/updCustomAttr_success.json
+Content:
+{
+"success": true,
+"message": "Custom attribute is created"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_delivery_delete_for_update_request.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "documentId"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test"
+},
+{
+"name": "contractType",
+"value": "INVOICE_OFFER"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": ""
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "test_order_erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "true"
+},
+{
+"name": "contractNumber",
+"value": "Ð’Ð -32-18-Ð¾Ð´"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": "ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡"
+},
+{
+"name": "erpPipeline",
+"value": "true"
+},
+{
+"name": "omsPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "ONE"
+},
+{
+"name": "approvalProcessStatus",
+"value": ""
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "invoiceSent",
+"value": ""
+},
+{
+"name": "paymentAmount",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": ""
+},
+{
+"name": "shippingCountEnum",
+"value": "MANY"
+},
+{
+"name": "deliveryDriverPhone",
+"value": ""
+},
+{
+"name": "deliveryCarNumber",
+"value": ""
+},
+{
+"name": "deliveryDriverFullName",
+"value": ""
+},
+{
+"name": "deliveryStatus",
+"value": ""
+},
+{
+"name": "logisticManagerResponsibleId",
+"value": ""
+},
+{
+"name": "transferred",
+"value": ""
+},
+{
+"name": "deliveryDocumentId",
+"value": "dd_id_2"
+},
+{
+"name": "deliveryDocumentLink",
+"value": "dd_link_2"
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": "2023-02-21T16:00:00Z"
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": "2023-02-21T18:00:00Z"
+},
+{
+"name": "carDeliveryDateTimeFromDescription",
+"value": "21.02.2023 19:00:00 +03:00"
+},
+{
+"name": "carDeliveryDateTimeToDescription",
+"value": "21.02.2023 21:30:00 +03:00"
+},
+{
+"name": "shippingDeliveryMethod",
+"value": "DETERMINED_IN_THE_DIRECTION"
+},
+{
+"name": "shippingErpGuid",
+"value": "2-test-erp_guid"
+},
+{
+"name": "paidQuantity",
+"value": ""
+},
+{
+"name": "licenseNumber",
+"value": ""
+},
+{
+"name": "shippingRecipientGuid",
+"value": "a44db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+{
+"name": "deliveryTimeZone",
+"value": "+03:00"
+},
+{
+"name": "deliveryPeriod",
+"value": ""
+},
+{
+"name": "pricesAgreed",
+"value": ""
+},
+{
+"name": "reservationRemovalDate",
+"value": ""
+},
+{
+"name": "reservationExtensionReason",
+"value": ""
+},
+{
+"name": "clientInn",
+"value": "test-client_inn"
+},
+{
+"name": "clientName",
+"value": "test-client_name"
+},
+{
+"name": "specificationApprovalRequired",
+"value": ""
+},
+{
+"name": "address",
+"value": ""
+},
+{
+"name": "promissedDeliveryDate",
+"value": ""
+},
+{
+"name": "partnerGuid",
+"value": ""
+},
+{
+"name": "documentTimeZone",
+"value": ""
+},
+{
+"name": "dispatchWarehouseSlotBooked",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsNote",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoods",
+"value": ""
+},
+{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_for_CreateMetalProcessingStartTimeWithValidDateShouldSuccess.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "test_order"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test"
+},
+{
+"name": "contractType",
+"value": "INVOICE_OFFER"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": ""
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},

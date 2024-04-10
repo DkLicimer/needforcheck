@@ -1,0 +1,468 @@
+﻿* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpTaskModelMapper {
+ErpTask map(CreateErpTaskCmd cmd);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/OrderAttributeModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderAttributeCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderAttributeModelMapper {
+
+OrderAttribute map(CreateUpdateOrderAttributeCmd source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/OrderModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderModelMapper {
+
+@Mapping(target = "partner.clientGuid", source = "clientGuid")
+@Mapping(target = "partner.clientType", source = "clientType")
+@Mapping(target = "partner.clientName", source = "clientName")
+@Mapping(target = "partner.clientInn", source = "clientInn")
+Order map(CreateUpdateOrderCmd source);
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/OrderReserveModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderReserveCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.OrderReserve;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderReserveModelMapper {
+
+OrderReserve map(CreateUpdateOrderReserveCmd source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/ProductSkuModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSku;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSkuService;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.ValidationException;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ProductSkuModelMapper {
+
+Collection<ProductSku> map(Collection<OrderItem> source);
+
+default Collection<ProductSkuService> mapServices(Collection<OrderItem> itemServices, Collection<OrderItem> items) {
+if (CollectionUtils.isNotEmpty(itemServices)) {
+return itemServices.stream()
+.map(i -> mapProductSkuService(i, items))
+.collect(Collectors.toSet());
+}
+
+return Set.of();
+}
+
+@Mapping(target = "id", source = "skuId")
+@Mapping(target = "name", source = "skuName")
+@Mapping(target = "type", source = "skuType")
+@Mapping(target = "typeName", source = "skuTypeName")
+ProductSku map(OrderItem source);
+
+/**
+* ÐšÐ¾Ð½Ð²ÐµÑ€Ñ‚Ð°Ñ†Ð¸Ñ ÑƒÑÐ»ÑƒÐ³Ð¸.
+*
+* @param source - Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð¿Ð¾ ÑƒÑÐ»ÑƒÐ³Ðµ.
+* @param productItems - ÑÐ¿Ð¸ÑÐ¾Ðº Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ‚Ð¾Ð², Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¾Ñ€Ð³Ð°Ð½Ð¸Ð·Ð¾Ð²Ð°Ñ‚ÑŒ ÑÐ²ÑÐ·ÑŒ ÑƒÑÐ»ÑƒÐ³Ð¸ Ð¿Ñ€Ð¸ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸.
+* @return {@link ProductSkuService}
+*/
+default ProductSkuService mapProductSkuService(OrderItem source, Collection<OrderItem> productItems) {
+if (source != null) {
+final var productSkuService = new ProductSkuService(map(source));
+if (source.getLinkedSkuPositionCode() != null) {
+final var linkedOrderItem = productItems.stream()
+.filter(i -> source.getLinkedSkuPositionCode().equals(i.getPositionCode()))
+.findFirst()
+.orElseThrow(() ->
+new ValidationException(
+String.format("ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶Ð¸Ñ‚ÑŒ ÑÐ²ÑÐ·Ð°Ð½Ð½ÑƒÑŽ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñƒ %s Ð¿Ð¾ positionCode",
+source.getLinkedSkuPositionCode())));
+productSkuService.setLinkedProductSkuId(linkedOrderItem.getSkuId());
+}
+
+return productSkuService;
+}
+
+return null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/SubdivisionModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateSubdivisionCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface SubdivisionModelMapper {
+Subdivision map(CreateUpdateSubdivisionCmd cmd);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/UserGroupModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateUserGroupCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.UserGroup;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface UserGroupModelMapper {
+UserGroup map(CreateUpdateUserGroupCmd cmd);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/WarehouseModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateWarehouseCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.Warehouse;
+import ru.liga.evraz.aggregation.domain.model.WarehouseWorkDay;
+import ru.liga.evraz.aggregation.domain.model.WorkDay;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface WarehouseModelMapper {
+Warehouse map(CreateUpdateWarehouseCmd cmd);
+
+List<WorkDay> map(List<WarehouseWorkDay> source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/config/AsyncExecutorConfig.java
+Content:
+package ru.liga.evraz.aggregation.application.config;
+
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.sleuth.instrument.async.LazyTraceAsyncTaskExecutor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
+
+import java.util.Optional;
+import java.util.concurrent.Executor;
+
+@Configuration
+class AsyncExecutorConfig {
+
+@Value("${async.threadPool.name:async-}")
+private String asyncThreadPoolName;
+@Value("${async.threadPool.size:30}")
+private int asyncPoolSize;
+
+@Value("${async.threadPool.queueSize:}")
+private Integer asyncQueueCapacity;
+
+@Value("${async.threadPool.corePoolSize:10}")
+private int asyncCorePoolSize;
+
+@Value("${async.threadPool.keepAlive:600}")
+private int keepAlive;
+
+// ÐÑƒÐ¶ÐµÐ½ ÐºÐ°Ðº Ð¼Ð¸Ð½Ð¸Ð¼ÑƒÐ¼ Ð´Ð»Ñ Ð¿Ñ€Ð¾ÐºÐ¸Ð´Ñ‹Ð²Ð°Ð½Ð¸Ñ SecurityContext Ð´Ð»Ñ Ð¸ÑÐ¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ Ð°ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð½Ñ‹Ñ… Ð·Ð°Ð´Ð°Ñ‡
+@Bean
+@Qualifier("asyncSecurityCtxTaskExecutor")
+public Executor securityContextAsyncTaskExecutor(@Qualifier("asyncTaskExecutor") AsyncTaskExecutor delegate,
+BeanFactory beanFactory) {
+return new LazyTraceAsyncTaskExecutor(beanFactory, new DelegatingSecurityContextAsyncTaskExecutor(delegate));
+}
+
+@Bean
+@Qualifier("asyncTaskExecutor")
+public AsyncTaskExecutor threadPoolTaskExecutor() {
+ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+executor.setThreadNamePrefix(asyncThreadPoolName);
+executor.setMaxPoolSize(asyncPoolSize);
+executor.setQueueCapacity(Optional.ofNullable(asyncQueueCapacity).orElse(Integer.MAX_VALUE));
+executor.setCorePoolSize(asyncCorePoolSize);
+executor.setKeepAliveSeconds(keepAlive);
+executor.afterPropertiesSet();
+return executor;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/config/CommandProperties.java
+Content:
+package ru.liga.evraz.aggregation.application.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.Map;
+
+@Validated
+@ConstructorBinding
+@ConfigurationProperties(prefix = "command")
+public record CommandProperties(Map<String, CommandMeta> meta) {
+public record CommandMeta(String messageType, String messageDescription, String attributeName) {
+
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/config/ErpMigrationBlackListConfig.java
+Content:
+package ru.liga.evraz.aggregation.application.config;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+
+@Validated
+@Configuration
+@ConfigurationProperties(prefix = "aggregation.migration.black-list")
+@Getter
+@Setter
+public class ErpMigrationBlackListConfig {
+private List<String> clientGuids;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/config/MessageSourceConfig.java
+Content:
+package ru.liga.evraz.aggregation.application.config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+@Configuration
+class MessageSourceConfig {
+@Bean
+@Qualifier("validationMessageSource")
+public MessageSource validationMessageSource() {
+ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+messageSource.setBasename("classpath:Validation");
+messageSource.setDefaultEncoding("UTF-8");
+return messageSource;
+}
+
+@Bean
+public LocalValidatorFactoryBean validator(@Qualifier("validationMessageSource") MessageSource messageSource) {
+LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+bean.setValidationMessageSource(messageSource);
+return bean;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/config/TimeConfig.java
+Content:
+package ru.liga.evraz.aggregation.application.config;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.time.Clock;
+
+@Configuration
+class TimeConfig {
+
+@Bean
+@ConditionalOnMissingBean
+public Clock clock() {
+return Clock.systemDefaultZone();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/config/ValidationProperties.java
+Content:
+package ru.liga.evraz.aggregation.application.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+
+@Validated
+@ConstructorBinding
+@ConfigurationProperties(prefix = "validation")
+public record ValidationProperties(List<String> approvalProcessStatusValidValues) {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CamundaProcessVariablesCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+@Getter
+public class CamundaProcessVariablesCmd {
+
+@NotEmpty
+private String methodName;
+@NotEmpty
+private String orderId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CancelErpTaskCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Validated
+public record CancelErpTaskCmd(@NotNull ErpTaskType taskType,
+@NotEmpty String orderId,
+@NotEmpty String instanceId) {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CloseErpOrderCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class CloseErpOrderCmd {
+@NotEmpty
+private String orderId;
+@NotEmpty
+private String instanceId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CommandStatusCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommandStatusCmd {
+
+@NotEmpty
+private String commandGuid;
+@NotNull
+private CmdStatus status;
+private String details;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateErpTaskCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskDocumentType;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Validated
+public record CreateErpTaskCmd(@NotEmpty String title,
+String description,
+@NotEmpty String documentErpGuid,
+@NotNull ErpTaskDocumentType documentType,
+String responsibleId,
+String roleId,
+String subdivisionId,
+@NotNull ZonedDateTime deadline,
+@NotNull ErpTaskType taskType,
+@NotEmpty String orderId,
+@NotEmpty String instanceId) {

@@ -1,0 +1,391 @@
+﻿final var resourceResourcePair = pathToExpectedResources.get(CUSTOMERSERVICE_UPDATE);
+dispatcherDatas.add(
+CUSTOMERSERVICE_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+var dispatcher = new StarfishProductDispatcher(dispatcherDatas);
+sfProductServer.setDispatcher(dispatcher);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/delivery_attribute/DeleteDeliveryAttributeTest.java
+Content:
+package ru.liga.evraz.aggregation.module.delivery_attribute;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOM_ATTRIBUTES_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEMS_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEM_SERVICES_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SHIPPING_UPDATE_TEMPLATE;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸, Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð½Ñ‹Ñ… Ð¾Ñ‚ 1Ð¡")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class DeleteDeliveryAttributeTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/delivery_attribute/cleaner.sql";
+private static final String DB_FILL = "/db/delivery_attribute/delivery_created.sql";
+
+@Autowired
+private DeliveryAttributeRepository attributeRepository;
+
+@Value("classpath:api/delivery_attribute/update/request.json")
+private Resource deleteDeliveryAttributeRequest;
+@Value("classpath:api/delivery_attribute/update/response.json")
+private Resource deleteDeliveryAttributeResponse;
+
+@Value("classpath:external/order/shipping/update/update_shipping_request3.json")
+private Resource extOrderShippingUpdateRequest;
+@Value("classpath:external/order/shipping/update/update_shipping_response3.json")
+private Resource extOrderShippingUpdateResponse;
+@Value("classpath:external/order/details/order_details_update_for_oa_attributes_request2.json")
+private Resource extOrderDetailsUpdateRequest;
+@Value("classpath:external/order/details/order_details_update_for_oa_attributes_response.json")
+private Resource extOrderDetailsUpdateResponse;
+@Value("classpath:external/order/custom_attributes/update_custom_attributes_request3.json")
+private Resource extOrderCustomAttributesForOAUpdateValidateSkuTypeRequest;
+@Value("classpath:/external/order/custom_attributes/updCustomAttr_success.json")
+private Resource extOrderCustomAttributesForOAUpdateResponse;
+@Value("classpath:external/order/item/update/update_items_request2.json")
+private Resource extOrderItemsForOAUpdateValidateSkuTypeRequest;
+@Value("classpath:/external/order/item/update/update_items_for_OA_emptyListResponse.json")
+private Resource extOrderItemsForOAUpdateResponse;
+@Value("classpath:external/order/item_service/update/update_item_service_request2.json")
+private Resource extOrderItemServicesForOAUpdateRequest;
+@Value("classpath:/external/order/item_service/update/update_item_service_response.json")
+private Resource extOrderItemServicesForOAUpdateResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void deleteDeliveryAttributeSuccess() {
+final var pathsToExpectedResources = Map.of(
+ORDER_SHIPPING_UPDATE_TEMPLATE, Pair.of(extOrderShippingUpdateRequest, extOrderShippingUpdateResponse),
+ORDER_DETAILS_UPDATE, Pair.of(extOrderDetailsUpdateRequest, extOrderDetailsUpdateResponse),
+ORDER_CUSTOM_ATTRIBUTES_UPDATE, Pair.of(extOrderCustomAttributesForOAUpdateValidateSkuTypeRequest, extOrderCustomAttributesForOAUpdateResponse),
+ORDER_ITEMS_UPDATE_TEMPLATE, Pair.of(extOrderItemsForOAUpdateValidateSkuTypeRequest, extOrderItemsForOAUpdateResponse),
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, Pair.of(extOrderItemServicesForOAUpdateRequest, extOrderItemServicesForOAUpdateResponse)
+);
+
+final var pathsTemplateParams = Map.<String, Object>of(
+"expected_starfish_order_id", "test_Sf_erp_guid2",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_customer_id", "1111111111");
+initOrderScenario(pathsToExpectedResources, pathsTemplateParams);
+
+customPostScenarioFromResource("/v1/delivery/additional-attribute",
+deleteDeliveryAttributeRequest, deleteDeliveryAttributeResponse, true, 200);
+
+Assertions.assertAll(
+() -> assertThat(attributeRepository.getById("1").getValue()).isEqualTo(null)
+);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(0, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/delivery_attribute/UpdateDeliveryAttributeTest.java
+Content:
+package ru.liga.evraz.aggregation.module.delivery_attribute;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOM_ATTRIBUTES_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEMS_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEM_SERVICES_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SHIPPING_UPDATE_TEMPLATE;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸, Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð½Ñ‹Ñ… Ð¾Ñ‚ 1Ð¡")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class UpdateDeliveryAttributeTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/delivery_attribute/cleaner.sql";
+private static final String DB_FILL = "/db/delivery_attribute/delivery_created.sql";
+
+@Value("classpath:api/delivery_attribute/update/request.json")
+private Resource updateDeliveryAttributeRequest;
+@Value("classpath:api/delivery_attribute/update/response.json")
+private Resource updateDeliveryAttributeResponse;
+
+@Value("classpath:external/order/shipping/update/update_shipping_request3.json")
+private Resource extOrderShippingUpdateRequest;
+@Value("classpath:external/order/shipping/update/update_shipping_response3.json")
+private Resource extOrderShippingUpdateResponse;
+@Value("classpath:external/order/details/order_details_update_for_oa_attributes_request2.json")
+private Resource extOrderDetailsUpdateRequest;
+@Value("classpath:external/order/details/order_details_update_for_oa_attributes_response.json")
+private Resource extOrderDetailsUpdateResponse;
+@Value("classpath:external/order/custom_attributes/update_custom_attributes_request3.json")
+private Resource extOrderCustomAttributesForOAUpdateValidateSkuTypeRequest;
+@Value("classpath:/external/order/custom_attributes/updCustomAttr_success.json")
+private Resource extOrderCustomAttributesForOAUpdateResponse;
+@Value("classpath:external/order/item/update/update_items_request2.json")
+private Resource extOrderItemsForOAUpdateValidateSkuTypeRequest;
+@Value("classpath:/external/order/item/update/update_items_for_OA_emptyListResponse.json")
+private Resource extOrderItemsForOAUpdateResponse;
+@Value("classpath:external/order/item_service/update/update_item_service_request2.json")
+private Resource extOrderItemServicesForOAUpdateRequest;
+@Value("classpath:/external/order/item_service/update/update_item_service_response.json")
+private Resource extOrderItemServicesForOAUpdateResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void updateDeliveryAttributeSuccess() {
+final var pathsToExpectedResources = Map.of(
+ORDER_SHIPPING_UPDATE_TEMPLATE, Pair.of(extOrderShippingUpdateRequest, extOrderShippingUpdateResponse),
+ORDER_DETAILS_UPDATE, Pair.of(extOrderDetailsUpdateRequest, extOrderDetailsUpdateResponse),
+ORDER_CUSTOM_ATTRIBUTES_UPDATE, Pair.of(extOrderCustomAttributesForOAUpdateValidateSkuTypeRequest, extOrderCustomAttributesForOAUpdateResponse),
+ORDER_ITEMS_UPDATE_TEMPLATE, Pair.of(extOrderItemsForOAUpdateValidateSkuTypeRequest, extOrderItemsForOAUpdateResponse),
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, Pair.of(extOrderItemServicesForOAUpdateRequest, extOrderItemServicesForOAUpdateResponse)
+);
+
+final var pathsTemplateParams = Map.<String, Object>of(
+"expected_starfish_order_id", "test_Sf_erp_guid2",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_customer_id", "1111111111");
+initOrderScenario(pathsToExpectedResources, pathsTemplateParams);
+
+customPostScenarioFromResource("/v1/delivery/additional-attribute",
+updateDeliveryAttributeRequest, updateDeliveryAttributeResponse, true, 200);
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+// TODO:: Ð¢Ð¾Ñ‡Ð½Ð¾ Ð»Ð¸ 0 Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ?
+assertEquals(0, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(0, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/delivery/CreateErpDeliveryTest.java
+Content:
+package ru.liga.evraz.aggregation.module.delivery;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.DeliveryOrderUuidGenerator;
+import ru.liga.evraz.aggregation.adapter.db.ErpDeliveryUuidGenerator;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryOrderItemJpaRepository;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.config.path.ProductPath;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.CUSTOMERSERVICE_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.PRODUCT_UPDATE;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ñ‚ÐµÑÑ‚ Ð¿Ð¾ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸ÐµÐ¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ ERP")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CreateErpDeliveryTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/erp_delivery/fill-db-1.sql";
+private static final String DB_FILL = "/db/erp_delivery/fill-db-2.sql";
+
+@MockBean
+private ErpDeliveryUuidGenerator erpDeliveryUuidGenerator;
+@MockBean
+private DeliveryOrderUuidGenerator deliveryOrderUuidGenerator;
+@Autowired
+private DeliveryTransactionRepository deliveryTransactionRepository;
+@Autowired
+private ErpDeliveryOrderItemJpaRepository itemRepository;
+
+@Value("classpath:/api/erp_delivery/delivery_success_request_1.json")
+private Resource deliverySuccessRequest1;
+@Value("classpath:/api/erp_delivery/delivery_success_response_1.json")
+private Resource deliverySuccessResponse1;
+
+@Value("classpath:/external/product/customer_service/createDeliverySuccess_Req.json")
+private Resource extCustomerServiceCatalogRequest_createDeliverySuccess;
+
+@Value("classpath:/external/product/customer_service/service_create_response.json")
+private Resource extCustomerServiceCatalogResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· ERP")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void createDeliverySuccess() {
+final var uuid1 = "b41db9b3-27d6-4c00-a6e6-c15b7df73306";
+final var uuid2 = "b41db9b3-27d6-4c00-a6e6-c15b7df73307";
+
+final var productPathesToExpectedResources = Map.of(
+CUSTOMERSERVICE_UPDATE, Pair.of(extCustomerServiceCatalogRequest_createDeliverySuccess, extCustomerServiceCatalogResponse)
+);
+initProductScenario(productPathesToExpectedResources, Map.of());
+
+initDeliveryScenario();
+doReturn(uuid1).when(erpDeliveryUuidGenerator).generateUuid();
+doReturn(uuid2).when(deliveryOrderUuidGenerator).generateUuid();
+customPostScenarioFromResource("/v1/delivery", deliverySuccessRequest1,
+deliverySuccessResponse1,true, 200);
+
+final var deliveryTransaction = deliveryTransactionRepository.findById(uuid1);
+final var itemsList = itemRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id(uuid2).build());
+
+Thread.sleep(2000);
+assertThat(deliveryTransaction.getShouldSend()).isEqualTo(false);
+assertThat(itemsList.size()).isEqualTo(2L);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(7, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+
+@Value("classpath:/api/erp_delivery/delivery_unsuccessful_request_1.json")
+private Resource deliveryUnsuccessfulRequest1;
+@Value("classpath:/api/erp_delivery/delivery_unsuccessful_response_1.json")
+private Resource deliveryUnsuccessfulResponse1;
+
+@Test
+@DisplayName("ÐžÑˆÐ¸Ð±ÐºÐ° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· ERP Ð¿Ñ€Ð¸ Ð½Ðµ ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… positionCode Ð² Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ")
+@SneakyThrows    @SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void createDeliveryUnsuccessful1() {
+// TODO:: Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ TransactionUuidGenerator
+final var uuid1 = "b41db9b3-27d6-4c00-a6e6-c15b7df73306";
+final var uuid2 = "b41db9b3-27d6-4c00-a6e6-c15b7df73307";
+final var uuid3 = "b41db9b3-27d6-4c00-a6e6-c15b7df73308";
+initDeliveryScenario();
+doReturn(uuid1, uuid2, uuid3).when(erpDeliveryUuidGenerator).generateUuid();
+doReturn(uuid1, uuid2).when(deliveryOrderUuidGenerator).generateUuid();
+customPostScenarioFromResource("/v1/delivery", deliveryUnsuccessfulRequest1,
+deliveryUnsuccessfulResponse1, 400);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(0, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+
+
+@Value("classpath:/api/erp_delivery/delivery_success_request_2.json")
+private Resource deliveryDeletedSuccessRequest;
+@Value("classpath:/api/erp_delivery/delivery_success_response_2.json")
+private Resource deliveryDeletedSuccessResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð°Ñ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° ÑƒÐ´Ð°Ð»ÐµÐ½Ð½Ð¾Ð¹ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸, Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð½ÐµÑ‚")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void createDeliveryWithNoOrder() {
+final var uuid1 = "b41db9b3-27d6-4c00-a6e6-c15b7df73306";
+final var uuid2 = "b41db9b3-27d6-4c00-a6e6-c15b7df73307";
+initDeliveryScenario();
+doReturn(uuid1).when(erpDeliveryUuidGenerator).generateUuid();
+doReturn(uuid2).when(deliveryOrderUuidGenerator).generateUuid();
+customPostScenarioFromResource("/v1/delivery", deliveryDeletedSuccessRequest,
+deliveryDeletedSuccessResponse,true, 200);
+
+final var deliveryTransaction = deliveryTransactionRepository.findById(uuid1);
+final var itemsList = itemRepository

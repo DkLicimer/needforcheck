@@ -1,0 +1,503 @@
+﻿"clientName": "test-client_name",
+"documentType": "CLIENT_ORDER",
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T17:24:50.000000+07:00",
+"documentSource": "ERP",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": null,
+"pricesAgreed": true,
+"recipientFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"recipientPhone": "+7 (111) 111-11-11",
+"recipientEmail": "recipientEmail@test.test",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "+7 (111) 111-11-11",
+"customerEmail": "customerEmail@test.test",
+"subdivisionId": "test_subdivision_id",
+"totalCost": 484025.50,
+"customerGuid": "d44769a9-ea02-11e3-80c5-f0921c007933",
+"orderPaid": false,
+"orderPaidAssignmentDate": "2023-12-27T17:24:50.000000+02:00",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM",
+"skuStatus": "TO_PROVIDE",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 484025.50
+}
+],
+"erpGuid": "test_erp_guid",
+"deleted": true,
+"deletedMark": false,
+"active": false,
+"contractNumber": "Ð’Ð -32-18-Ð¾Ð´",
+"inPieces": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/create/successResponse_oneItem.json
+Content:
+{
+"payload": {
+"documentType": "CLIENT_ORDER",
+"baseErpGuid": null,
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T10:24:50.000000Z",
+"documentSource": "ERP",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"documentCancellationReason": null,
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": 123456,
+"pricesAgreed": true,
+"recipientFullName": null,
+"recipientPhone": null,
+"recipientEmail": "recipientEmail@test.test",
+"clientGuid": "test-client_guid",
+"clientType": "ENTITY",
+"clientInn": "test-client_inn",
+"clientName": "test-client_name",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "+7 (111) 111-11-11",
+"customerEmail": "customerEmail@test.test",
+"subdivisionId": "test_subdivision_id",
+"erpGuid": "test_erp_guid",
+"deleted": false,
+"deletedMark": false,
+"active": true,
+"customerGuid": "d44769a9-ea02-11e3-80c5-f0921c007933",
+"orderPaid": false,
+"orderPaidAssignmentDate": "2023-12-27T17:24:50.000000Z",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"linkedSkuPositionCode": null,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM",
+"skuStatus": "TO_PROVIDE",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"positionCancellationReason": null,
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 484025.5,
+"skuDateTime": null,
+"skuComment": null,
+"productVariantAttribute": null
+}
+],
+"totalCost": 484025.5,
+"contractNumber": "Ð’Ð -32-18-Ð¾Ð´",
+"saleManagerResponsibleName": null,
+"orderComment": null,
+"erpPipeline": null,
+"inPieces": false
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/create/successResponse_oneItem_deleted.json
+Content:
+{
+"payload": {
+"documentType": "CLIENT_ORDER",
+"baseErpGuid": null,
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T10:24:50.000000Z",
+"documentSource": "ERP",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"documentCancellationReason": null,
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": null,
+"pricesAgreed": true,
+"recipientFullName": null,
+"recipientPhone": null,
+"recipientEmail": "recipientEmail@test.test",
+"clientGuid": "test-client_guid",
+"clientType": "ENTITY",
+"clientInn": "test-client_inn",
+"clientName": "test-client_name",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "+7 (111) 111-11-11",
+"customerEmail": "customerEmail@test.test",
+"subdivisionId": "test_subdivision_id",
+"erpGuid": "test_erp_guid",
+"deleted": false,
+"deletedMark": false,
+"active": true,
+"customerGuid": "d44769a9-ea02-11e3-80c5-f0921c007933",
+"orderPaid": false,
+"orderPaidAssignmentDate": "2023-12-27T16:24:50.000000Z",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"linkedSkuPositionCode": null,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM",
+"skuStatus": "CANCELED",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"positionCancellationReason": "NO_ITEM_TO_COMPLETE_ORDER",
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 484025.5,
+"skuDateTime": null,
+"skuComment": null,
+"productVariantAttribute": null
+}
+],
+"totalCost": 484025.5,
+"contractNumber": "Ð’Ð -32-18-Ð¾Ð´",
+"saleManagerResponsibleName": null,
+"orderComment": null,
+"erpPipeline": null,
+"inPieces": false
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/create/successResponse_orderWithService.json
+Content:
+{
+"payload": {
+"documentType": "CLIENT_ORDER",
+"baseErpGuid": null,
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T10:24:50.000000Z",
+"documentSource": "ERP",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"documentCancellationReason": null,
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": null,
+"pricesAgreed": true,
+"recipientFullName": null,
+"recipientPhone": null,
+"recipientEmail": "recipientEmail@test.test",
+"clientGuid": "test-client_guid",
+"clientType": "ENTITY",
+"clientInn": "test-client_inn",
+"clientName": "test-client_name",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "+7 (111) 111-11-11",
+"customerEmail": "customerEmail@test.test",
+"subdivisionId": "test_subdivision_id",
+"erpGuid": "test_erp_guid",
+"deleted": false,
+"deletedMark": false,
+"active": true,
+"customerGuid": "d44769a9-ea02-11e3-80c5-f0921c007933",
+"orderPaid": false,
+"orderPaidAssignmentDate": "2023-12-27T15:24:50.000000Z",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"linkedSkuPositionCode": null,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM",
+"skuStatus": "TO_PROVIDE",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"positionCancellationReason": null,
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 484025.5,
+"skuDateTime": null,
+"skuComment": null,
+"productVariantAttribute": null
+},
+{
+"positionCode": 2,
+"linkedSkuPositionCode": 1,
+"skuId": "test_service_sku_id",
+"skuName": "test_service_sku_name",
+"skuTypeName": "ÐœÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ¸Ð½Ð³",
+"skuType": "MP_SERVICE",
+"skuStatus": "SHIP",
+"quantity": 0.666,
+"measureUnit": "Ñ‚",
+"price": 2200.0,
+"currency": "RUB",
+"positionCancellationReason": null,
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 1465.2,
+"skuDateTime": null,
+"skuComment": null,
+"productVariantAttribute": null
+}
+],
+"totalCost": 485490.7,
+"contractNumber": "Ð’Ð -32-18-Ð¾Ð´",
+"saleManagerResponsibleName": null,
+"orderComment": null,
+"erpPipeline": null,
+"inPieces": false
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/create/successResponse_order_deleted.json
+Content:
+{
+"payload": {
+"documentType": "CLIENT_ORDER",
+"baseErpGuid": null,
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T10:24:50.000000Z",
+"documentSource": "ERP",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"documentCancellationReason": null,
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": null,
+"pricesAgreed": true,
+"recipientFullName": null,
+"recipientPhone": null,
+"recipientEmail": "recipientEmail@test.test",
+"clientGuid": "test-client_guid",
+"clientType": "ENTITY",
+"clientInn": "test-client_inn",
+"clientName": "test-client_name",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "+7 (111) 111-11-11",
+"customerEmail": "customerEmail@test.test",
+"subdivisionId": "test_subdivision_id",
+"erpGuid": "test_erp_guid",
+"deleted": true,
+"deletedMark": false,
+"active": false,
+"customerGuid": "d44769a9-ea02-11e3-80c5-f0921c007933",
+"orderPaid": false,
+"orderPaidAssignmentDate": "2023-12-27T15:24:50.000000Z",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"linkedSkuPositionCode": null,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM",
+"skuStatus": "TO_PROVIDE",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"positionCancellationReason": null,
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 484025.5,
+"skuDateTime": null,
+"skuComment": null,
+"productVariantAttribute": null
+}
+],
+"totalCost": 484025.5,
+"contractNumber": "Ð’Ð -32-18-Ð¾Ð´",
+"saleManagerResponsibleName": null,
+"orderComment": null,
+"erpPipeline": null,
+"inPieces": false
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/legal_entity/order_customers_legal_entity_update_request.json
+Content:
+{
+"id": "test-client_guid",
+"name": "test-client_name",
+"legalAddress": null,
+"actualAddresses": null,
+"INN": "test-client_inn"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/legal_entity/order_customers_legal_entity_update_response.json
+Content:
+{
+"id": "test-client_guid",
+"name": "test-client_name",
+"legalAddress": null,
+"actualAddresses": null,
+"INN": "test-client_inn"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/event_handler/update_process_variables_request.json
+Content:
+{
+"orderId": "tenantId-clientOrderId-hash"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/event_handler/update_process_variables_response.json
+Content:
+{
+"success": true,
+"message": "Ð£ÑÐ¿ÐµÑˆÐ½Ð°Ñ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐ° Ð´Ð°Ð½Ð½Ñ‹Ð¹ Ð² bpm-service",
+"result": "Ok"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/task_failed_request_1.json
+Content:
+{
+"payload": {
+"orderId": "b41db9b3-27d6-4c85-a6e6-c15b7df73306",
+"documentErpGuid": "b41db9b3-27d6-4c85-a6e6-c15b7df73306",
+"title": "ÐÐ¾Ð²Ð°Ñ Ð·Ð°Ð´Ð°Ñ‡Ð° OMS",
+"description": "Ð’Ð·ÑÑ‚ÑŒ Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ Ð·Ð°ÐºÐ°Ð·",
+"responsibleId": "0a19c864-2349-11eb-a884-48df371528b9",
+"roleId": "0608d466-6fe2-11ed-a424-f0921c00a904",
+"subdivisionId": "d44769a9-ea02-11e3-80c5-f0921c007974",
+"deadline": "2023-12-01T16:06:06+03:00",
+"instanceId": "instance-id",
+"taskType": "TRANSPORT_CONTROL",
+"documentType": "DELIVERY"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/task_failed_response_1.json
+Content:
+{
+"fault":
+{
+"code":"BAD_REQUEST",
+"details":"responsibleId or (roleId and subdivisionId) should not be blank"
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/task_success_request_1.json
+Content:
+{
+"payload": {
+"orderId": "b41db9b3-27d6-4c85-a6e6-c15b7df73306",
+"documentErpGuid": "b41db9b3-27d6-4c85-a6e6-c15b7df73306",
+"title": "ÐÐ¾Ð²Ð°Ñ Ð·Ð°Ð´Ð°Ñ‡Ð° OMS",
+"description": "Ð’Ð·ÑÑ‚ÑŒ Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ Ð·Ð°ÐºÐ°Ð·",
+"roleId": "0608d466-6fe2-11ed-a424-f0921c00a904",
+"subdivisionId": "d44769a9-ea02-11e3-80c5-f0921c007974",
+"deadline": "2023-12-01T16:06:06+03:00",
+"instanceId": "instance-id",
+"taskType": "TRANSPORT_CONTROL",
+"documentType": "DELIVERY"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/task_success_request_2.json
+Content:
+{
+"payload": {
+"orderId": "b41db9b3-27d6-4c85-a6e6-c15b7df73306",
+"documentErpGuid": "b41db9b3-27d6-4c85-a6e6-c15b7df73306",
+"title": "ÐÐ¾Ð²Ð°Ñ Ð·Ð°Ð´Ð°Ñ‡Ð° OMS",
+"description": "Ð’Ð·ÑÑ‚ÑŒ Ð² Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ Ð·Ð°ÐºÐ°Ð·",
+"responsibleId": "0a19c864-2349-11eb-a884-48df371528b9",
+"deadline": "2023-12-01T16:06:06+03:00",
+"instanceId": "instance-id",
+"taskType": "TRANSPORT_CONTROL",
+"documentType": "DELIVERY"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/task_success_response_1.json
+Content:
+{
+"payload": {
+"success": true,
+"commandGuid": "test-command-guid"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/task_success_response_2.json
+Content:
+{
+"payload": {
+"success": true,
+"commandGuid": "test-command-guid-2"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/send_command_status/update_erp_tak_status_request.json
+Content:
+{
+"payload": {
+"guid": "test-erp-task-commandGuid",

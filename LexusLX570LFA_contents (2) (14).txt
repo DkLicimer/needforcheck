@@ -1,0 +1,518 @@
+﻿},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": "2-test-erp_guid"
+}
+],
+"discountPrice": 0.0,
+"positionCode": 2
+},
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾",
+"productId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 78730.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "4"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{"name":"shippingErpGuid","value":"2-test-erp_guid"}
+],
+"discountPrice": 0.0,
+"positionCode": 4
+},
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ",
+"productId": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 67980.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.315,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "1"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": ""
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": "2-test-erp_guid"
+}
+],
+"discountPrice": 0.0,
+"positionCode": 1
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_emptyList_request.json
+Content:
+[
+
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_duplicate_request.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ",
+"productId": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 4.27,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "5"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": "4"
+},
+{
+"name": "skuStatus",
+"value": "SHIP"
+},
+{
+"name": "skuStatusDescription",
+"value": "ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+},
+{
+"name": "skuType",
+"value": "ITEM_GP"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": ""
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": ""
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "metalProcessingStartTime",
+"value": "2022-11-15T20:27:51.704+00:00"
+},
+{
+"name": "metalProcessingStartTimeDescription",
+"value": "15.11.2022 20:27:51"
+},
+{
+"name": "metalProcessingCompleted",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 5
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_emptyListResponse.json
+Content:
+[]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_success_request.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ",
+"productId": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 4.27,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "5"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": "4"
+},
+{
+"name": "skuStatus",
+"value": "SHIP"
+},
+{
+"name": "skuStatusDescription",
+"value": "ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+},
+{
+"name": "skuType",
+"value": "ITEM_GP"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": ""
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": ""
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "metalProcessingStartTime",
+"value": ""
+},
+{
+"name": "metalProcessingStartTimeDescription",
+"value": ""
+},
+{
+"name": "metalProcessingCompleted",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 5
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_validate_skuType_request.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ",
+"productId": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 4.27,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "5"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": "4"
+},
+{
+"name": "skuStatus",
+"value": "SHIP"
+},
+{
+"name": "skuStatusDescription",
+"value": "ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+},
+{
+"name": "skuType",
+"value": "ITEM_GP"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": ""
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": ""
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{

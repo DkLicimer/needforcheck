@@ -1,0 +1,288 @@
+﻿Prompt: Analyze the LexusLX570LFA repository to understand its structure, purpose, and functionality. Follow these steps to study the codebase:
+
+1. Read the README file to gain an overview of the project, its goals, and any setup instructions.
+
+2. Examine the repository structure to understand how the files and directories are organized.
+
+3. Identify the main entry point of the application (e.g., main.py, app.py, index.js) and start analyzing the code flow from there.
+
+4. Study the dependencies and libraries used in the project to understand the external tools and frameworks being utilized.
+
+5. Analyze the core functionality of the project by examining the key modules, classes, and functions.
+
+6. Look for any configuration files (e.g., config.py, .env) to understand how the project is configured and what settings are available.
+
+7. Investigate any tests or test directories to see how the project ensures code quality and handles different scenarios.
+
+8. Review any documentation or inline comments to gather insights into the codebase and its intended behavior.
+
+9. Identify any potential areas for improvement, optimization, or further exploration based on your analysis.
+
+10. Provide a summary of your findings, including the project's purpose, key features, and any notable observations or recommendations.
+
+Use the files and contents provided below to complete this analysis:
+
+README:
+# Introduction
+TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.
+
+# Getting Started
+TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
+1. 	Installation process
+2. 	Software dependencies
+3. 	Latest releases
+4. 	API references
+
+# Build and Test
+TODO: Describe and show how to build your code and run the tests.
+
+# Contribute
+TODO: Explain how other users and developers can contribute to make your code better.
+
+If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
+- [ASP.NET Core](https://github.com/aspnet/Home)
+- [Visual Studio Code](https://github.com/Microsoft/vscode)
+- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+
+Repository Structure: LexusLX570LFA
+/README.md
+/evrazropos/
+/evrazropos/EMI_evraz_oms_aggregation_service/
+/evrazropos/EMI_evraz_oms_aggregation_service/.gitignore
+/evrazropos/EMI_evraz_oms_aggregation_service/.gitlab-ci.yml
+/evrazropos/EMI_evraz_oms_aggregation_service/Dockerfile
+/evrazropos/EMI_evraz_oms_aggregation_service/GitVersion.yml
+/evrazropos/EMI_evraz_oms_aggregation_service/README.md
+/evrazropos/EMI_evraz_oms_aggregation_service/ci/
+/evrazropos/EMI_evraz_oms_aggregation_service/client.truststore.jks
+/evrazropos/EMI_evraz_oms_aggregation_service/deployment/
+/evrazropos/EMI_evraz_oms_aggregation_service/mvnw
+/evrazropos/EMI_evraz_oms_aggregation_service/mvnw.cmd
+/evrazropos/EMI_evraz_oms_aggregation_service/openapi/
+/evrazropos/EMI_evraz_oms_aggregation_service/pom.xml
+/evrazropos/EMI_evraz_oms_aggregation_service/src/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/main/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/application-test.yml
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/files/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/logback-test.xml
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_reserve_renewal.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_reserve_renewal_key.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_ship_permission_kafka.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_ship_permission_kafka_key.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_ship_permission_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_sign_pipeline_false_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_sign_pipeline_kafka_key.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_sign_pipeline_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/shipping_request_ship_permission_kafka.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/shipping_request_ship_permission_kafka_key.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/files/file.csv
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/bpm/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/command/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/productCreate_severalDelivery_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/product_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/product_create_request_for_OA.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/product_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/createDeliveryAttributeSuccess_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/createDeliverySuccess_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/createMetalProcessingStartTimeWithValidDateShouldSuccess.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteDeliverySuccess_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteForUpdateWithNextDeliverySuccess_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteMetalProcessingStartTimeOrderAttributeFromExistedOrder_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteOlurTaskSentOrderAttributeFromExistedOrder_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/reloadOrdersSuccess_Req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/service_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/service_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/service_create_severalDelivery_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/updateDeliverySuccess_Req_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/updateDeliverySuccess_Req_2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/by_client_order_id/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/legal_entities/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/set_cancellation_reason/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_delivery_auto_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request3.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request_for_order_update.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request_for_reload_order.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_response2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_response3.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/set_cancellation_reason/update_order_cancellation_reason_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/legal_entities/order_customers_legal_entity_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/legal_entities/order_customers_legal_entity_update_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_createMetalProcessingStartTimeWithValidDateShouldSuccessRequest.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_delivery_delete_for_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_request2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_request_for_reload_order.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_request_with_OA.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_request_with_OA_delete_olurTaskSent.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_request_with_OA_withoutStarfishOrderId_orderExistsInStarfish.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_service_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item_service/update/update_item_services_for_OA_validate_skuType_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_delivery_delete_for_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_emptyList_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_duplicate_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_emptyListResponse.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_success_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_for_OA_validate_skuType_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request_for_reload_order.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request_with_OA.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request_with_OA_delete_olurTaskSent.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request_with_OA_orderExistsInStarfish.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_reload_order_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_delivery_delete_for_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_for_oa_attributes_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_for_oa_attributes_request2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_for_oa_attributes_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_request_with_OA.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_request_with_OA_for_deleted_olurSentTask.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_for_reload_order.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_oa_delete_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_oa_save_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/customer/order_customer_update_without_contacts_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/updCustomAttr_success.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_delivery_delete_for_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_for_CreateMetalProcessingStartTimeWithValidDateShouldSuccess.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_for_OA_attributes_success_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_for_OA_attributes_validate_skuType_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request3.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_for_reload_order.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_with_OA.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_with_OA2.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_with_OA_deleted_olurTaskSent.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_shipping_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_shipping_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_deleted_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_deleted_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_one_item_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_one_item_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_one_item_deleted_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_one_item_deleted_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_with_service_create_on_update_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_with_service_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_with_service_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_with_several_delivery_service_create_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_with_several_delivery_service_create_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/by_client_order_id/getOrderByClientOrderId_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/bpm/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/order/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/order/get_order_custom_attributes_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/order/get_order_custom_attributes_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/order/get_order_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/order/get_order_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/bpm/set_process_variables_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/event_handler/bpm/set_process_variables_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/attribute/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/attribute/order_details_update_request1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/attribute/update_custom_attributes_request1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/attribute/update_item_service_request1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/attribute/update_items_request1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/delivery/attribute/update_shipping_request1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/command/bpm/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/command/bpm/send_message_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/command/bpm/send_message_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/bpm/message_order_deleted_req.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/bpm/message_order_deleted_resp.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/delivery_attribute/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_task/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_reserve/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/subdivision/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/subdivision/fill-subdivision.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/subdivision/truncate_subdivision_entities.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_reserve/fill-order-reserve.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_reserve/truncate_order_reserve_entities.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/fill_duplicate_attribute.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/fill_order_attributes.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/order_created.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/order_created_for_metalProcessingAttribute.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/truncate_order_attributes.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/empty_db_with_order_fulfilment_cmd.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/fill_erp_command.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created_for_deleted_oa.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created_with_order_attributes.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created_with_order_attributes_for_similar_items.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created_with_order_attributes_without_starfishOrderId.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created_with_shipping_erp_guid.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/reload_orders_data.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/truncate_order_entities.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_task/fill-db-1.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_task/fill_erp-db-2.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/fill-db-1.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/fill-db-2.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/fill-db-3-test-update.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/fill-db-4-test-delete.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/fill-db-shippingCountEnum_value_ONE.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/erp_delivery/fill-db-test-delete-delivery-for-update.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/delivery_attribute/cleaner.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/delivery_attribute/delivery_created.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/fill_erp_command.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/order_ship_permission/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/shipping_request_ship_permission/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/truncate_erp_command.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/shipping_request_ship_permission/fill-db-test-delete-delivery-for-update.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/order_ship_permission/fill-for-order-ship-permission.sql
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/event_handler/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/legal_entity/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/usergroup/
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/usergroup/usergroup_seccess_request.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/usergroup/usergroup_seccess_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_create_request_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_create_response_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_not_found_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_success_get_response.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_update_request_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_update_response_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_create_request_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_create_response_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_update_request_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_update_response_1.json
+/evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/

@@ -1,0 +1,521 @@
+﻿"orderPositionCode": 2,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 3,
+"orderPositionCode": 3,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 4,
+"orderPositionCode": 4,
+"skuId": "test_sku_id",
+"quantity": 10.0
+}
+]
+},
+{
+"erpOrderGuid": "4-test-erp_guid",
+"deliveryItems": []
+}
+],
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a11db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/update_request.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"erpGuid": "1-test-erp_guid",
+"deleted": false,
+"active": true,
+"deliveryDocumentDateTime": "2023-02-25T11:00:00+03:00",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T14:44:44+04:00",
+"carDeliveryDateTimeTo": "2023-02-26T15:55:55+03:00",
+"deliveryMethod": "PICKUP",
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a44db9b3-27d6-4c85-a6e6-c15b7df73306",
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "1-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 7,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.00
+},
+{
+"positionCode": 8,
+"skuId": "2222222",
+"quantity": 200.00
+},
+{
+"positionCode": 9,
+"orderPositionCode": 4,
+"skuId": "2222222",
+"quantity": 0.1
+}
+]
+},
+{
+"erpOrderGuid": "2-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": 2,
+"skuId": "test_sku_id",
+"quantity": 10.00
+},
+{
+"positionCode": 3,
+"orderPositionCode": 4,
+"skuId": "test_sku_id",
+"quantity": 11.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/update_request_shippingEnumCount_ONE.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"erpGuid": "1-test-erp_guid",
+"deleted": false,
+"active": true,
+"deliveryDocumentDateTime": "2023-02-25T11:00:00+03:00",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T14:44:44+04:00",
+"carDeliveryDateTimeTo": "2023-02-26T15:55:55+03:00",
+"deliveryMethod": "PICKUP",
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a44db9b3-27d6-4c85-a6e6-c15b7df73306",
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "1-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 7,
+"orderPositionCode": 4,
+"skuId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"quantity": 0.234
+},
+{
+"positionCode": 6,
+"skuId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"quantity": 1.0
+}
+]
+},
+{
+"erpOrderGuid": "2-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": 2,
+"skuId": "test_sku_id",
+"quantity": 10.00
+},
+{
+"positionCode": 3,
+"orderPositionCode": 4,
+"skuId": "test_sku_id",
+"quantity": 11.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/update_response.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"deliveryDocumentDateTime": "2023-02-25T08:00:00Z",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T10:44:44Z",
+"carDeliveryDateTimeTo": "2023-02-26T12:55:55Z",
+"deliveryMethod": "PICKUP",
+"erpGuid": "1-test-erp_guid",
+"deleted": false,
+"active": true,
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "1-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 7,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.0
+},
+{
+"positionCode": 8,
+"orderPositionCode": null,
+"skuId": "2222222",
+"quantity": 200.0
+},
+{
+"positionCode": 9,
+"orderPositionCode": 4,
+"skuId": "2222222",
+"quantity": 0.1
+}
+]
+},
+{
+"erpOrderGuid": "2-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": 2,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 3,
+"orderPositionCode": 4,
+"skuId": "test_sku_id",
+"quantity": 11.0
+}
+]
+}
+],
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a44db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/update_response_shippingEnumCount_ONE.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"deliveryDocumentDateTime": "2023-02-25T08:00:00Z",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T10:44:44Z",
+"carDeliveryDateTimeTo": "2023-02-26T12:55:55Z",
+"deliveryMethod": "PICKUP",
+"erpGuid": "1-test-erp_guid",
+"deleted": false,
+"active": true,
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "1-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 6,
+"orderPositionCode": null,
+"skuId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"quantity": 1.0
+},
+{
+"positionCode": 7,
+"orderPositionCode": 4,
+"skuId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"quantity": 0.234
+}
+]
+},
+{
+"erpOrderGuid": "2-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": 2,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 3,
+"orderPositionCode": 4,
+"skuId": "test_sku_id",
+"quantity": 11.0
+}
+]
+}
+],
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a44db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/update/update/custom_attribute_update_request1.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "test_order"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test"
+},
+{
+"name": "contractType",
+"value": "INVOICE_OFFER"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": ""
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "4-test-erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "true"
+},
+{
+"name": "contractNumber",
+"value": "Ð’Ð -32-18-Ð¾Ð´"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": "ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡"
+},
+{
+"name": "erpPipeline",
+"value": "true"
+},
+{
+"name": "omsPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "ONE"
+},
+{
+"name": "paymentAmount",
+"value": ""
+},
+{
+"name": "invoiceSent",
+"value": ""
+},
+{
+"name": "approvalProcessStatus",
+"value": ""
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": ""
+},
+{
+"name": "shippingCountEnum",
+"value": "NO_ZNP"
+},
+{
+"name": "logisticManagerResponsibleId",
+"value": ""
+},
+{
+"name": "deliveryStatus",
+"value": ""
+},
+{
+"name": "deliveryDriverFullName",
+"value": ""
+},
+{
+"name": "deliveryCarNumber",
+"value": ""
+},
+{
+"name": "deliveryDriverPhone",
+"value": ""
+},
+{
+"name": "transferred",
+"value": ""
+},
+{
+"name": "deliveryDocumentId",
+"value": ""
+},
+{
+"name": "deliveryDocumentLink",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFromDescription",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeToDescription",
+"value": ""
+},
+{
+"name": "shippingDeliveryMethod",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+},
+{
+"name": "paidQuantity",
+"value": ""
+},
+{
+"name": "licenseNumber",
+"value": ""
+},
+{
+"name": "shippingRecipientGuid",
+"value": ""
+},
+{
+"name": "deliveryTimeZone",
+"value": ""

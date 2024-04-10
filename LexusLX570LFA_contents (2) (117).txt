@@ -1,0 +1,506 @@
+﻿import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.springframework.data.domain.Persistable;
+import ru.liga.evraz.aggregation.adapter.db.entity.product.ProductSkuEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Data
+@Table(name = "order_entity_item")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderItemEntity implements Persistable<String> {
+
+@Id
+private String id;
+
+private Long positionCode;
+
+private Long linkedSkuPositionCode;
+
+@ManyToOne
+@JoinColumn(name = "sku_id", nullable = false)
+private ProductSkuEntity product;
+
+private String skuStatus;
+
+private Double quantity;
+
+private String measureUnit;
+
+private BigDecimal price;
+
+@Column(name = "position_cost")
+private Double positionCost;
+
+private String currency;
+
+private String warehouseId;
+
+private String positionCancellationReason;
+
+private boolean provideFromOtherOrders;
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "order_id", nullable = false)
+@NotFound(action = NotFoundAction.IGNORE)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private OrderEntity order;
+
+@Column(name = "item_date_time")
+private LocalDateTime itemDateTime;
+
+private String skuComment;
+
+private String productVariantAttribute;
+
+@Column(name = "discount")
+private Double discount;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/ClientDocumentAuthorityNote.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Slf4j
+public enum ClientDocumentAuthorityNote {
+GET_ORIGINAL_DOCUMENT_AT_DELIVERY,
+ORIGINAL_DOCUMENT_IN_OFFICE,
+DELIVERY_WITH_DOCUMENT_COPY,
+GET_SIGNATURE_ON_THE_RETURN_DOCUMENT,
+DOCUMENT_NOT_NEEDED;
+
+public static final Set<ClientDocumentAuthorityNote> AUTHORITY_NOTE_WITHOUT_SEG = EnumSet.of(
+GET_SIGNATURE_ON_THE_RETURN_DOCUMENT,
+DOCUMENT_NOT_NEEDED
+);
+
+public static final Set<ClientDocumentAuthorityNote> AUTHORITY_NOTE_WITH_SEG = EnumSet.of(
+GET_ORIGINAL_DOCUMENT_AT_DELIVERY,
+ORIGINAL_DOCUMENT_IN_OFFICE,
+DELIVERY_WITH_DOCUMENT_COPY
+);
+
+public static boolean isAuthorityNoteRequired(Boolean seg, String note) {
+if (AUTHORITY_NOTE_WITHOUT_SEG.stream().map(Enum::name).collect(Collectors.toSet()).contains(note)
+|| (Boolean.TRUE.equals(seg) && (StringUtils.isEmpty(note) || AUTHORITY_NOTE_WITH_SEG.stream().map(Enum::name).collect(Collectors.toSet()).contains(note)))) {
+return false;
+}
+return true;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/DeliveryAttributeEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Table(name = "delivery_attribute")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class DeliveryAttributeEntity implements Persistable<String> {
+
+@Id
+private String id;
+
+@Column(name = "erp_delivery_guid", nullable = false)
+private String erpDeliveryGuid;
+
+@Column(name = "position_code")
+private Long positionCode;
+
+@Column(name = "name", nullable = false)
+private String name;
+
+@Column(name = "value")
+private String value;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/DeliveryOrderEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Getter
+@Setter
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "delivery_order")
+public class DeliveryOrderEntity implements Persistable<String> {
+@Id
+private String id;
+
+@Column(name = "order_id")
+private String orderId;
+
+@Column(name = "erp_order_guid")
+private String erpOrderGuid;
+
+@ManyToOne(optional = false)
+@JoinColumn(name = "delivery_id", nullable = false)
+private ErpDeliveryEntity delivery;
+
+@OneToMany(mappedBy = "deliveryOrder", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+private List<ErpDeliveryOrderItemEntity> deliveryOrderItems;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdDate;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedDate;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/DeliveryOrderJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Repository
+@Validated
+public interface DeliveryOrderJpaRepository extends JpaRepository<DeliveryOrderEntity, String> {
+
+Optional<DeliveryOrderEntity> findByErpOrderGuid(@NotEmpty String orderErpGuid);
+
+List<DeliveryOrderEntity> findAllByDelivery(@NotNull ErpDeliveryEntity delivery);
+
+void deleteAllByIdIn(List<String> orders);
+
+List<DeliveryOrderEntity> findAllByErpOrderGuid(@NotEmpty String erpOrderGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/ErpDeliveryEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Getter
+@Setter
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "erp_delivery")
+public class ErpDeliveryEntity implements Persistable<String> {
+@Id
+private String id;
+@Column
+private String erpGuid;
+@Column
+private String deliveryDocumentId;
+@OneToMany(mappedBy = "delivery", orphanRemoval = true, cascade = CascadeType.ALL)
+private List<DeliveryOrderEntity> deliveryOrderEntities;
+@Column
+private LocalDateTime deliveryDocumentDateTime;
+@Column
+private String deliveryDocumentLink;
+@Column
+private LocalDateTime carDeliveryDateTimeFrom;
+@Column
+private LocalDateTime carDeliveryDateTimeTo;
+@Column
+private String carDeliveryDateTimeFromDescription;
+@Column
+private String carDeliveryDateTimeToDescription;
+@Column
+private String deliveryMethod;
+@Column
+private Boolean deleted;
+@Column
+private Boolean active;
+@Column
+private String recipientFullName;
+@Column
+private String recipientPhone;
+@Column
+private String recipientEmail;
+@Column
+private String recipientGuid;
+@Column
+private String deliveryTimeZone;
+@Column
+private LocalDate promisedDeliveryDate;
+@Column
+private LocalTime deliveryIntervalFrom;
+@Column
+private LocalTime deliveryIntervalTo;
+@Column
+private String address;
+@Column
+private String warehouseId;
+
+@Column(name = "dispatch_warehouse_slot_booked")
+private Boolean dispatchWarehouseSlotBooked;
+@Column
+private String clientDocumentAuthorityForReceiveGoodsNote;
+@Column
+private Boolean clientDocumentAuthorityForReceiveGoods;
+@Column
+private Boolean soleExecutiveGovernment;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdDate;
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedDate;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/ErpDeliveryJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Validated
+public interface ErpDeliveryJpaRepository extends JpaRepository<ErpDeliveryEntity, String> {
+
+Optional<ErpDeliveryEntity> findByErpGuid(@NotEmpty String erpGuid);
+
+void deleteByErpGuid(@NotEmpty String erpGuid);
+
+List<ErpDeliveryEntity> findAllByIdIn(@NotNull @Size(min = 1) List<String> ids);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/ErpDeliveryOrderItemEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Getter
+@Setter
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "erp_delivery_order_item")
+@EqualsAndHashCode(exclude = {"id", "deliveryOrder", "createdDate", "modifiedDate", "newEntity" })
+public class ErpDeliveryOrderItemEntity implements Persistable<String> {
+@Id
+private String id;
+@ManyToOne(optional = false, cascade = CascadeType.ALL)
+@JoinColumn(name = "delivery_order_id", nullable = false)
+private DeliveryOrderEntity deliveryOrder;
+private Integer positionCode;
+private Integer orderPositionCode;
+private String skuId;
+private Double quantity;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdDate;
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedDate;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/delivery/ErpDeliveryOrderItemJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.delivery;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import javax.validation.constraints.NotNull;

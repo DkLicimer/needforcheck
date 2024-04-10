@@ -1,0 +1,475 @@
+﻿<repositories>
+<repository>
+<id>gitlab-maven</id>
+<name>starfish-24-repo</name>
+<url>https://starfish.gitlab.yandexcloud.net/api/v4/groups/6/-/packages/maven</url>
+<releases>
+<updatePolicy>always</updatePolicy>
+</releases>
+</repository>
+<repository>
+<id>evraz-mvn</id>
+<name>evraz-mvn</name>
+<url>https://nexus.phoenixit.ru/repository/evraz-mvn</url>
+</repository>
+</repositories>
+<pluginRepositories>
+<pluginRepository>
+<id>evraz-mvn</id>
+<name>evraz-mvn</name>
+<url>https://nexus.phoenixit.ru/repository/evraz-mvn</url>
+<releases>
+<enabled>true</enabled>
+<updatePolicy>always</updatePolicy>
+</releases>
+</pluginRepository>
+</pluginRepositories>
+<dependencies>
+<dependency>
+<groupId>com.starfish24</groupId>
+<artifactId>local-discovery-client</artifactId>
+<version>${local.discovery.version}</version>
+</dependency>
+</dependencies>
+</profile>
+<profile>
+<id>ci</id>
+<repositories>
+<repository>
+<id>__RegistryServer__</id>
+<url>__MavenRepoUrl__</url>
+</repository>
+</repositories>
+<distributionManagement>
+<repository>
+<id>__RegistryServer__</id>
+<url>__MavenRepoUrl__</url>
+</repository>
+</distributionManagement>
+<pluginRepositories>
+<pluginRepository>
+<name>evraz</name>
+<id>__RegistryServer__</id>
+<url>__MavenRepoUrl__</url>
+<releases>
+<enabled>true</enabled>
+<updatePolicy>always</updatePolicy>
+</releases>
+</pluginRepository>
+</pluginRepositories>
+</profile>
+</profiles>
+
+<build>
+<plugins>
+<plugin>
+<groupId>org.openapitools</groupId>
+<artifactId>openapi-generator-maven-plugin</artifactId>
+<version>${openapi-generator-plugin.version}</version>
+<executions>
+<execution>
+<id>generate-server</id>
+<goals>
+<goal>generate</goal>
+</goals>
+<configuration>
+<inputSpec>
+${project.basedir}/openapi/yaml/api.yaml
+</inputSpec>
+<generatorName>spring</generatorName>
+<apiPackage>ru.liga.evraz.aggregation.api.adapter.in.http</apiPackage>
+<modelPackage>ru.liga.evraz.aggregation.api.adapter.in.http.model</modelPackage>
+<generateModelDocumentation>true</generateModelDocumentation>
+<generateApis>true</generateApis>
+<!--<templateDirectory>${project.basedir}/openapi/templates</templateDirectory>-->
+
+<typeMappings>
+<typeMapping>OffsetDateTime=ZonedDateTime</typeMapping>
+</typeMappings>
+<importMappings>
+<importMapping>java.time.OffsetDateTime=java.time.ZonedDateTime</importMapping>
+</importMappings>
+
+<configOptions>
+<useTags>true</useTags>
+<reactive>false</reactive>
+<interfaceOnly>true</interfaceOnly>
+<delegatePattern>false</delegatePattern>
+<skipDefaultInterface>false</skipDefaultInterface>
+<additionalModelTypeAnnotations>
+@lombok.Builder
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
+</additionalModelTypeAnnotations>
+</configOptions>
+<additionalProperties>
+<additionalProperty>modelNameSuffix=Http</additionalProperty>
+</additionalProperties>
+</configuration>
+</execution>
+</executions>
+</plugin>
+<plugin>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-maven-plugin</artifactId>
+<version>2.6.3</version>
+<configuration>
+<layout>ZIP</layout>
+</configuration>
+<executions>
+<execution>
+<goals>
+<goal>repackage</goal>
+<goal>build-info</goal>
+</goals>
+</execution>
+</executions>
+</plugin>
+<plugin>
+<groupId>pl.project13.maven</groupId>
+<artifactId>git-commit-id-plugin</artifactId>
+<executions>
+<execution>
+<phase>validate</phase>
+<goals>
+<goal>revision</goal>
+</goals>
+</execution>
+</executions>
+<configuration>
+<dateFormat>yyyy-MM-dd HH:mm:ss XXX</dateFormat>
+<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+<generateGitPropertiesFile>true</generateGitPropertiesFile>
+<includeOnlyProperties>
+<includeOnlyProperty>^git.commit.*</includeOnlyProperty>
+<includeOnlyProperty>^git.branch.*</includeOnlyProperty>
+</includeOnlyProperties>
+</configuration>
+</plugin>
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-checkstyle-plugin</artifactId>
+<version>3.1.2</version>
+<dependencies>
+<dependency>
+<groupId>com.puppycrawl.tools</groupId>
+<artifactId>checkstyle</artifactId>
+<version>9.3</version>
+</dependency>
+</dependencies>
+<configuration>
+<configLocation>ci/checkstyle.xml</configLocation>
+</configuration>
+<executions>
+<execution>
+<phase>validate</phase>
+<goals>
+<goal>check</goal>
+</goals>
+</execution>
+</executions>
+</plugin>
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-compiler-plugin</artifactId>
+<version>3.9.0</version>
+<configuration>
+<annotationProcessorPaths>
+<path>
+<groupId>org.projectlombok</groupId>
+<artifactId>lombok</artifactId>
+<version>${lombok.version}</version>
+</path>
+<path>
+<groupId>org.mapstruct</groupId>
+<artifactId>mapstruct-processor</artifactId>
+<version>${org.mapstruct.version}</version>
+</path>
+</annotationProcessorPaths>
+<source>17</source>
+<target>17</target>
+</configuration>
+</plugin>
+<!-- ÐÐ° Ñ‚ÐµÐºÑƒÑ‰Ð¸Ð¹ Ð¼Ð¾Ð¼ÐµÐ½Ñ‚ Ð½Ð° CI Ð½ÐµÑ‚ Docker Environment -->
+<!-- TODO:: Ð¢Ð°Ðº Ð¶Ðµ Ð½Ð°Ð´Ð¾ Ð¿Ð¾Ñ„Ð¸ÐºÑÐ¸Ñ‚ÑŒ Ð¾ÑˆÐ¸Ð±ÐºÐ¸ Ñ‚ÐµÑÑ‚Ð¾Ð² -->
+<plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-surefire-plugin</artifactId>
+<version>${maven.surefire-plugin.version}</version>
+<configuration>
+<argLine>-Dfile.encoding=UTF8</argLine>
+</configuration>
+<dependencies>
+<dependency>
+<groupId>org.junit.jupiter</groupId>
+<artifactId>junit-jupiter-engine</artifactId>
+<version>${junit.version}</version>
+</dependency>
+</dependencies>
+</plugin>
+<plugin>
+<groupId>org.jacoco</groupId>
+<artifactId>jacoco-maven-plugin</artifactId>
+<version>${maven.jacoco-plugin.version}</version>
+<executions>
+<execution>
+<goals>
+<goal>prepare-agent</goal>
+</goals>
+</execution>
+<execution>
+<id>report</id>
+<phase>prepare-package</phase>
+<goals>
+<goal>report</goal>
+</goals>
+</execution>
+</executions>
+</plugin>
+</plugins>
+</build>
+</project>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/application-test.yml
+Content:
+scheduled.order.createUpdate.enabled: false
+
+spring:
+kafka:
+producer:
+client-id: ${spring.application.name}
+consumer:
+group-id: ${spring.application.name}
+
+aggregation:
+kafka:
+concurrency: "5"
+command-shipping-request-ship-permission:
+request:
+topic: "test-cmd-shipment_permission-v1"
+
+feign:
+client:
+config:
+default:
+logger-level: full
+starfish:
+product:
+name: 'test-product'
+order:
+name: 'test-order'
+bpm:
+name: 'test-bpm'
+erp-adapter:
+name: 'test-erp-adapter'
+
+logging:
+config: classpath:logback-test.xml
+level:
+org.springframework.test.context.jdbc: debug
+ru.liga.evraz.aggregation: debug
+org.hibernate.SQL: debug
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/logback-test.xml
+Content:
+<configuration>
+<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+<springProperty name="appName" source="spring.application.name" />
+
+<property name="LOG_FILE" value="${appName}"/>
+
+<springProfile name="!local, !local-staging, !test">
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+<providers>
+<timestamp/>
+<version/>
+<logLevel/>
+<message/>
+<loggerName/>
+<threadName/>
+<context/>
+<pattern>
+<omitEmptyFields>true</omitEmptyFields>
+<pattern>
+{
+"trace": {
+"service": "${appName}",
+"trace_id": "%X{traceId}",
+"span_id": "%X{spanId}",
+"parent_span_id": "%X{parentId}",
+"exportable": "%X{sampled}",
+"login": "%X{login}",
+"tenantId": "%X{tenantId}"
+}
+}
+</pattern>
+</pattern>
+<mdc>
+<excludeMdcKeyName>traceId</excludeMdcKeyName>
+<excludeMdcKeyName>spanId</excludeMdcKeyName>
+<excludeMdcKeyName>parentId</excludeMdcKeyName>
+<excludeMdcKeyName>spanExportable</excludeMdcKeyName>
+<excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+<excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+<excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
+<excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+</mdc>
+<stackTrace/>
+</providers>
+</encoder>
+</appender>
+</springProfile>
+
+<springProfile name="test, local, local-staging">
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<encoder>
+<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread, %X{traceId:-}, %X{spanId:-}, %X{sampled:-}, %X{login}, %X{tenantId}] %-5level %logger{36} - %msg%n</pattern>
+</encoder>
+</appender>
+</springProfile>
+
+<root level="info">
+<appender-ref ref="STDOUT" />
+</root>
+
+<logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
+<level value="DEBUG" />
+</logger>
+<logger name="com.starfish24" level="DEBUG"/>
+
+</configuration>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_reserve_renewal.json
+Content:
+{
+"erpGuid": "test_erp_guid",
+"commandGuid": "commandGuid",
+"reservationRemovalDate": "2023-12-31",
+"reservationExtensionReason": "RESERVATION_EXTENSION_PREPAYMENT"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_reserve_renewal_key.json
+Content:
+{
+"commandGuid": "commandGuid"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_ship_permission_kafka.json
+Content:
+{
+"erpGuid": "erpGuid",
+"commandGuid": "commandGuid",
+"documentItems": [
+{
+"skuId": "skuId1",
+"positionCode": 1,
+"skuStatus": "SHIP"
+},
+{
+"skuId": "skuId2",
+"positionCode": 2,
+"skuStatus": "SHIP"
+},
+{
+"skuId": "skuId3",
+"positionCode": 3,
+"skuStatus": "SHIP"
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_ship_permission_kafka_key.json
+Content:
+{
+"commandGuid": "commandGuid"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_ship_permission_response.json
+Content:
+{
+"erpGuid": "test_order_erp_guid",
+"commandGuid": "commandGuid",
+"documentItems": [
+{
+"skuId": "skuId1",
+"positionCode": 1,
+"skuStatus": "SHIP"
+},
+{
+"skuId": "skuId2",
+"positionCode": 2,
+"skuStatus": "SHIP"
+},
+{
+"skuId": "skuId3",
+"positionCode": 3,
+"skuStatus": "SHIP"
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_sign_pipeline_false_response.json
+Content:
+{
+"erpGuid": "erpGuid",
+"commandGuid": "commandGuid",
+"omsPipeline": false
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_sign_pipeline_kafka_key.json
+Content:
+{
+"commandGuid": "commandGuid"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/order_sign_pipeline_response.json
+Content:
+{
+"erpGuid": "erpGuid",
+"commandGuid": "commandGuid",
+"omsPipeline": true
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/shipping_request_ship_permission_kafka.json
+Content:
+{
+"erpGuid": "shippingErpGuid",
+"erpOrderGuid": "test_order_erp_guid",
+"commandGuid": "commandGuid"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/kafka/response/shipping_request_ship_permission_kafka_key.json
+Content:
+{
+"commandGuid": "commandGuid"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/files/file.csv
+Content:
+111-guid
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/productCreate_severalDelivery_request.json
+Content:
+[
+{
+"id": "99999799911100",
+"name": "Ð¢Ð¾Ð²Ð°Ñ€ ÐÐ¾Ð²Ñ‹Ð¹ Ð¿Ð¾ÑÐ»Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ñ€Ð°Ð· Ð´Ð²Ð° Ñ‚Ñ€Ð¸",
+"sku": [
+{
+"id": "99999799911100",
+"name": "Ð¢Ð¾Ð²Ð°Ñ€ ÐÐ¾Ð²Ñ‹Ð¹ Ð¿Ð¾ÑÐ»Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ñ€Ð°Ð· Ð´Ð²Ð° Ñ‚Ñ€Ð¸"
+}
+],
+"shortDescription": "ITEM_GP",
+"description": "ÐºÐ°ÐºÐ¾Ð¹ Ñ‚Ð¾ Ñ‚Ð¾Ð²Ð°Ñ€ Ð¿Ð¾ÑÐ»Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ",
+"active": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/product_create_request.json
+Content:
+[
+{
+"id": "test_sku_id",

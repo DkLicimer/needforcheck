@@ -1,0 +1,417 @@
+﻿
+// Mapper
+private final UserGroupMapper userGroupMapper;
+// UseCase
+private final CreateUpdateUserGroupUseCase ucCreateUpdateUserGroup;
+
+@Override
+public ResponseEntity<CreateUpdateUserGroupResponseHttp> createOrUpdateUserGroup(CreateUpdateUserGroupRequestHttp body) {
+final var cmd = userGroupMapper.mapToCmd(body);
+final var userGroup = ucCreateUpdateUserGroup.createUpdateUserGroup(cmd);
+return ResponseEntity.ok(userGroupMapper.mapToResponse(userGroup));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/UserGroupMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateUserGroupRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateUserGroupResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.UserGroupParticipantHttp;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateUserGroupCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.UserGroup;
+import ru.liga.evraz.aggregation.domain.model.UserGroupParticipant;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+interface UserGroupMapper {
+@Mapping(target = "groupId", source = "userGroupId")
+@Mapping(target = "groupName", source = "userGroupName")
+@Mapping(target = "participants", source = "userGroupParticipants")
+CreateUpdateUserGroupCmd mapToCmd(CreateUpdateUserGroupRequestHttp source);
+
+@Mapping(target = "userGroupId", source = "groupId")
+CreateUpdateUserGroupResponseHttp mapToResponse(UserGroup source);
+
+@Mapping(target = "subdivisionId", source = "unitId")
+@Mapping(target = "subdivisionName", source = "unitName")
+UserGroupParticipant mapUserGroupParticipant(UserGroupParticipantHttp source);
+
+@Mapping(target = "unitId", source = "subdivisionId")
+@Mapping(target = "unitName", source = "subdivisionName")
+UserGroupParticipantHttp mapUserGroupParticipant(UserGroupParticipant source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/WarehouseController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.WarehouseApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateWarehouseRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateWarehouseResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetWarehouseResponseHttp;
+import ru.liga.evraz.aggregation.application.CreateUpdateWarehouseUseCase;
+
+@Api(tags = "Warehouse")
+@RestController
+@Validated
+@RequiredArgsConstructor
+class WarehouseController implements WarehouseApi {
+// Mapper
+private final WarehouseMapper warehouseMapper;
+// UseCase
+private final CreateUpdateWarehouseUseCase ucCreateUpdateWarehouse;
+
+@Override
+public ResponseEntity<CreateUpdateWarehouseResponseHttp> createOrUpdateWarehouse(CreateUpdateWarehouseRequestHttp body) {
+final var cmd = warehouseMapper.mapToCmd(body);
+final var userGroup = ucCreateUpdateWarehouse.createUpdateWarehouse(cmd);
+return ResponseEntity.ok(warehouseMapper.mapToResponse(userGroup));
+}
+
+@Override
+public ResponseEntity<GetWarehouseResponseHttp> getWarehouse(String warehouseId) {
+final var result = ucCreateUpdateWarehouse.get(warehouseId);
+return new ResponseEntity<>(warehouseMapper.mapGetWarehouseResponse(result), HttpStatus.OK);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/WarehouseMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateWarehouseRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateWarehouseResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetWarehouseResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.WarehouseHttp;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateWarehouseCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.Warehouse;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface WarehouseMapper {
+CreateUpdateWarehouseCmd mapToCmd(CreateUpdateWarehouseRequestHttp source);
+
+@Mapping(target = "subdivisionId", source = "subdivision.subdivisionId")
+@Mapping(target = "subdivisionName", source = "subdivision.subdivisionName")
+CreateUpdateWarehouseResponseHttp mapToResponse(Warehouse source);
+
+default GetWarehouseResponseHttp mapGetWarehouseResponse(Warehouse warehouse) {
+return GetWarehouseResponseHttp.builder()
+.payload(WarehouseHttp.builder()
+.id(warehouse.getId())
+.name(warehouse.getName())
+.subdivisionId(warehouse.getSubdivision() != null ? warehouse.getSubdivision().getSubdivisionId() : StringUtils.EMPTY)
+.subdivisionName(warehouse.getSubdivision() != null ? warehouse.getSubdivision().getSubdivisionName() : StringUtils.EMPTY)
+.build())
+.build();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/doc/ApiDocConfig.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in.doc;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.server.ServerWebExchange;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.HttpAuthenticationScheme;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+
+import java.util.List;
+
+@Configuration
+class ApiDocConfig {
+@Value("${spring.application.name}")
+private String applicationName;
+
+@Value("${spring.swagger.local:false}")
+private boolean localSwagger;
+
+@Bean
+public Docket docket() {
+var bearerAuth = HttpAuthenticationScheme.JWT_BEARER_BUILDER.name("bearerAuth").build();
+
+final var docket = new Docket(DocumentationType.OAS_30);
+
+if (!localSwagger) {
+docket.pathMapping("/api/" + applicationName);
+}
+
+return docket.ignoredParameterTypes(ServerWebExchange.class)
+.apiInfo(apiInfo())
+.securitySchemes(List.of(bearerAuth))
+.select()
+.apis(RequestHandlerSelectors.basePackage("ru.liga.evraz.aggregation.adapter.http.in"))
+.build();
+}
+
+private ApiInfo apiInfo() {
+return new ApiInfoBuilder()
+.title(applicationName)
+.build();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/CommandJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.command.ErpCommandEntity;
+import ru.liga.evraz.aggregation.domain.model.command.CommandStatusData;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+
+import java.util.List;
+import java.util.Optional;
+
+@Validated
+public interface CommandJpaRepository extends JpaRepository<ErpCommandEntity, String> {
+
+@Modifying
+@Query("""
+UPDATE ErpCommandEntity osp
+SET osp.sendStatus = true, osp.modifiedAt = now()
+WHERE osp.commandGuid = :commandGuid
+""")
+void updateSendStatusByCommandGuid(@Param("commandGuid") String commandGuid);
+
+Optional<ErpCommandEntity> findByCommandGuid(String commandGuid);
+
+@Modifying(clearAutomatically = true)
+@Query("""
+UPDATE ErpCommandEntity ece
+SET ece.erpStatus = :status, ece.erpDetails = :details, ece.modifiedAt = now()
+WHERE ece.commandGuid = :commandGuid
+""")
+void updateErpCommandStatus(@Param("commandGuid") String commandGuid,
+@Param("status") CmdStatus status,
+@Param("details") String details);
+
+@Query(name = "erpCommandFindLatestWithStatusForOrder", nativeQuery = true)
+List<CommandStatusData> findLatestWithStatusForOrder(@Param("orderId") String orderId);
+
+List<ErpCommandEntity> findAllByOrderId(String orderId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/CommandRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.ErpCommandEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.command.ErpCommandEntity;
+import ru.liga.evraz.aggregation.domain.model.command.AbstractCommand;
+import ru.liga.evraz.aggregation.domain.model.command.CloseErpOrderCommand;
+import ru.liga.evraz.aggregation.domain.model.command.CommandStatusData;
+import ru.liga.evraz.aggregation.domain.model.command.ErpCommandDto;
+import ru.liga.evraz.aggregation.domain.model.command.ErpTaskCommand;
+import ru.liga.evraz.aggregation.domain.model.command.OrderReserveRenewalCommand;
+import ru.liga.evraz.aggregation.domain.model.command.OrderShipPermissionItemsCommand;
+import ru.liga.evraz.aggregation.domain.model.command.OrderSignPipelineCommand;
+import ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission.ShippingRequestShipPermissionItemsCommand;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Repository
+@RequiredArgsConstructor
+class CommandRepositoryImpl implements CommandRepository {
+
+private final CommandUuidGenerator commandUuidGenerator;
+private final CommandJpaRepository commandJpaRepository;
+private final ErpCommandEntityMapper mapper;
+
+@Override
+public OrderShipPermissionItemsCommand createErpCommand(OrderShipPermissionItemsCommand command) {
+command.setCommandGuid(commandUuidGenerator.generateUuid());
+log.info("Create command. CommandGuid {}", command.getCommandGuid());
+final var entity = mapper.map(command);
+entity.setNewEntity(true);
+commandJpaRepository.saveAndFlush(entity);
+return command;
+}
+
+@Override
+public ShippingRequestShipPermissionItemsCommand createErpCommand(ShippingRequestShipPermissionItemsCommand command) {
+command.setCommandGuid(commandUuidGenerator.generateUuid());
+log.info("Create command. CommandGuid {}, commandType: {}", command.getCommandGuid(), command.getCommandType());
+final var entity = mapper.map(command);
+entity.setNewEntity(true);
+final var resultEntity = commandJpaRepository.saveAndFlush(entity);
+return mapper.mapShippingRequestShipPermission(resultEntity);
+}
+
+@Override
+public OrderSignPipelineCommand createErpCommand(OrderSignPipelineCommand command) {
+command.setCommandGuid(commandUuidGenerator.generateUuid());
+log.info("Create command. CommandGuid {}, commandType: {}", command.getCommandGuid(), command.getCommandType());
+final var entity = mapper.map(command);
+entity.setNewEntity(true);
+final var resultEntity = commandJpaRepository.saveAndFlush(entity);
+return mapper.mapOrderSignPipeline(resultEntity);
+}
+
+@Override
+public CloseErpOrderCommand createErpCommand(CloseErpOrderCommand command) {
+command.setCommandGuid(commandUuidGenerator.generateUuid());
+log.info("Create command. CommandGuid {}, commandType: {}", command.getCommandGuid(), command.getCommandType());
+ErpCommandEntity entity = mapper.map(command);
+entity.setNewEntity(true);
+ErpCommandEntity resultEntity = commandJpaRepository.saveAndFlush(entity);
+return mapper.mapCloseErpOrder(resultEntity);
+}
+
+@Override
+public ErpTaskCommand createErpCommand(ErpTaskCommand command) {
+command.setCommandGuid(commandUuidGenerator.generateUuid());
+log.info("Create command. CommandGuid {}, commandType: {}", command.getCommandGuid(), command.getCommandType());
+ErpCommandEntity entity = mapper.map(command);
+entity.setNewEntity(true);
+ErpCommandEntity resultEntity = commandJpaRepository.saveAndFlush(entity);
+return mapper.mapErpTask(resultEntity);
+}
+
+@Override
+public OrderReserveRenewalCommand createErpCommand(OrderReserveRenewalCommand command) {
+command.setCommandGuid(commandUuidGenerator.generateUuid());
+log.info("Create command. CommandGuid {}, commandType: {}", command.getCommandGuid(), command.getCommandType());
+final var entity = mapper.map(command);
+entity.setNewEntity(true);
+final var resultEntity = commandJpaRepository.saveAndFlush(entity);
+return mapper.mapOrderReserveRenewal(resultEntity);
+}
+
+@Override
+public void updateSendStatusByCommandGuid(String commandGuid) {
+log.info("Try to set send status true for command with commandGuid {}", commandGuid);
+commandJpaRepository.updateSendStatusByCommandGuid(commandGuid);
+}
+
+@Override
+public Optional<AbstractCommand> findByCommandGuid(String commandGuid) {
+return commandJpaRepository.findByCommandGuid(commandGuid)
+.map(mapper::map);
+}
+
+@Override
+public void updateErpCommandStatus(String commandGuid, CmdStatus status, String details) {
+commandJpaRepository.updateErpCommandStatus(commandGuid, status, details);
+}
+
+@Override
+public List<CommandStatusData> findLatestWithStatusForOrder(String orderId) {
+return commandJpaRepository.findLatestWithStatusForOrder(orderId);
+}
+
+@Override
+public Optional<ErpCommandDto> findErpCommandByCommandGuid(String commandGuid) {
+return commandJpaRepository.findByCommandGuid(commandGuid)
+.map(mapper::mapErpCommand);
+}
+
+@Override
+public Optional<ErpCommandDto> findLatestByOrderIdAndTypeWithPositiveErpStatus(String orderId, String commandType) {
+final var commandsForOrder = commandJpaRepository.findAllByOrderId(orderId);
+return commandsForOrder.stream()
+.filter(cmd -> commandType.equalsIgnoreCase(cmd.getCommandType())
+&& CmdStatus.OK.equals(cmd.getErpStatus())
+&& Boolean.TRUE.equals(cmd.isSendStatus()))
+.sorted(Comparator.comparing(ErpCommandEntity::getCreatedAt).reversed())
+.map(mapper::mapErpCommand)
+.findFirst();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/CommandUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class CommandUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryAttributeJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryAttributeEntity;
+
+import java.util.List;
+import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
+
+@Validated
+interface DeliveryAttributeJpaRepository extends JpaRepository<DeliveryAttributeEntity, String> {
+
+void deleteByErpDeliveryGuidAndNameAndPositionCode(@NotEmpty String erpDeliveryGuid, @NotEmpty String name, Long positionCode);
+
+Optional<DeliveryAttributeEntity> findByErpDeliveryGuidAndNameAndPositionCode(@NotEmpty String erpDeliveryGuid, @NotEmpty String name, Long positionCode);
+
+List<DeliveryAttributeEntity> findAllByErpDeliveryGuid(@NotEmpty String deliveryErpGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryAttributeRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.ErpDeliveryEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.DeliveryTransactionEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+import ru.liga.evraz.aggregation.application.event.DeliveryAttributeEvent;
+import ru.liga.evraz.aggregation.application.event.EventType;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+
+import java.util.List;

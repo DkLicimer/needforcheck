@@ -1,0 +1,385 @@
+﻿}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/delivery/UpdateErpDeliveryTest.java
+Content:
+package ru.liga.evraz.aggregation.module.delivery;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.DeliveryOrderUuidGenerator;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryOrderItemJpaRepository;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.config.path.OrderPath;
+import ru.liga.evraz.aggregation.config.path.ProductPath;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDERS_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDERS_SHIPPING_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CREATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMER_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOM_ATTRIBUTES_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DELETE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_GET_BY_CLIENT_ORDER_ID;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEMS_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEM_SERVICES_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SET_CANCELLATION_REASON;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SHIPPING_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.CUSTOMERSERVICE_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.PRODUCT_UPDATE;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ñ‚ÐµÑÑ‚ Ð¿Ð¾ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸ÐµÐ¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ ERP")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class UpdateErpDeliveryTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/erp_delivery/fill-db-1.sql";
+private static final String DB_FILL = "/db/erp_delivery/fill-db-3-test-update.sql";
+
+private static final String DB_FILL_SHIPPING_COUNT_ENUM_ONE = "/db/erp_delivery/fill-db-shippingCountEnum_value_ONE.sql";
+
+@Autowired
+private ErpDeliveryJpaRepository deliveryRepository;
+@Autowired
+private DeliveryOrderJpaRepository deliveryOrderJpaRepository;
+@Autowired
+private ErpDeliveryOrderItemJpaRepository itemJpaRepository;
+@MockBean
+private DeliveryOrderUuidGenerator orderUuidGenerator;
+
+@Value("classpath:api/erp_delivery/update/update_request_shippingEnumCount_ONE.json")
+private Resource updateRequest_forShippingCountEnumOne;
+@Value("classpath:api/erp_delivery/update/update_response_shippingEnumCount_ONE.json")
+private Resource updateResponse_forShippingCountEnumOne;
+@Value("classpath:api/erp_delivery/update/update_request.json")
+private Resource updateRequest;
+@Value("classpath:api/erp_delivery/update/update_response.json")
+private Resource updateResponse;
+
+@Value("classpath:/external/product/customer_service/updateDeliverySuccess_Req_1.json")
+private Resource extCustomerServiceCatalogRequest_updateDeliverySuccess_1;
+@Value("classpath:/external/product/customer_service/updateDeliverySuccess_Req_2.json")
+private Resource extCustomerServiceCatalogRequest_updateDeliverySuccess_2;
+
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_request.json")
+private Resource legalEntityUpdateRequest;
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_response.json")
+private Resource legalEntityUpdateResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· ERP")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void updateDeliverySuccess() {
+final var productPathesToExpectedResources = Map.of(
+CUSTOMERSERVICE_UPDATE, List.of(
+Pair.of(extCustomerServiceCatalogRequest_updateDeliverySuccess_1, extCustomerServiceCatalogResponse),
+Pair.of(extCustomerServiceCatalogRequest_updateDeliverySuccess_2, extCustomerServiceCatalogResponse))
+);
+initProductScenario(productPathesToExpectedResources, Map.of());
+
+initDeliveryScenario();
+
+doReturn("123-uuid-test").when(orderUuidGenerator).generateUuid();
+
+final var url = "/v1/delivery";
+customPostScenarioFromResource(url, updateRequest, updateResponse, true, 200);
+
+final var orderList = deliveryOrderJpaRepository
+.findAllByDelivery(ErpDeliveryEntity.builder().id("1-uuid-test").build());
+final var orderItemList1 = itemJpaRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id("123-uuid-test").build());
+final var orderItemList2 = itemJpaRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id("2-uuid-test").build());
+
+Assertions.assertAll(
+() -> assertThat(orderItemList1.size()).isEqualTo(3),
+() -> assertThat(orderItemList2.size()).isEqualTo(3),
+() -> assertThat(orderList.size()).isEqualTo(2)
+);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(21, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+
+final var productDispatcher = (StarfishProductDispatcher) sfProductServer.getDispatcher();
+assertEquals(2, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· ERP. ÐšÐµÐ¹Ñ Ñ ShippingCountEnum = ONE")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL_SHIPPING_COUNT_ENUM_ONE, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void updateDeliverySuccess_OneShippingCountEnum() {
+final var productPathesToExpectedResources = Map.of(
+CUSTOMERSERVICE_UPDATE, List.of(
+Pair.of(extCustomerServiceCatalogRequest_updateDeliverySuccess_1, extCustomerServiceCatalogResponse),
+Pair.of(extCustomerServiceCatalogRequest_updateDeliverySuccess_2, extCustomerServiceCatalogResponse))
+);
+initProductScenario(productPathesToExpectedResources, Map.of());
+
+initDeliveryScenario_OneShippingCountEnum();
+
+doReturn("123-uuid-test").when(orderUuidGenerator).generateUuid();
+
+final var url = "/v1/delivery";
+customPostScenarioFromResource(url, updateRequest_forShippingCountEnumOne, updateResponse_forShippingCountEnumOne, true, 200);
+
+final var orderList = deliveryOrderJpaRepository
+.findAllByDelivery(ErpDeliveryEntity.builder().id("1-uuid-test").build());
+final var orderItemList1 = itemJpaRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id("123-uuid-test").build());
+final var orderItemList2 = itemJpaRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id("2-uuid-test").build());
+
+Assertions.assertAll(
+() -> assertThat(orderItemList1.size()).isEqualTo(2),
+() -> assertThat(orderItemList2.size()).isEqualTo(3),
+() -> assertThat(orderList.size()).isEqualTo(2)
+);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(21, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+
+final var productDispatcher = (StarfishProductDispatcher) sfProductServer.getDispatcher();
+assertEquals(2, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+
+@Value("classpath:api/erp_delivery/update/delete_for_update_request.json")
+private Resource deleteDeliveryForUpdateRequest;
+@Value("classpath:api/erp_delivery/update/delete_for_update_response.json")
+private Resource deleteDeliveryForUpdateResponse;
+@Value("classpath:/external/order/create/order_with_service_create_request.json")
+private Resource extOrderWithServiceCreateRequest;
+@Value("classpath:/external/order/create/order_with_service_create_response.json")
+private Resource extOrderWithServiceCreateResponse;
+@Value("classpath:/external/order/details/order_details_update_delivery_delete_for_update_request.json")
+private Resource extOrderDetailsUpdateRequest;
+@Value("classpath:/external/order/details/order_details_update_response.json")
+private Resource extOrderDetailsUpdateResponse;
+@Value("classpath:/external/order/item/update/update_items_delivery_delete_for_update_request.json")
+private Resource extOrderItemsUpdateRequest;
+@Value("classpath:/external/order/item/update/update_items_response.json")
+private Resource extOrderItemsUpdateResponse;
+@Value("classpath:/external/order/custom_attributes/update_custom_attributes_delivery_delete_for_update_request.json")
+private Resource extOrderCustomAttributesUpdateRequest;
+@Value("classpath:/external/order/custom_attributes/update_custom_attributes_response.json")
+private Resource extOrderCustomAttributesUpdateResponse;
+@Value("classpath:/external/order/customer/order_customer_update_without_contacts_request.json")
+private Resource extOrderCustomerUpdateWithoutContactsRequest;
+@Value("classpath:/external/order/customer/order_customer_update_response.json")
+private Resource extOrderCustomerUpdateResponse;
+@Value("classpath:/external/order/item_service/update/update_item_service_delivery_delete_for_update_request.json")
+private Resource extOrderItemServicesUpdateRequest;
+@Value("classpath:/external/order/item_service/update/update_item_service_response.json")
+private Resource extOrderItemServicesUpdateResponse;
+@Value("classpath:/external/order/shipping/update/update_shipping_delivery_auto_request.json")
+private Resource extOrderShippingUpdateRequest;
+@Value("classpath:/external/order/shipping/update/update_shipping_response.json")
+private Resource extOrderShippingUpdateResponse;
+@Value("classpath:/external/order/set_cancellation_reason/update_order_cancellation_reason_response.json")
+private Resource extOrderCancellationReasonUpdateResponse;
+
+@Value("classpath:/external/product/customer_service/deleteForUpdateWithNextDeliverySuccess_Req.json")
+private Resource extCustomerServiceCatalogRequest_deleteForUpdateWithNextDeliverySuccess;
+
+@Value("classpath:/external/product/customer_service/service_create_response.json")
+private Resource extCustomerServiceCatalogResponse;
+
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸ Ð¿Ð¾Ð´ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ¹ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = "/db/erp_delivery/fill-db-test-delete-delivery-for-update.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void deleteForUpdateWithNextDeliverySuccess() {
+final var productPathesToExpectedResources = Map.of(
+CUSTOMERSERVICE_UPDATE, List.of(Pair.of(extCustomerServiceCatalogRequest_deleteForUpdateWithNextDeliverySuccess, extCustomerServiceCatalogResponse))
+);
+initProductScenario(productPathesToExpectedResources, Map.of());
+
+final var pathesToExpectedResources = Map.of(
+ORDER_CREATE, Pair.of(extOrderWithServiceCreateRequest, extOrderWithServiceCreateResponse),
+//ORDER_DETAILS_UPDATE, Pair.of(extOrderDetailsUpdateRequest, extOrderDetailsUpdateResponse),
+ORDERS_DETAILS_UPDATE, Pair.of(extOrderDetailsUpdateRequest, extOrderDetailsUpdateResponse),
+ORDER_CUSTOM_ATTRIBUTES_UPDATE, Pair.of(extOrderCustomAttributesUpdateRequest, extOrderCustomAttributesUpdateResponse),
+ORDER_CUSTOMER_UPDATE, Pair.of(extOrderCustomerUpdateWithoutContactsRequest, extOrderCustomerUpdateResponse),
+ORDER_ITEMS_UPDATE_TEMPLATE, Pair.of(extOrderItemsUpdateRequest, extOrderItemsUpdateResponse),
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, Pair.of(extOrderItemServicesUpdateRequest, extOrderItemServicesUpdateResponse),
+ORDER_SHIPPING_UPDATE_TEMPLATE, Pair.of(extOrderShippingUpdateRequest, extOrderShippingUpdateResponse),
+ORDERS_SHIPPING_UPDATE_TEMPLATE, Pair.of(extOrderShippingUpdateRequest, extOrderShippingUpdateResponse),
+ORDER_SET_CANCELLATION_REASON, Pair.<Resource, Resource>of(null, extOrderCancellationReasonUpdateResponse),
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse)
+);
+initOrderScenario(pathesToExpectedResources, Map.of("expected_starfish_order_id", "test_starfish24_erp_guid",
+"expected_customer_id", "test-customer_guid",
+"legalEntityId", "test-client_guid"));
+
+final var url = "/v1/delivery";
+customPostScenarioFromResource(url, deleteDeliveryForUpdateRequest, deleteDeliveryForUpdateResponse, true, 200);
+
+final var orderListForDeleted = deliveryOrderJpaRepository
+.findAllByDelivery(ErpDeliveryEntity.builder().id("1-uuid-test").build());
+
+final var orderItemList = itemJpaRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id("2-uuid-test").build());
+
+assertThat(deliveryRepository.findByErpGuid("1-test-erp_guid").isPresent()).isEqualTo(false);
+assertThat(deliveryRepository.findByErpGuid("2-test-erp_guid").isPresent()).isEqualTo(true);
+assertThat(orderListForDeleted.isEmpty()).isEqualTo(true);
+assertThat(orderItemList.isEmpty()).isEqualTo(true);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(14, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+
+final var productDispatcher = (StarfishProductDispatcher) sfProductServer.getDispatcher();
+// TODO:: Ñ€Ð°Ð·Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ð² Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ðµ Ð´Ð²ÑƒÑ… Ð³ÐµÐ½ÐµÑ€Ð¸Ñ€ÑƒÐµÐ¼Ñ‹Ñ… Event-Ð¾Ð²
+assertEquals(2, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+
+@Value("classpath:api/erp_delivery/external/update/update/shipping_update_request1.json")
+private Resource shippingRequest1;
+@Value("classpath:api/erp_delivery/external/update/update/shipping_update_request2.json")
+private Resource shippingRequest2;
+@Value("classpath:api/erp_delivery/external/update/update/shipping_update_request3.json")
+private Resource shippingRequest3;
+@Value("classpath:api/erp_delivery/external/update/update/shipping_update_response.json")
+private Resource shippingResponse;
+@Value("classpath:api/erp_delivery/external/update/update/custom_attribute_update_request1.json")
+private Resource customAttributeRequest1;
+@Value("classpath:api/erp_delivery/external/update/update/custom_attribute_update_request_shippingCountEnumOne.json")
+private Resource customAttributeRequest_forShippingCountEnumOne;
+@Value("classpath:api/erp_delivery/external/update/update/custom_attribute_update_request2.json")
+private Resource customAttributeRequest2;
+@Value("classpath:api/erp_delivery/external/update/update/custom_attribute_update_request3.json")
+private Resource customAttributeRequest3;
+@Value("classpath:api/erp_delivery/external/update/update/custom_attribute_update_response.json")
+private Resource customAttributeResponse;
+@Value("classpath:api/erp_delivery/external/update/update/order_details_update_request1.json")
+private Resource orderDetailsRequest1;
+@Value("classpath:api/erp_delivery/external/update/update/order_details_update_request2.json")
+private Resource orderDetailsRequest2;
+@Value("classpath:api/erp_delivery/external/update/update/order_details_update_request3.json")
+private Resource orderDetailsRequest3;
+@Value("classpath:api/erp_delivery/external/update/update/order_details_update_response.json")
+private Resource orderDetailsResponse;
+@Value("classpath:api/erp_delivery/external/update/update/items_update_request1.json")
+private Resource itemsRequest1;
+@Value("classpath:api/erp_delivery/external/update/update/items_update_request2.json")
+private Resource itemsRequest2;
+@Value("classpath:api/erp_delivery/external/update/update/items_update_request3.json")
+private Resource itemsRequest3;
+@Value("classpath:api/erp_delivery/external/update/update/items_update_request_oneShippingCountEnum.json")
+private Resource itemsRequest_oneShippingCountEnum;
+@Value("classpath:api/erp_delivery/external/update/update/items_update_response.json")
+private Resource itemsResponse;
+@Value("classpath:api/erp_delivery/external/update/update/items_service_update_request1.json")
+private Resource itemsServiceRequest1;
+@Value("classpath:api/erp_delivery/external/update/update/items_service_update_request2.json")
+private Resource itemsServiceRequest2;
+@Value("classpath:api/erp_delivery/external/update/update/items_service_update_request3.json")
+private Resource itemsServiceRequest3;
+@Value("classpath:api/erp_delivery/external/update/update/items_service_update_response.json")
+private Resource itemsServiceResponse;
+@Value("classpath:api/erp_delivery/external/update/update/order_customer_update_request.json")
+private Resource customerUpdateRequest;
+@Value("classpath:api/erp_delivery/external/update/update/order_customer_update_response.json")
+private Resource customerUpdateResponse;
+
+private void initDeliveryScenario() {
+//        final var shippingData1 = DispatcherData.builder()
+//            .path("/shipping/test_Sf_erp_guid4/update")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(shippingRequest1)
+//            .expectedResponse(shippingResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var shippingData2 = DispatcherData.builder()
+//            .path("/shipping/test_Sf_erp_guid2/update")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(shippingRequest2)
+//            .expectedResponse(shippingResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var shippingData3 = DispatcherData.builder()
+//            .path("/shipping/test_Sf_erp_guid1/update")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(shippingRequest3)
+//            .expectedResponse(shippingResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+final var shippingDataPut1 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid4/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest1)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut2 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid2/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest2)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut3 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid1/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest3)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData1 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid4/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest1)

@@ -1,0 +1,492 @@
+﻿File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/items_update_request.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "ÐÑ€Ð¼Ð°Ñ‚ÑƒÑ€Ð° 16 (2Ñ„) Ð500Ð¡ Ð“ÐžÐ¡Ð¢ 34028-2016_11700 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾",
+"productId": "62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 57200.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.19,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "2"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 2
+},
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾",
+"productId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 78730.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "4"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 4
+},
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ",
+"productId": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 67980.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.315,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "1"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": ""
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": "123"
+}
+],
+"discountPrice": 0.0,
+"positionCode": 1
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/items_update_response.json
+Content:
+[
+{}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/order_customer_update_request.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€",
+"middleName": null,
+"lastName": null,
+"phones": [
+"+7 (111) 111-11-11"
+],
+"emails": [
+"test@test.com"
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/order_customer_update_response.json
+Content:
+{
+"success": true,
+"message": "Customer is updated"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/order_details_update_request.json
+Content:
+{
+"clientOrderId": "test_order___10.08.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": false,
+"contactEmail": "test@test.com",
+"contactPhone": "7(999) 999-99-01",
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": "ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚",
+"totalCost": 0.0,
+"payableCost": 0.0,
+"currencyId": "RUB",
+"notification": null,
+"responsibleManager": "test_sale_manager_responsible_id",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/order_details_update_response.json
+Content:
+{
+"orderId": "order details response Ok"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/shipping_update_request.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": "Test Testovich Testov",
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "delivery_auto",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": "3269a17a-1957-11e4-80bf-f0921c005714",
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/create/shipping_update_response.json
+Content:
+{
+"success": true,
+"message": "ok",
+"result": "ok too"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/update/order_customer_request.json
+Content:
+{
+"id": "test-customer_guid",
+"firstName": "Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€",
+"middleName": null,
+"lastName": null,
+"phones": [
+"+7 (111) 111-11-11"
+],
+"emails": [
+"test@test.com"
+],
+"type": null,
+"subscriptions": null,
+"statuses": null,
+"tags": null,
+"customerType": "entity",
+"organizationName": "test-client_name",
+"organizationINN": "test-client_inn",
+"legalAddress": null,
+"actualAddress": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/update/order_customer_response.json
+Content:
+{
+"success": true,
+"message": "Customer is updated"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/update/request.json
+Content:
+{
+"payload": {
+"erpDeliveryGuid": "1-uuid-test",
+"positionCode": 2,
+"name": "deliveryStatus",
+"value": "CAR_FOUND",
+"deleted": true
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/update/response.json
+Content:
+{
+"payload": {
+"erpDeliveryGuid": "1-uuid-test",
+"positionCode": 2,
+"name": "deliveryStatus",
+"value": "CAR_FOUND",
+"deleted": true
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/create/request.json
+Content:
+{
+"payload": {
+"erpDeliveryGuid": "1-test-erp_guid",
+"positionCode": 2,
+"name": "deliveryDriverFullName",
+"value": "Testov Test",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/delivery_attribute/create/response.json
+Content:
+{
+"payload": {
+"erpDeliveryGuid": "1-test-erp_guid",
+"positionCode": 2,
+"name": "deliveryDriverFullName",
+"value": "Testov Test",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/shipping_request_ship_permission/notFoundResponse.json
+Content:
+{
+"fault": {
+"code": "NOT_FOUND",
+"details": "ErpDelivery not found by shippingErpGuid shippingErpGuid"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/shipping_request_ship_permission/successRequest.json
+Content:
+{
+"payload": {
+"commandType": "SHIPPING_REQUEST_SHIP_PERMISSION",
+"instanceId": "instanceId",
+"orderId": "test_starfish24_erp_guid",
+"shippingErpGuid": "shippingErpGuid"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/shipping_request_ship_permission/successResponse.json
+Content:
+{
+"payload": {
+"commandGuid": "commandGuid",
+"commandName": "SHIPPING_REQUEST_SHIP_PERMISSION. ÐšÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð¾Ðº (Ñ‚Ð¾Ð²Ð°Ñ€Ð½Ñ‹Ñ… Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð¸ ÑƒÑÐ»ÑƒÐ³) Ð—ÐÐŸ (Ð—Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ) Ð½Ð° \"Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ\" Ð² 1Ð¡",
+"commandTopic": "test-cmd-shipment_permission-v1",
+"commandDateTime" : "29.06.2023 00:00:00 +03:00"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/send_command_status/order_fulfilment_pipeline.json
+Content:
+{
+"payload": {
+"commandGuid": "222-commandGuid",

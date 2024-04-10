@@ -1,0 +1,503 @@
+﻿package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderAttribute {
+
+private String id;
+private String erpOrderGuid;
+private Long positionCode;
+private String name;
+private String value;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/OrderReloadDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
+@Builder
+@Validated
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Jacksonized
+public class OrderReloadDto {
+
+@NotEmpty
+private String orderErpGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/OrderReserve.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.enums.ReservationReason;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+@Setter
+public class OrderReserve {
+private String id;
+@NotEmpty(message = "erpGuid must not be null nor empty")
+private String erpOrderGuid;
+@NotNull(message = "active must not be null")
+private boolean active;
+private String reservationRemovalDate;
+private ReservationReason reservationExtensionReason;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/OrderReserveRenewalDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.LocalDate;
+
+@Builder
+@Validated
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Jacksonized
+public class OrderReserveRenewalDto {
+
+private String erpGuid; // order erp guid
+private String commandGuid;
+@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+private LocalDate reservationRemovalDate;
+private ReservationExtensionReason reservationExtensionReason;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/OrderShipPermissionDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.command.OrderItemShortData;
+
+import java.util.List;
+
+@Builder
+@Validated
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Jacksonized
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class OrderShipPermissionDto {
+
+private String erpGuid;
+private String commandGuid;
+private List<OrderItemShortData> documentItems;
+private String documentStatus;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/OrderSignPipelineDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
+import org.springframework.validation.annotation.Validated;
+
+@Builder
+@Validated
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Jacksonized
+public class OrderSignPipelineDto {
+
+private String erpGuid;
+private String commandGuid;
+private Boolean omsPipeline;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/Partner.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+public class Partner {
+@NotEmpty
+private String clientGuid;
+@NotEmpty
+private String clientType;
+private String clientInn;
+@NotEmpty
+private String clientName;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/ReservationExtensionReason.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Getter;
+
+@Getter
+public enum ReservationExtensionReason {
+RESERVATION_EXTENSION_PREPAYMENT
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/Responsible.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Responsible {
+private String responsibleId;
+private String responsibleFullName;
+private String responsibleEmail;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/ShippingRequestShipPermissionDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
+@Builder
+@Validated
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Jacksonized
+@ToString
+public class ShippingRequestShipPermissionDto {
+@NotEmpty
+@JsonProperty("erpGuid")
+private String shippingErpGuid;
+@NotEmpty
+@JsonProperty("erpOrderGuid")
+private String orderErpGuid;
+@JsonIgnore
+private String orderId;
+@NotEmpty
+private String commandGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/Subdivision.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+public class Subdivision {
+@NotEmpty(message = "subdivisionId must not be null nor empty")
+private String subdivisionId;
+private String subdivisionName;
+@NotEmpty(message = "timeZone must not be null nor empty")
+private String timeZone;
+@NotEmpty(message = "workDays must not be null nor empty")
+@Valid
+private List<WorkDay> workDays;
+@NotNull(message = "deleted must not be null")
+private boolean deleted;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/UserGroup.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+public class UserGroup {
+private String groupId;
+private String groupName;
+@Setter
+private List<UserGroupParticipant> participants;
+private OffsetDateTime createdDate;
+private OffsetDateTime modifiedDate;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/UserGroupParticipant.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.OffsetDateTime;
+
+@Builder
+@Getter
+public class UserGroupParticipant {
+private String id;
+private String personId;
+private String personFullName;
+private String email;
+private String subdivisionId;
+private String subdivisionName;
+private String roleId;
+private String roleName;
+private OffsetDateTime createdDate;
+private OffsetDateTime modifiedDate;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/Warehouse.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+public class Warehouse {
+private String id;
+private String name;
+private String timeZone;
+
+private String warehouseType;
+private String address;
+private String city;
+private Boolean active;
+private Boolean deleted;
+
+private List<WarehouseWorkDay> workDays;
+@Setter
+private Subdivision subdivision;
+private OffsetDateTime createdAt;
+private OffsetDateTime modifiedAt;
+
+public Warehouse update(Warehouse newWarehouse) {
+this.name = newWarehouse.getName();
+this.timeZone = newWarehouse.getTimeZone();
+this.workDays = newWarehouse.getWorkDays();
+this.subdivision = newWarehouse.getSubdivision();
+this.warehouseType = newWarehouse.getWarehouseType();
+this.address = newWarehouse.getAddress();
+this.city = newWarehouse.getCity();
+this.active = newWarehouse.getActive();
+this.deleted = newWarehouse.getDeleted();
+return this;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/WarehouseWorkDay.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.DayName;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class WarehouseWorkDay {
+@NotNull(message = "name must not be null")
+@Valid
+private DayName name;
+@NotEmpty(message = "workSchedule must not be null nor empty")
+@Valid
+private List<WarehouseWorkSchedule> workSchedule;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/WarehouseWorkSchedule.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class WarehouseWorkSchedule {
+@NotEmpty(message = "start must not be null nor empty")
+@Pattern(regexp = "([01]\\d|2[0-3]):[0-5]\\d", message = "start must be in 'hh:mm' format")
+private String start;
+@NotEmpty(message = "end must not be null nor empty")
+@Pattern(regexp = "([01]\\d|2[0-3]):[0-5]\\d", message = "start must be in 'hh:mm' format")
+private String end;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/WorkDay.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.DayName;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class WorkDay {
+@NotNull(message = "name must not be null")
+@Valid
+private DayName name;
+@NotEmpty(message = "workSchedule must not be null nor empty")
+@Valid
+private List<WorkSchedule> workSchedule;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/WorkSchedule.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class WorkSchedule {
+@NotEmpty(message = "start must not be null nor empty")
+@Pattern(regexp = "([01]\\d|2[0-3]):[0-5]\\d", message = "start must be in 'hh:mm' format")
+private String start;

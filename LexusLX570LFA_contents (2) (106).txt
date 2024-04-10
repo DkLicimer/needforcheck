@@ -1,0 +1,445 @@
+﻿
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CancelErpTaskResponse {
+@JsonProperty("success")
+private Boolean success;
+
+@JsonProperty("fault")
+private Fault fault;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/CreateErpTaskDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskSourceCode;
+import ru.liga.evraz.aggregation.adapter.http.out.ErpZonedDateTimeSerializer;
+
+import java.time.ZonedDateTime;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CreateErpTaskDto {
+@JsonProperty("sourceCode")
+private ErpTaskSourceCode sourceCode;
+
+@JsonProperty("guid")
+private String guid;
+
+@JsonProperty("title")
+private String title;
+
+@JsonProperty("description")
+private String description;
+
+@JsonProperty("erpGuid")
+private String erpGuid;
+
+@JsonProperty("responsibleId")
+private String responsibleId;
+
+@JsonProperty("roleId")
+private String roleId;
+
+@JsonProperty("subdivisionId")
+private String subdivisionId;
+
+@JsonProperty("deadline")
+@JsonSerialize(using = ErpZonedDateTimeSerializer.class)
+private ZonedDateTime deadline;
+
+@JsonProperty("commandGuid")
+private String commandGuid;
+
+@JsonProperty("type")
+private String type;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/CreateErpTaskRequest.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class CreateErpTaskRequest {
+private CreateErpTaskDto payload;
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/CreateErpTaskResponse.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateErpTaskResponse {
+@JsonProperty("success")
+private Boolean success;
+
+@JsonProperty("fault")
+private Fault fault;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/Fault.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class Fault {
+@JsonProperty("code")
+private String code;
+
+@JsonProperty("details")
+private String details;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/converter/DtoConverter.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.converter;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public interface DtoConverter<T, D> {
+D convertToDto(T t);
+
+default List<D> convertListToDto(List<T> tList) {
+if (tList.isEmpty()) {
+return Collections.emptyList();
+}
+return tList.stream().map(this::convertToDto).collect(Collectors.toList());
+}
+
+default Set<D> convertSetToDto(Set<T> tSet) {
+if (tSet.isEmpty()) {
+return Collections.emptySet();
+}
+return tSet.stream().map(this::convertToDto).collect(Collectors.toSet());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/converter/ErpTaskConverter.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CancelErpTaskDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CreateErpTaskDto;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpTaskConverter {
+
+@Mapping(source = "model.id", target = "guid")
+@Mapping(source = "model.documentErpGuid", target = "erpGuid")
+@Mapping(source = "model.taskType.erpValue", target = "type")
+CreateErpTaskDto convertToDto(ErpTask model, String commandGuid);
+
+@Mapping(source = "model.id", target = "guid")
+@Mapping(target = "status", constant = "COMPLETED")
+@Mapping(target = "decision", constant = "CANCELED")
+CancelErpTaskDto convertToCancelDto(ErpTask model, String commandGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/logging/CachedHttpServletRequest.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.logging;
+
+import org.springframework.util.StreamUtils;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+
+class CachedHttpServletRequest extends HttpServletRequestWrapper {
+
+private final byte[] cachedPayload;
+
+CachedHttpServletRequest(HttpServletRequest request) throws IOException {
+super(request);
+InputStream requestInputStream = request.getInputStream();
+this.cachedPayload = StreamUtils.copyToByteArray(requestInputStream);
+}
+
+@Override
+public ServletInputStream getInputStream() {
+return new CachedServletInputStream(this.cachedPayload);
+}
+
+@Override
+public BufferedReader getReader() {
+ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.cachedPayload);
+return new BufferedReader(new InputStreamReader(byteArrayInputStream));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/logging/CachedServletInputStream.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.logging;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+
+@Slf4j
+class CachedServletInputStream extends ServletInputStream {
+
+private final InputStream cachedInputStream;
+
+CachedServletInputStream(byte[] cachedBody) {
+this.cachedInputStream = new ByteArrayInputStream(cachedBody);
+}
+
+@Override
+public boolean isFinished() {
+try {
+return cachedInputStream.available() == 0;
+} catch (IOException exp) {
+log.error(exp.getMessage());
+}
+return false;
+}
+
+@Override
+public boolean isReady() {
+return true;
+}
+
+@Override
+public void setReadListener(ReadListener readListener) {
+throw new UnsupportedOperationException();
+}
+
+@Override
+public int read() throws IOException {
+return cachedInputStream.read();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/logging/RequestResponseLoggingFilter.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.logging;
+
+import io.micrometer.core.instrument.util.IOUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@Slf4j
+@Component
+class RequestResponseLoggingFilter extends OncePerRequestFilter {
+
+private static final List<String> IGNORE_LOGGING_URI = List.of(
+"/v1/orders/reload"
+);
+
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+FilterChain filterChain) throws ServletException, IOException {
+
+CachedHttpServletRequest cachedHttpServletRequest;
+long startTime  = System.currentTimeMillis();
+
+if (IGNORE_LOGGING_URI.contains(request.getRequestURI())) {
+log.info("Incoming Request: method [{}], uri [{}]", request.getMethod(), request.getRequestURI());
+
+filterChain.doFilter(request, response);
+} else {
+cachedHttpServletRequest = new CachedHttpServletRequest(request);
+final var requestBody = IOUtils.toString(cachedHttpServletRequest.getInputStream(), StandardCharsets.UTF_8);
+
+log.info("Incoming Request: method [{}], uri [{}], body [{}]", request.getMethod(), request.getRequestURI(), requestBody);
+
+filterChain.doFilter(cachedHttpServletRequest, response);
+}
+long endTime = System.currentTimeMillis();
+log.info("Outgoing Response: status [{}], processing time [{}ms]", response.getStatus(), endTime - startTime);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/ErpCommandController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.CommandApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CloseErpOrderCmdRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CloseErpOrderCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateCmdStatusRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetErpCommandResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderReserveRenewalCmdRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderReserveRenewalCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderShipPermissionItemsCmdRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderShipPermissionItemsCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderSignPipelineCmdRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderSignPipelineCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ShippingRequestShipPermissionItemsCmdRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ShippingRequestShipPermissionItemsCmdResponseHttp;
+import ru.liga.evraz.aggregation.application.CommandStatusSendUseCase;
+import ru.liga.evraz.aggregation.application.CreateOrderReserveRenewalCmdUseCase;
+import ru.liga.evraz.aggregation.application.CreateOrderShipPermissionItemsUseCase;
+import ru.liga.evraz.aggregation.application.CreateOrderSignPipelineUseCase;
+import ru.liga.evraz.aggregation.application.CreateShippingRequestShipPermissionCmdUseCase;
+import ru.liga.evraz.aggregation.application.GetErpCommandUseCase;
+import ru.liga.evraz.aggregation.application.cmd.CloseErpOrderCmd;
+import ru.liga.evraz.aggregation.application.usecase.CloseErpOrderUseCase;
+
+@Api(tags = "Command")
+@RestController
+@RequiredArgsConstructor
+class ErpCommandController implements CommandApi {
+
+private final CreateOrderShipPermissionItemsUseCase ucOrderShipPermission;
+private final CreateShippingRequestShipPermissionCmdUseCase ucShippingRequestShipPermission;
+private final CreateOrderSignPipelineUseCase ucOrderSignPipeline;
+private final CreateOrderReserveRenewalCmdUseCase ucOrderReserveRenewal;
+private final CommandStatusSendUseCase ucCommandStatusSend;
+private final ErpCommandHttpMapper mapper;
+private final CloseErpOrderUseCase closeErpOrderUseCase;
+private final GetErpCommandUseCase ucGetErpCommand;
+
+@Override
+public ResponseEntity<ShippingRequestShipPermissionItemsCmdResponseHttp> createShippingRequestShipPermission(
+ShippingRequestShipPermissionItemsCmdRequestHttp body) {
+final var cmd = mapper.map(body.getPayload());
+final var commandResult = ucShippingRequestShipPermission.process(cmd);
+return new ResponseEntity<>(mapper.mapToShippingRequestShipPermissionResponse(commandResult), HttpStatus.OK);
+}
+
+@Override
+public ResponseEntity<OrderShipPermissionItemsCmdResponseHttp> createOrderShipPermission(
+OrderShipPermissionItemsCmdRequestHttp body) {
+final var cmd = mapper.map(body.getPayload());
+final var commandResult = ucOrderShipPermission.process(cmd);
+return ResponseEntity.ok(mapper.mapToOrderShipPermissionResponse(commandResult));
+}
+
+@Override
+public ResponseEntity<OrderSignPipelineCmdResponseHttp> createOrderSignPipeline(
+OrderSignPipelineCmdRequestHttp body) {
+final var cmd = mapper.map(body);
+final var commandGuid = ucOrderSignPipeline.process(cmd);
+return ResponseEntity.ok(mapper.mapToOrderSignPipelineResponse(commandGuid));
+}
+
+@Override
+public ResponseEntity<OrderReserveRenewalCmdResponseHttp> createOrderReserveRenewalCommand(
+OrderReserveRenewalCmdRequestHttp body) {
+final var cmd = mapper.map(body.getPayload());
+final var commandResult = ucOrderReserveRenewal.process(cmd);
+return new ResponseEntity<>(mapper.mapToOrderReserveRenewalResponse(commandResult), HttpStatus.OK);
+}
+
+@Override
+public ResponseEntity<Void> cmdStatusSend(CreateCmdStatusRequestHttp body) {
+final var cmd = mapper.map(body);
+ucCommandStatusSend.process(cmd);
+return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+}
+
+@Override
+public ResponseEntity<CloseErpOrderCmdResponseHttp> closeErpOrder(CloseErpOrderCmdRequestHttp body) {
+CloseErpOrderCmd cmd = mapper.map(body);
+String commandGuid = closeErpOrderUseCase.process(cmd);
+return ResponseEntity.ok(mapper.mapToCloseErpOrderCmdResponse(commandGuid));
+}
+
+@Override
+public ResponseEntity<GetErpCommandResponseHttp> getErpCommand(String commandGuid) {
+final var erpCommand = ucGetErpCommand.getErpCommand(commandGuid);
+return ResponseEntity.ok(mapper.mapToErpCommandResponse(erpCommand));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/ErpCommandHttpMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.*;
+import ru.liga.evraz.aggregation.application.cmd.*;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateCmdStatusRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderReserveRenewalCmdDataHttp;

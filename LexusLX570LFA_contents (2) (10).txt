@@ -1,0 +1,513 @@
+﻿}
+],
+"anyProductsRelated": true
+},
+{
+"id": "5555333111",
+"name": "Ð°Ð²Ñ‚Ð¾Ð¼Ð¾Ð±Ð¸Ð»Ð¸Ðº",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð° Ð°Ð²Ñ‚Ð¾ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+},
+{
+"id": "5555333113",
+"name": "skuName_ÐœÐŸ_ÑƒÑÐ»ÑƒÐ³Ð°",
+"description": "skuTypeName_ÐœÐŸ_ÑƒÑÐ»ÑƒÐ³Ð°",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "metalProcessingStartTimeDescription",
+"inputType": "string",
+"fieldName": "Ð”Ð°Ñ‚Ð° ÐœÐŸ"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/updateDeliverySuccess_Req_1.json
+Content:
+[
+{
+"id": "280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9",
+"name": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)",
+"description": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/updateDeliverySuccess_Req_2.json
+Content:
+[
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_delivery_auto_request.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": "Testov Test",
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": "3269a17a-1957-11e4-80bf-f0921c005714",
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": null,
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request2.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": null,
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": "3269a17a-1957-11e4-80bf-f0921c005714",
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request3.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": "Testov Test",
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": null,
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request_for_order_update.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": "test_recipient_full_name",
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": null,
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_request_for_reload_order.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": null,
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": "3269a17a-1957-11e4-80bf-f0921c005714",
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_response.json
+Content:
+{
+"success": true,
+"message": "Shipping is updated"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/shipping/update/update_shipping_response2.json
+Content:
+{
+"success": true,
+"message": "Shipping is updated"

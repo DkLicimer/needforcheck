@@ -1,0 +1,438 @@
+﻿
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class DeliveryAttributeRepositoryImpl implements DeliveryAttributeRepository {
+
+private final DeliveryAttributeJpaRepository jpaAttributeRepo;
+private final DeliveryTransactionJpaRepository jpaTransactionRepo;
+private final OrderTransactionRepository orderTransactionRepo;
+private final ErpDeliveryJpaRepository jpaDeliveryRepo;
+private final DeliveryOrderJpaRepository jpaDeliveryOrderRepo;
+
+private final DeliveryAttributeUuidGenerator uuidGenerator;
+private final ErpDeliveryEntityMapper mapper;
+
+private final ApplicationEventPublisher applicationEventPublisher;
+
+@Override
+public void deleteByErpDeliveryGuidAndNameAndPositionCode(DeliveryAttribute attribute) {
+final var attributeName = attribute.getName();
+final var deliveryErpGuid = attribute.getErpDeliveryGuid();
+final var positionCode = attribute.getPositionCode();
+
+log.info("Try to delete delivery  attribute {}, with delivery erpGuid {} for positionCode {}", attributeName, deliveryErpGuid, positionCode);
+
+jpaAttributeRepo.deleteByErpDeliveryGuidAndNameAndPositionCode(deliveryErpGuid, attributeName, positionCode);
+
+produceEvents(deliveryErpGuid, attribute, EventType.DELETE_DELIVERY_ATTRIBUTE);
+}
+
+@Override
+public DeliveryAttribute create(DeliveryAttribute attribute) {
+log.info("Try to create delivery attribute {}, with erpGuid {} for positionCode {}",
+attribute.getName(), attribute.getErpDeliveryGuid(), attribute.getPositionCode());
+
+final var entity = mapper.map(attribute);
+entity.setNewEntity(true);
+entity.setId(uuidGenerator.generateUuid());
+final var savedAttribute = jpaAttributeRepo.save(entity);
+
+produceEvents(attribute.getErpDeliveryGuid(), attribute, EventType.CREATE_DELIVERY_ATTRIBUTE);
+
+return mapper.map(savedAttribute);
+}
+
+@Override
+public DeliveryAttribute update(DeliveryAttribute attribute) {
+log.info("Try to update delivery attribute {}, with erpGuid {} for positionCode {}",
+attribute.getName(), attribute.getErpDeliveryGuid(), attribute.getPositionCode());
+
+final var entity = mapper.map(attribute);
+entity.setNewEntity(false);
+final var updatedAttribute = jpaAttributeRepo.save(entity);
+
+produceEvents(attribute.getErpDeliveryGuid(), attribute, EventType.UPDATE_DELIVERY_ATTRIBUTE);
+
+return mapper.map(updatedAttribute);
+}
+
+@Override
+public DeliveryAttribute findByErpOrderGuidAndNameAndPositionCode(DeliveryAttribute attribute) {
+final var optDeliveryAttr = jpaAttributeRepo.findByErpDeliveryGuidAndNameAndPositionCode(
+attribute.getErpDeliveryGuid(), attribute.getName(), attribute.getPositionCode());
+return optDeliveryAttr.map(mapper::map).orElse(null);
+}
+
+@Override
+public List<DeliveryAttribute> findByDeliveryErpGuid(String deliveryErpGuid) {
+return jpaAttributeRepo.findAllByErpDeliveryGuid(deliveryErpGuid).stream()
+.map(mapper::map).toList();
+}
+
+@Override
+public DeliveryAttribute getById(String id) {
+return jpaAttributeRepo.findById(id).map(mapper::map)
+.orElse(DeliveryAttribute.builder().build());
+}
+
+private void produceEvents(String deliveryErpGuid, DeliveryAttribute attribute, EventType eventType) {
+final var optDelivery = jpaDeliveryRepo.findByErpGuid(deliveryErpGuid);
+if (optDelivery.isEmpty()) {
+log.info("""
+Delivery was not found for deliveryErpGuid {}.
+Events to create/update order in starfish will not be sent.
+DeliveryAttribute: {}, event type: {}""", deliveryErpGuid, attribute, eventType);
+
+final var deliveryTransactionEntity = DeliveryTransactionEntity.builder()
+.transactionId(uuidGenerator.generateUuid())
+.erpGuid(deliveryErpGuid)
+.shouldSend(true)
+.newEntity(true)
+.build();
+jpaTransactionRepo.save(deliveryTransactionEntity);
+return;
+}
+
+final var deliveryId = optDelivery.get().getId();
+
+final var deliveryOrderErpGuids = jpaDeliveryOrderRepo
+.findAllByDelivery(ErpDeliveryEntity.builder().id(deliveryId).build()).stream()
+.map(DeliveryOrderEntity::getErpOrderGuid)
+.toList();
+
+for (String orderErpGuid : deliveryOrderErpGuids) {
+produceEvent(deliveryErpGuid, attribute, eventType, orderErpGuid);
+}
+}
+
+private void produceEvent(String deliveryErpGuid, DeliveryAttribute attribute, EventType eventType,
+String orderErpGuid) {
+final var transactionId = uuidGenerator.generateUuid();
+final var deliveryTransactionEntity = DeliveryTransactionEntity.builder()
+.transactionId(transactionId)
+.erpGuid(deliveryErpGuid)
+.shouldSend(true)
+.newEntity(true)
+.build();
+final var deliveryTransaction = jpaTransactionRepo.save(deliveryTransactionEntity);
+
+final var orderTransactionEntity = OrderTransactionEntity.builder()
+.transactionId(transactionId)
+.erpGuid(orderErpGuid)
+.shouldSend(true)
+.newEntity(true)
+.build();
+orderTransactionRepo.save(orderTransactionEntity);
+
+final var event = DeliveryAttributeEvent.builder()
+.deliveryErpGuid(deliveryErpGuid)
+.orderErpGuid(orderErpGuid)
+.transactionId(deliveryTransaction.getId())
+.attribute(attribute)
+.eventType(eventType)
+.build();
+applicationEventPublisher.publishEvent(event);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryAttributeUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class DeliveryAttributeUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryOrderItemUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Component
+public class DeliveryOrderItemUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryOrderUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Component
+public class DeliveryOrderUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryTransactionJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.DeliveryTransactionEntity;
+
+import javax.validation.constraints.NotEmpty;
+
+@Validated
+interface DeliveryTransactionJpaRepository extends JpaRepository<DeliveryTransactionEntity, String> {
+
+@Modifying
+@Query("update DeliveryTransactionEntity dt set dt.shouldSend = false where dt.transactionId = :transactionId")
+void setShouldSentFalse(@NotEmpty @Param("transactionId") String transactionId);
+
+DeliveryTransactionEntity findByTransactionId(@NotEmpty String transactionId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/DeliveryTransactionRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.DeliveryTransactionEntity;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+
+@Repository
+@RequiredArgsConstructor
+class DeliveryTransactionRepositoryImpl implements DeliveryTransactionRepository {
+
+private final DeliveryTransactionJpaRepository jpaRepository;
+
+@Override
+public void setShouldSentFalse(String id) {
+jpaRepository.setShouldSentFalse(id);
+}
+
+@Override
+public DeliveryTransactionEntity save(DeliveryTransactionEntity entity) {
+return jpaRepository.save(entity);
+}
+
+@Override
+public DeliveryTransactionEntity findById(String id) {
+return jpaRepository.findByTransactionId(id);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/ErpCommandMetrics.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.command.ErpCommandEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.command.MetricConfigEntity;
+
+import java.time.Clock;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class ErpCommandMetrics {
+
+private final Clock clock;
+private final CommandJpaRepository erpCommandJpaRepository;
+private final CommandMapper commandMapper;
+private final MeterRegistry meterRegistry;
+
+final AtomicInteger allErpCommandsCount = new AtomicInteger(0);
+
+ConcurrentHashMap<String, AtomicInteger> gaugeMetric2value = new ConcurrentHashMap<>();
+
+@Value("${erp.commands.metrics.period:PT1M}")
+private Duration duration;
+
+@Value("${erp.commands.metrics.enabled:true}")
+private Boolean metricsEnabled;
+
+@Value("${erp.commands.metrics.is-test:false}")
+private Boolean metricsTest;
+
+@Scheduled(cron = "${erp.commands.metrics.collectorCron:0/5 * * * * *}")
+public void collectErpCommandMetrics() {
+if (metricsEnabled) {
+final var allErpCommandsPerPeriod = getAllErpCommandsPerPeriod();
+
+final var allCommandsPerPeriodCount = allErpCommandsPerPeriod.size();
+allErpCommandsCount.getAndSet(allCommandsPerPeriodCount);
+
+final Map<String, List<ErpCommandEntity>> allByType = collectAndGroupByType(
+allErpCommandsPerPeriod,
+erpCommand -> true);
+
+for (final var type : erpCommandMapper.getCommandTypes()) {
+fillGaugeMetricForType("erp_command_all_count", type, allByType);
+}
+}
+}
+
+private List<ErpCommandEntity> getAllErpCommandsPerPeriod() {
+final var currentDateTime = LocalDateTime.now(clock);
+final var metricsConfigSelectionDelta = getSelectionDeltaFromDbOrDefault();
+final var allCommandsPerPeriod = new ArrayList<ErpCommandEntity>();
+
+if (!metricsTest) {
+allCommandsPerPeriod.addAll(
+erpCommandJpaRepository.findAllByCreatedAtIsLessThanEqualAndCreatedAtIsGreaterThan(
+currentDateTime,
+currentDateTime.minus(metricsConfigSelectionDelta))
+);
+} else {
+generateDataForTest(allCommandsPerPeriod);
+}
+return allCommandsPerPeriod;
+}
+
+private Duration getSelectionDeltaFromDbOrDefault() {
+return commandMapper.findAll().stream()
+.findFirst()
+.map(MetricConfigEntity::getSelectionDelta)
+.map(Duration::parse)
+.orElse(duration);
+}
+
+private static void generateDataForTest(ArrayList<ErpCommandEntity> allCommandsPerPeriod) {
+// Logic to generate test data
+}
+
+private void fillGaugeMetricForType(String metricName, String type, Map<String, List<ErpCommandEntity>> dataByType4Metrics) {
+final var key = metricName + " " + type;
+
+final int value = Optional.ofNullable(dataByType4Metrics.get(type))
+.map(List::size)
+.orElse(0);
+
+if (gaugeMetric2value.containsKey(key)) {
+final var atomicInt = gaugeMetric2value.get(key);
+atomicInt.getAndSet(value);
+} else {
+final var atomicValue = new AtomicInteger(value);
+gaugeMetric2value.put(key, atomicValue);
+meterRegistry.gauge(metricName, Set.of(Tag.of("commandType", type)), atomicValue);
+}
+}
+
+private Map<String, List<ErpCommandEntity>> collectAndGroupByType(Collection<ErpCommandEntity> collection,
+Predicate<? super ErpCommandEntity> filterPredicate) {
+return collection.stream()
+.filter(filterPredicate)
+.collect(Collectors.groupingBy(ErpCommandEntity::getCommandType));
+}
+}
+```
+
+Ð­Ñ‚Ð¾Ñ‚ ÐºÐ»Ð°ÑÑ ÑÐ¾Ð±Ð¸Ñ€Ð°ÐµÑ‚ Ð¼ÐµÑ‚Ñ€Ð¸ÐºÐ¸ Ð´Ð»Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´ ERP, Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÑ Ð¿Ñ€ÐµÐ´Ð¾ÑÑ‚Ð°Ð²Ð»ÐµÐ½Ð½Ñ‹Ðµ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð¸Ð· Ð±Ð°Ð·Ñ‹ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¸ ÐºÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ð¾Ð½Ð½Ð¾Ð³Ð¾ Ñ„Ð°Ð¹Ð»Ð°. ÐžÐ½ Ð°Ð½Ð°Ð»Ð¾Ð³Ð¸Ñ‡ÐµÐ½ ÐºÐ»Ð°ÑÑÑƒ `ArmMetrics`, Ð½Ð¾ Ð°Ð´Ð°Ð¿Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½ Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ð°Ð¼Ð¸ ERP.
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/ErpDeliveryRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import ru.liga.evraz.aggregation.adapter.db.converter.ErpDeliveryEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryOrderItemEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryOrderItemJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.DeliveryTransactionEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+import ru.liga.evraz.aggregation.application.event.DeliveryEvent;
+import ru.liga.evraz.aggregation.application.event.EventType;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.domain.model.DeliveryItem;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ErpDeliveryRepositoryImpl implements ErpDeliveryRepository {
+
+private final ErpDeliveryJpaRepository deliveryRepository;
+private final ErpDeliveryOrderItemJpaRepository itemRepository;
+private final DeliveryOrderJpaRepository deliveryOrderJpaRepository;
+
+private final ErpDeliveryUuidGenerator erpDeliveryUuidGenerator;
+private final DeliveryOrderUuidGenerator deliveryOrderUuidGenerator;
+private final DeliveryOrderItemUuidGenerator deliveryOrderItemUuidGenerator;
+
+private final ErpDeliveryEntityMapper mapper;
+
+private final DeliveryTransactionRepository deliveryTransactionJpaRepository;
+private final OrderTransactionRepository orderTransactionRepo; // Ð§Ñ‚Ð¾Ð±Ñ‹ Ð² ÑˆÐµÐ´ÑƒÐ»ÐµÑ€Ðµ Ð½Ðµ Ñ€Ð°Ð·Ð±Ð¸Ñ€Ð°Ñ‚ÑŒ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸
+private final ApplicationEventPublisher applicationEventPublisher;
+
+@Override
+@Transactional
+public ErpDelivery createUpdate(ErpDelivery newDeliveryModel) {
+log.debug("{}", newDeliveryModel);
+final var deliveryErpGuid = newDeliveryModel.getErpGuid();
+if (Boolean.TRUE.equals(newDeliveryModel.getDeleted() || Boolean.FALSE.equals(newDeliveryModel.getActive()))) {
+log.info("Try to delete delivery with erpGuid {}", deliveryErpGuid);
+deleteDeliveryAndSendUpdateInfoToSf(newDeliveryModel);
+return newDeliveryModel;
+}
+
+var optOldDeliveryEntity = deliveryRepository.findByErpGuid(deliveryErpGuid);
+var newDeliveryEntity = mapper.toDeliveryEntity(newDeliveryModel);

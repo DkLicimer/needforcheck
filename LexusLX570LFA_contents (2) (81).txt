@@ -1,0 +1,457 @@
+﻿* â€¢  DESCRIPTION_OF_THE_TRANSPORT_SERVICE = ÐÐ° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹;
+* â€¢  OUR_TRANSPORTATION_SERVICE_TO_THE_CLIENT = ÐÐ°ÑˆÐ° Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð°Ñ ÑÐ»ÑƒÐ¶Ð±Ð° Ð´Ð¾ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+* â€¢  OUR_TRANSPORT_SERVICE_TO_THE_CARRIER = ÐÐ°ÑˆÐ° Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð°Ñ ÑÐ»ÑƒÐ¶Ð±Ð° Ð´Ð¾ Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·Ñ‡Ð¸ÐºÐ°.
+* Ð‘Ñ‹Ð²Ð°ÐµÑ‚ Ð½Ðµ ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ðµ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð¸ Ð¿Ð¾ Ñ„Ð°ÐºÑ‚Ñƒ. Ð’ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ ÑÐ¿Ð¾ÑÐ¾Ð± Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¾Ð´Ð¸Ð½, Ð° Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð° Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° Ñ Ð´Ñ€ÑƒÐ³Ð¸Ð¼ Ñ‚Ð¸Ð¿Ð¾Ð¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ (sÑ€kuType=SERVICE_DELIVERY).
+*/
+@Getter
+public enum ErpDeliveryMethod {
+PICKUP_FROM_OUR_WAREHOUSE("Ð¡Ð°Ð¼Ð¾Ð²Ñ‹Ð²Ð¾Ð· (Ñ Ð½Ð°ÑˆÐµÐ³Ð¾ ÑÐºÐ»Ð°Ð´Ð°)"),
+DELIVERY_BY_RAILWAY_TRANSPORT("Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð¶/Ð´ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼"),
+DESCRIPTION_OF_THE_TRANSPORT_SERVICE("ÐÐ° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹"),
+OUR_TRANSPORTATION_SERVICE_TO_THE_CLIENT("ÐÐ°ÑˆÐ° Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð°Ñ ÑÐ»ÑƒÐ¶Ð±Ð° Ð´Ð¾ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°"),
+OUR_TRANSPORT_SERVICE_TO_THE_CARRIER("ÐÐ°ÑˆÐ° Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð°Ñ ÑÐ»ÑƒÐ¶Ð±Ð° Ð´Ð¾ Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·Ñ‡Ð¸ÐºÐ°");
+
+private final String description;
+
+ErpDeliveryMethod(String description) {
+this.description = description;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/ErpTaskStatus.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ Ð·Ð°Ð´Ð°Ñ‡Ð¸ Ð² 1Ð¡.
+* â€¢ CREATED - Ð¡Ð¾Ð·Ð´Ð°Ð½Ð°;
+* â€¢ IN_PROGRESS - Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÑ‚ÑÑ;
+* â€¢ COMPLETED - Ð—Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð°.
+*/
+@Getter
+public enum ErpTaskStatus {
+CREATED,
+IN_PROGRESS,
+COMPLETED
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/OrderAgreement.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¡Ð¾Ð³Ð»Ð°ÑˆÐµÐ½Ð¸Ðµ. (Ð”Ð»Ñ Order Ñ OrderDocumentType = CLIENT_ORDER).
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  PREPAYMENT = ÐŸÑ€ÐµÐ´Ð¾Ð¿Ð»Ð°Ñ‚Ð°
+* â€¢  POSTPAID = ÐžÑ‚ÑÑ€Ð¾Ñ‡ÐºÐ° (Ð¿Ð¾ÑÑ‚Ð¾Ð¿Ð»Ð°Ñ‚Ð°)
+*/
+@Getter
+public enum OrderAgreement {
+PREPAYMENT,
+POSTPAID;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/OrderContractType.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¢Ð¸Ð¿ Ð´Ð¾Ð³Ð¾Ð²Ð¾Ñ€Ð° (documentType = CLIENT_ORDER).
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  INVOICE_OFFER = Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°
+* â€¢  INVOICE_OFFER_CASH = Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð° (Ð½Ð°Ð»Ð¸Ñ‡Ð½Ñ‹Ð¹ Ñ€Ð°ÑÑ‡ÐµÑ‚)
+* â€¢  FRAME_STANDARD = Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ñ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹
+* â€¢  FRAME_NON_STANDARD = Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹
+*/
+@Getter
+public enum OrderContractType {
+INVOICE_OFFER("Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°"),
+INVOICE_OFFER_CASH("Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð° (Ð½Ð°Ð»Ð¸Ñ‡Ð½Ñ‹Ð¹ Ñ€Ð°ÑÑ‡ÐµÑ‚)"),
+FRAME_STANDARD("Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ñ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹"),
+FRAME_NON_STANDARD("Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹");
+
+private final String description;
+
+OrderContractType(String description) {
+this.description = description;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/OrderDocumentSource.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+/**
+* Ð˜ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÑÐ²ÐºÐ¸.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  SITE_CLIENT = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð¾Ð¼ Ð½Ð° ÑÐ°Ð¹Ñ‚Ðµ;
+* â€¢  SITE_MANAGER = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶ Ð½Ð° ÑÐ°Ð¹Ñ‚Ðµ;
+* â€¢  ERP = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶ Ð² 1C:ERP.
+* <p>
+* Ð˜ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  SITE_CLIENT = Ð—Ð°ÐºÐ°Ð· ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð°Ð²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸ Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ñ ÑÐ°Ð¹Ñ‚Ð°, ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð¾Ð¼;
+* â€¢  SITE_MANAGER = Ð—Ð°ÐºÐ°Ð· ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð°Ð²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸ Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ñ ÑÐ°Ð¹Ñ‚Ð°, ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶;
+* â€¢  ERP = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶ Ð² 1C:ERP.
+*/
+@Getter
+public enum OrderDocumentSource {
+SITE_CLIENT,
+SITE_MANAGER,
+ERP;
+
+public static final Set<OrderDocumentSource> CLIENT_REQUEST_SET = EnumSet.of(
+SITE_CLIENT, SITE_MANAGER, ERP);
+
+public static final Set<OrderDocumentSource> CLIENT_ORDER_SET = EnumSet.of(
+SITE_CLIENT, SITE_MANAGER, ERP);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/OrderDocumentStatus.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+/**
+* Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ Ð—Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° (documentType=CLIENT_REQUEST):
+* â€¢  ACCEPTED = ÐŸÑ€Ð¸Ð½ÑÑ‚Ð°;
+* â€¢  IN_PROCESSING = Ð’ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐµ;
+* â€¢  PROCESSED = ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ð½Ð°;
+* â€¢  CANCELED_BY_USER = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¼;
+* â€¢  CANCELED_BY_MANAGER = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼;
+* â€¢  CANCELED_BY_KC_EMPLOYEE = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ¾Ð¼ ÐšÐ¦.
+* <p>
+* Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ Ð—Ð°ÐºÐ°Ð·Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° (documentType=CLIENT_ORDER):
+* â€¢  TO_BE_AGREED = ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸;
+* â€¢  TO_BE_COMPLETED = Ðš Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸ÑŽ;
+* â€¢  CLOSED = Ð—Ð°ÐºÑ€Ñ‹Ñ‚.
+*/
+@Getter
+public enum OrderDocumentStatus {
+// CLIENT_REQUEST
+ACCEPTED("ÐŸÑ€Ð¸Ð½ÑÑ‚Ð°"),
+IN_PROCESSING("Ð’ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐµ"),
+PROCESSED("ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ð½Ð°"),
+CANCELED_BY_USER("ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¼"),
+CANCELED_BY_MANAGER("ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼"),
+CANCELED_BY_KC_EMPLOYEE("ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ¾Ð¼ ÐšÐ¦"),
+// CLIENT_ORDER
+TO_BE_AGREED("ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"),
+TO_BE_COMPLETED("Ðš Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸ÑŽ"),
+CLOSED("Ð—Ð°ÐºÑ€Ñ‹Ñ‚");
+
+public static final Set<OrderDocumentStatus> CLIENT_REQUEST_SET = EnumSet.of(
+ACCEPTED,
+IN_PROCESSING,
+PROCESSED,
+CANCELED_BY_USER,
+CANCELED_BY_MANAGER,
+CANCELED_BY_KC_EMPLOYEE
+);
+
+public static final Set<OrderDocumentStatus> CLIENT_ORDER_SET = EnumSet.of(
+TO_BE_AGREED,
+TO_BE_COMPLETED,
+CLOSED
+);
+
+private final String description;
+
+OrderDocumentStatus(String description) {
+this.description = description;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/OrderDocumentType.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¢Ð¸Ð¿ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° (Ð·Ð°ÐºÐ°Ð·/Ð·Ð°ÑÐ²ÐºÐ°).
+* â€¢  CLIENT_REQUEST = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+* â€¢  CLIENT_ORDER = Ð—Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°.
+*/
+@Getter
+public enum OrderDocumentType {
+CLIENT_REQUEST, // Ð—Ð°ÑÐ²ÐºÐ°
+CLIENT_ORDER;   // Ð—Ð°ÐºÐ°Ð·
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/OrderPaymentMethod.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¡Ð¿Ð¾ÑÐ¾Ð± Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹, Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  PAYMENT_ON_ACCOUNT = ÐŸÑ€ÐµÐ´Ð¾Ð¿Ð»Ð°Ñ‚Ð° Ð¿Ð¾ ÑÑ‡ÐµÑ‚Ñƒ;
+* â€¢  ONLINE = ÐžÐ½Ð»Ð°Ð¹Ð½ Ð½Ð° ÑÐ°Ð¹Ñ‚Ðµ;
+* â€¢  PAYMENT_UPON_RECEIPT = Ð¡ Ð¾Ñ‚ÑÑ€Ð¾Ñ‡ÐºÐ¾Ð¹ Ð¿Ð»Ð°Ñ‚ÐµÐ¶Ð°;
+* â€¢  POSTPAID = ÐžÐ¿Ð»Ð°Ñ‚Ð° Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŽ Ð¿Ñ€Ð¸ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ;
+* â€¢  POINT_OF_SALE_PAYMENT = ÐžÐ¿Ð»Ð°Ñ‚Ð° Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ.
+*/
+@Getter
+public enum OrderPaymentMethod {
+PAYMENT_ON_ACCOUNT("INVOICE"),
+ONLINE("PREPAID"),
+PAYMENT_UPON_RECEIPT("CUSTOM_POST_PAID"),
+POSTPAID("POST_PAID"),
+POINT_OF_SALE_PAYMENT("POINT_OF_SALE_PAYMENT");
+
+private final String starfishValue;
+
+OrderPaymentMethod(String starfishValue) {
+this.starfishValue = starfishValue;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/SfDeliveryMethod.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¡Ð¿Ð¾ÑÐ¾Ð± Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² Starfish24.
+* ÐŸÐ¾Ð»Ðµ Ð¿ÐµÑ€ÐµÐ´Ð°ÐµÐ¼ ÐºÐ°Ðº ÐµÑÑ‚ÑŒ, Ð»Ð¾Ð³Ð¸ÐºÑƒ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ð³Ð¾ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð½Ð° MVP1 Ð½Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÑ‚ÑÑ
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  DELIVERY_AUTO_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð°Ð²Ñ‚Ð¾;
+* â€¢  DELIVERY_RAILWAY_SERVICE = Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð¶/Ð´ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼;
+* â€¢  DELIVERY_SEA_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¼Ð¾Ñ€ÑÐºÐ°Ñ;
+* â€¢  PICKUP_IN_STORE = Ð¡Ð°Ð¼Ð¾Ð²Ñ‹Ð²Ð¾Ð·;
+* Ð•ÑÑ‚ÑŒ ÑƒÑÐ»ÑƒÐ³Ð° ÐŸÐµÑ€ÐµÐ²Ð°Ð»ÐºÐ°, ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð² OMS Ð½Ðµ Ð¾Ð±Ñ€Ð°Ð±Ð°Ñ‚Ñ‹Ð²Ð°ÐµÐ¼ (ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸)
+* <p>
+* ÐÐ° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1Ð¡:
+* Ð ÐµÐ³Ð¸ÑÑ‚Ñ€ ÑÐ²ÐµÐ´ÐµÐ½Ð¸Ð¹ (Ð²Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€, Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð°, Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Ñ‚Ð¸Ð¿Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸), ÐµÑÐ»Ð¸ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¾Ð´Ð½Ð¾Ð·Ð½Ð°Ñ‡Ð½Ð¾ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÑŒ Ð¿Ð¾ Ð²Ð¸Ð´Ñƒ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð²Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, ÐµÑÐ»Ð¸ Ð½ÐµÑ‚, Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñƒ.
+* Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Ñ‚Ð¸Ð¿Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸
+* Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÑ‚ÑÑ Ð² ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ð¸ Ñ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð¼
+* <a href="https://cfl.evraz.com/pages/viewpage.action?pageId=69173742">Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ</a>
+*/
+@Getter
+public enum SfDeliveryMethod {
+DELIVERY_AUTO_SERVICE("delivery_auto", "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼"),
+DELIVERY_RAILWAY_SERVICE("delivery_rail", "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð¶/Ð´ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼"),
+DELIVERY_SEA_SERVICE("delivery_water", "Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¼Ð¾Ñ€ÑÐºÐ°Ñ"),
+PICKUP_IN_STORE("pickup_in_store", "Ð¡Ð°Ð¼Ð¾Ð²Ñ‹Ð²Ð¾Ð·"),
+DELIVERY_OTHER("delivery_other", "Ð”Ñ€ÑƒÐ³Ð¾Ð¹");
+
+private final String description;
+
+private final String sfDeliveryTypeValue;
+
+SfDeliveryMethod(String sfDeliveryTypeValue, String description) {
+this.sfDeliveryTypeValue = sfDeliveryTypeValue;
+this.description = description;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/common/ControllerResult.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.common;
+
+import lombok.Getter;
+import lombok.Setter;
+
+
+@Getter
+@Setter
+public class ControllerResult {
+
+private boolean success = true;
+private String message;
+private String result;
+
+public static ControllerResult successResult(String message) {
+ControllerResult result = new ControllerResult();
+result.success = true;
+result.message = message;
+return result;
+}
+
+public static ControllerResult failResult(String message) {
+ControllerResult result = new ControllerResult();
+result.success = false;
+result.message = message;
+return result;
+}
+
+public ControllerResult() {
+
+}
+
+public ControllerResult(boolean success, String message, String result) {
+this.success = success;
+this.message = message;
+this.result = result;
+}
+
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/AbstractCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public abstract class AbstractCommand {
+protected String commandGuid;
+protected String commandType;
+protected String instanceId;
+protected String orderId;
+protected String erpGuid;
+protected LocalDateTime createdAt;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/CloseErpOrderCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class CloseErpOrderCommand extends AbstractCommand {
+private String documentCancellationReason;
+private String positionCancellationReason;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/CommandStatusData.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CommandStatusData {
+private String commandGuid;
+private String commandType;
+private String erpStatus;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/ErpCommandDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class ErpCommandDto {
+private String commandGuid;
+private String commandType;
+private String instanceId;
+private String orderId;
+private String erpGuid;
+private String shippingErpGuid;
+private String documentCancellationReason;
+private String positionCancellationReason;
+private String erpStatus;
+private String erpDetails;
+private String taskGuid;
+private Boolean omsPipeline;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/ErpTaskCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class ErpTaskCommand extends AbstractCommand {
+private String taskGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/OrderItemShortData.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class OrderItemShortData {
+@NotEmpty
+private String skuId;
+@Positive
+private Long positionCode;
+@NotEmpty
+@Pattern(regexp = "SHIP")
+private String skuStatus;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/OrderReserveRenewalCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+

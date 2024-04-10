@@ -1,0 +1,438 @@
+﻿import com.fasterxml.jackson.annotation.JsonProperty;
+
+public enum DayName {
+@JsonProperty("MONDAY")
+MONDAY,
+@JsonProperty("TUESDAY")
+TUESDAY,
+@JsonProperty("WEDNESDAY")
+WEDNESDAY,
+@JsonProperty("THURSDAY")
+THURSDAY,
+@JsonProperty("FRIDAY")
+FRIDAY,
+@JsonProperty("SATURDAY")
+SATURDAY,
+@JsonProperty("SUNDAY")
+SUNDAY
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/BpmService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributeDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ñ Ð¼Ð¾Ð´ÐµÐ»ÑÐ¼Ð¸ "Ð—Ð°ÐºÐ°Ð·/Ð—Ð°ÑÐ²ÐºÐ°".
+*/
+@Validated
+public interface BpmService {
+
+ControllerResult updateProcessVariables(@NotEmpty String sfOrderId, Optional<OrderSearchDto> optSfOrder, @NotNull List<CustomAttributesDto> customAttributes);
+
+void sendCommandStatus(@NotEmpty String messageId, String orderId, String tenantId,
+@Valid @NotEmpty List<CustomAttributeDto> customAttributes);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/CommandRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.command.AbstractCommand;
+import ru.liga.evraz.aggregation.domain.model.command.CloseErpOrderCommand;
+import ru.liga.evraz.aggregation.domain.model.command.CommandStatusData;
+import ru.liga.evraz.aggregation.domain.model.command.ErpCommandDto;
+import ru.liga.evraz.aggregation.domain.model.command.ErpTaskCommand;
+import ru.liga.evraz.aggregation.domain.model.command.OrderReserveRenewalCommand;
+import ru.liga.evraz.aggregation.domain.model.command.OrderShipPermissionItemsCommand;
+import ru.liga.evraz.aggregation.domain.model.command.OrderSignPipelineCommand;
+import ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission.ShippingRequestShipPermissionItemsCommand;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð¿Ð¾ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐµ ÐºÐ¾Ð¼Ð°Ð½Ð´.
+*/
+@Validated
+public interface CommandRepository {
+
+@Transactional
+OrderShipPermissionItemsCommand createErpCommand(@NotNull OrderShipPermissionItemsCommand command);
+
+@Transactional
+ShippingRequestShipPermissionItemsCommand createErpCommand(@NotNull ShippingRequestShipPermissionItemsCommand command);
+
+@Transactional
+OrderSignPipelineCommand createErpCommand(@NotNull OrderSignPipelineCommand command);
+
+@Transactional
+CloseErpOrderCommand createErpCommand(@NotNull CloseErpOrderCommand command);
+
+@Transactional
+ErpTaskCommand createErpCommand(@NotNull ErpTaskCommand command);
+
+@Transactional
+OrderReserveRenewalCommand createErpCommand(@NotNull OrderReserveRenewalCommand command);
+
+@Transactional
+void updateSendStatusByCommandGuid(@NotEmpty String id);
+
+@Transactional(readOnly = true)
+Optional<AbstractCommand> findByCommandGuid(@NotEmpty String commandGuid);
+
+@Transactional
+void updateErpCommandStatus(@NotEmpty String commandGuid, CmdStatus status, String details);
+
+@Transactional(readOnly = true)
+List<CommandStatusData> findLatestWithStatusForOrder(String orderId);
+
+@Transactional(readOnly = true)
+Optional<ErpCommandDto> findErpCommandByCommandGuid(@NotEmpty String commandGuid);
+
+@Transactional(readOnly = true)
+Optional<ErpCommandDto> findLatestByOrderIdAndTypeWithPositiveErpStatus(@NotEmpty String orderId, @NotEmpty String commandType);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/DeliveryAttributeRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+
+import java.util.List;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð—Ð°Ð´Ð°Ñ‡Ð° Ð² ERP".
+*/
+@Validated
+public interface DeliveryAttributeRepository {
+
+void deleteByErpDeliveryGuidAndNameAndPositionCode(@Valid @NotNull DeliveryAttribute attribute);
+
+DeliveryAttribute findByErpOrderGuidAndNameAndPositionCode(@Valid @NotNull DeliveryAttribute attribute);
+
+@Transactional
+DeliveryAttribute create(@Valid @NotNull DeliveryAttribute attribute);
+
+@Transactional
+DeliveryAttribute update(@Valid @NotNull DeliveryAttribute attribute);
+
+List<DeliveryAttribute> findByDeliveryErpGuid(@NotEmpty String deliveryErpGuid);
+
+DeliveryAttribute getById(@NotEmpty String id);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/DeliveryTransactionRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.DeliveryTransactionEntity;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ Ñ‚Ñ€Ð°Ð½Ð·Ð°ÐºÑ†Ð¸Ð¾Ð½Ð½Ð¾Ð¹ Ñ‚Ð°Ð±Ð»Ð¸Ñ†ÐµÐ¹ Ð¿Ð¾ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ°Ð¼.
+*/
+@Validated
+public interface DeliveryTransactionRepository {
+
+@Transactional
+void setShouldSentFalse(@NotEmpty String id);
+
+DeliveryTransactionEntity save(@NotNull DeliveryTransactionEntity entity);
+
+DeliveryTransactionEntity findById(@NotEmpty String id);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/ErpDeliveryRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð—Ð°Ð´Ð°Ñ‡Ð° Ð² ERP".
+*/
+@Validated
+public interface ErpDeliveryRepository {
+
+ErpDelivery createUpdate(@Valid @NotNull ErpDelivery delivery);
+
+@Transactional(readOnly = true)
+List<ErpDelivery> findAllByIds(@NotNull @Size(min = 1) List<String> ids);
+
+@Transactional(readOnly = true)
+ErpDelivery findByErpGuid(@NotEmpty String erpGuid);
+
+@Transactional(readOnly = true)
+Optional<ErpDelivery> findByErpGuidWithoutOrders(@NotEmpty String erpGuid);
+
+@Transactional(readOnly = true)
+ErpDelivery getByErpGuidOrError(@NotEmpty String shippingErpGuid);
+
+@Transactional(readOnly = true, noRollbackFor = Exception.class)
+List<DeliveryOrder> findAllByErpOrderGuid(@NotEmpty String orderErpGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/ErpTaskService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+import ru.liga.evraz.aggregation.application.cmd.ErpTaskStatusCmd;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð—Ð°Ð´Ð°Ñ‡Ð° Ð² ERP".
+*/
+@Validated
+public interface ErpTaskService {
+ErpTask findFirstActiveByOrderAndType(String orderId, ErpTaskType taskType);
+
+List<ErpTask> findActiveByOrderAndType(String orderId, ErpTaskType taskType);
+
+ErpTask create(@Valid @NotNull ErpTask task);
+
+void markSent(String id);
+
+void deactivate(String id, Boolean canceled);
+
+void updateStatus(ErpTaskStatusCmd cmd);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/OrderAttributeRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð°Ð¼Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°.
+*/
+@Validated
+public interface OrderAttributeRepository {
+
+@Transactional
+OrderAttribute create(@Valid @NotNull OrderAttribute attribute);
+
+@Transactional
+OrderAttribute update(@Valid @NotNull OrderAttribute attribute);
+
+void deleteByErpOrderGuidAndAttributeNameAndPositionCode(@Valid @NotNull OrderAttribute attribute);
+
+OrderAttribute findByErpOrderGuidAndNameAndPositionCode(@NotEmpty String erpGuid, @NotEmpty String name, Long positionCode);
+
+List<OrderAttribute> findAll();
+
+List<OrderAttribute> findByErpOrderGuid(@NotEmpty String erpGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/OrderItemRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ".
+*/
+@Validated
+public interface OrderItemRepository {
+@Transactional(readOnly = true)
+List<OrderItem> getOrderItemsByOrders(Set<String> orderErpGuids);
+
+@Transactional(readOnly = true)
+List<OrderItem> getOrderItemsByOrder(String orderErpGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/OrderRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import feign.FeignException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð—Ð°ÐºÐ°Ð·/Ð—Ð°ÑÐ²ÐºÐ°".
+*/
+@Validated
+public interface OrderRepository {
+
+boolean existsByErpGuid(@NotBlank String erpGuid);
+
+@Transactional(readOnly = true)
+Order getByErpGuid(@NotBlank String erpGuid);
+
+boolean existsByStarfishOrderId(@NotBlank String sfOrderId);
+
+Order getByStarfishOrderId(@NotBlank String sfOrderId);
+
+String getErpGuidByStarfishOrderId(@NotBlank String sfOrderId);
+
+@Transactional(noRollbackFor = {FeignException.class})
+Order create(@Valid @NotNull Order order);
+
+@Transactional(noRollbackFor = {FeignException.class})
+Order update(@Valid @NotNull Order order);
+
+@Transactional
+void setStarfishOrderId(@NotEmpty String orderErpGuid, @NotEmpty String sfOrderId);
+
+@Transactional
+void setOmsPipelineFlag(@NotEmpty String sfOrderId, @NotNull Boolean omsPipeline);
+
+@Transactional
+void createOrderTransactionForOmsPipelineUpdate(@NotEmpty String orderErpGuid, String orderTransactionIdSuffix);
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/OrderReserveRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.OrderReserve;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð ÐµÐ·ÐµÑ€Ð² Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ".
+*/
+@Validated
+public interface OrderReserveRepository {
+
+boolean existsByOrderErpGuid(@NotBlank String erpGuid);
+
+@Transactional
+OrderReserve create(@Valid @NotNull OrderReserve attribute);
+
+@Transactional
+OrderReserve update(@Valid @NotNull OrderReserve attribute);
+
+OrderReserve getByErpOrderGuid(@NotEmpty String erpGuid);
+
+OrderReserve getById(@NotEmpty String id);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/OrderService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.LegalEntityDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer.CustomerDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDetails;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderUpdateDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping.ShippingDto;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ñ Ð¼Ð¾Ð´ÐµÐ»ÑÐ¼Ð¸ "Ð—Ð°ÐºÐ°Ð·/Ð—Ð°ÑÐ²ÐºÐ°".
+*/
+@Validated
+public interface OrderService {
+String createOrder(@Valid @NotNull Order order, @NotNull OrderCreateExtendedDto sfOrder);
+String createOrder(String erpGuid, @NotNull OrderCreateExtendedDto sfOrder, CancellationReason cancellationReason);
+
+Order getShortOrderInfoByStarfishOrderId(@NotEmpty String sfOrderId);
+
+Optional<OrderSearchDto> getShortOrderInfoByClientOrderId(@NotEmpty String clientOrderId);
+
+@Deprecated
+void setOrderCancellationReason(@Valid @NotNull Order order, @NotEmpty String sfOrderId);
+
+void setOrderCancellationReason(CancellationReason cancellationReason, String sfOrderId);
+
+void markOrderDeleted(String starfishOrderId);
+
+ResponseEntity<OrderDto> updateOrderCustomAttributes(@NotEmpty String sfOrderId, @NotEmpty List<CustomAttributesDto> attributes);
+

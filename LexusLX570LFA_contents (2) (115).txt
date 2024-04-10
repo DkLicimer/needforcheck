@@ -1,0 +1,515 @@
+﻿@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/SubdivisionEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@Data
+@Table(name = "subdivision")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class SubdivisionEntity implements Serializable {
+
+@Id
+private String subdivisionId;
+@Column
+private String subdivisionName;
+@Column(nullable = false)
+private String timeZone;
+@OneToMany(mappedBy = "subdivision", orphanRemoval = true, cascade = CascadeType.ALL)
+private Set<WorkDayEntity> workDays;
+@OneToMany(mappedBy = "subdivision", orphanRemoval = true, cascade = CascadeType.ALL)
+private Set<WarehouseEntity> warehouses;
+@Column(nullable = false)
+private boolean deleted;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/UserGroupEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "user_group")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Slf4j
+@Validated
+public class UserGroupEntity implements Persistable<String> {
+
+@Id
+@Column(name = "group_id")
+private String groupId;
+
+@Column(name = "group_name")
+private String groupName;
+
+@ManyToMany(cascade = CascadeType.ALL)
+@JoinTable(
+name = "group_participant",
+joinColumns = @JoinColumn(name = "user_group_id"),
+inverseJoinColumns = @JoinColumn(name = "user_group_participant_id")
+)
+private List<UserGroupParticipantEntity> participants;
+
+@Column(name = "created_date", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdDate;
+
+@Column(name = "modified_date")
+@LastModifiedDate
+private LocalDateTime modifiedDate;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public String getId() {
+return this.groupId;
+}
+
+@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/UserGroupParticipantEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "user_group_participant")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Slf4j
+@Validated
+public class UserGroupParticipantEntity implements Persistable<String> {
+@Id
+@Column(name = "person_id")
+private String personId;
+@Column(name = "person_full_name")
+private String personFullName;
+@Column(name = "email")
+private String email;
+@Column(name = "subdivision_id")
+private String subdivisionId;
+@Column(name = "subdivision_name")
+private String subdivisionName;
+@Column(name = "role_id")
+private String roleId;
+@Column(name = "role_name")
+private String roleName;
+
+@ManyToMany(mappedBy = "participants")
+private List<UserGroupEntity> userGroups;
+
+@Column(name = "created_date", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdDate;
+
+@Column(name = "modified_date")
+@LastModifiedDate
+private LocalDateTime modifiedDate;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public String getId() {
+return this.personId;
+}
+
+@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/WarehouseEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Table(name = "warehouse")
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class WarehouseEntity implements Persistable<String> {
+@Id
+private String id;
+
+private String name;
+
+private String timeZone;
+
+private String type;
+
+private String address;
+
+private String city;
+
+private Boolean active;
+
+private Boolean deleted;
+
+@OneToMany(mappedBy = "warehouse", orphanRemoval = true, cascade = CascadeType.ALL)
+private Set<WarehouseWorkDayEntity> workDays;
+
+@ManyToOne(optional = false, fetch = FetchType.LAZY)
+@JoinColumn(name = "subdivision_id", nullable = false)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private SubdivisionEntity subdivision;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+@Transient
+public boolean isNew() {
+return false;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/WarehouseWorkDayEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+import ru.liga.evraz.aggregation.domain.DayName;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@Data
+@Table(name = "warehouse_work_day")
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class WarehouseWorkDayEntity implements Serializable {
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id")
+private Long workDayId;
+@Enumerated(EnumType.STRING)
+private DayName name;
+@OneToMany(mappedBy = "workDay", orphanRemoval = true, cascade = CascadeType.ALL)
+private List<WarehouseWorkScheduleEntity> workSchedule;
+@ManyToOne(optional = false, fetch = FetchType.LAZY)
+@JoinColumn(name = "warehouse_id", nullable = false)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private WarehouseEntity warehouse;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/WarehouseWorkScheduleEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Data
+@Table(name = "warehouse_work_schedule")
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class WarehouseWorkScheduleEntity implements Serializable {
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id")
+private Long workScheduleId;
+@Column(nullable = false)
+private String start;
+@Column(nullable = false, name = "\"end\"")
+private String end;
+@ManyToOne(optional = false, fetch = FetchType.LAZY)
+@JoinColumn(name = "warehouse_work_day_id", nullable = false)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private WarehouseWorkDayEntity workDay;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/WorkDayEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+import ru.liga.evraz.aggregation.domain.DayName;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+@Entity
+@Data
+@Table(name = "work_day")
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkDayEntity implements Serializable {
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long workDayId;
+@Enumerated(EnumType.STRING)
+private DayName name;
+@OneToMany(mappedBy = "workDay", orphanRemoval = true, cascade = CascadeType.ALL)
+private List<WorkScheduleEntity> workSchedule;
+@ManyToOne(optional = false, fetch = FetchType.LAZY)
+@JoinColumn(name = "subdivision_id", nullable = false)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private SubdivisionEntity subdivision;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/WorkScheduleEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Data
+@Table(name = "work_schedule")
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkScheduleEntity implements Serializable {
+
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long workScheduleId;
+@Column(nullable = false)
+private String start;
+@Column(nullable = false, name = "\"end\"")
+private String end;
+@ManyToOne(optional = false, fetch = FetchType.LAZY)
+@JoinColumn(name = "work_day_id", nullable = false)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private WorkDayEntity workDay;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/transaction/DeliveryTransactionEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.transaction;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Builder
+@Table(name = "delivery_transaction")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class DeliveryTransactionEntity implements Persistable<String> {
+
+@Id
+@Column(name = "transaction_id", nullable = false)
+private String transactionId;
+
+@Column(name = "erp_guid", nullable = false)
+private String erpGuid;
+
+@Column(name = "should_send", nullable = false)
+private Boolean shouldSend;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate

@@ -1,0 +1,528 @@
+﻿"name": "specificationApprovalRequired",
+"value": ""
+},
+{
+"name": "address",
+"value": ""
+},
+{
+"name": "promissedDeliveryDate",
+"value": ""
+},
+{
+"name": "partnerGuid",
+"value": ""
+},
+{
+"name": "documentTimeZone",
+"value": ""
+},
+{
+"name": "dispatchWarehouseSlotBooked",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsNote",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoods",
+"value": ""
+},
+{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/update/delete/custom_attribute_delete_request2.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "test_order"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test"
+},
+{
+"name": "contractType",
+"value": "INVOICE_OFFER"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": ""
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "4-test-erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "true"
+},
+{
+"name": "contractNumber",
+"value": "Ð’Ð -32-18-Ð¾Ð´"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": "ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡"
+},
+{
+"name": "erpPipeline",
+"value": "true"
+},
+{
+"name": "omsPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "ONE"
+},
+{
+"name": "paymentAmount",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": ""
+},
+{
+"name": "approvalProcessStatus",
+"value": ""
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "invoiceSent",
+"value": ""
+},
+{
+"name": "shippingCountEnum",
+"value": "NO_ZNP"
+},
+{
+"name": "deliveryStatus",
+"value": ""
+},
+{
+"name": "logisticManagerResponsibleId",
+"value": ""
+},
+{
+"name": "transferred",
+"value": ""
+},
+{
+"name": "deliveryDriverPhone",
+"value": ""
+},
+{
+"name": "deliveryCarNumber",
+"value": ""
+},
+{
+"name": "deliveryDriverFullName",
+"value": ""
+},
+{
+"name": "deliveryDocumentId",
+"value": ""
+},
+{
+"name": "deliveryDocumentLink",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFromDescription",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeToDescription",
+"value": ""
+},
+{
+"name": "shippingDeliveryMethod",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+},
+{
+"name": "paidQuantity",
+"value": ""
+},
+{
+"name": "licenseNumber",
+"value": ""
+},
+{
+"name": "shippingRecipientGuid",
+"value": ""
+},
+{
+"name": "deliveryTimeZone",
+"value": ""
+},
+{
+"name": "deliveryPeriod",
+"value": ""
+},
+{
+"name": "pricesAgreed",
+"value": ""
+},
+{
+"name": "reservationRemovalDate",
+"value": ""
+},
+{
+"name": "reservationExtensionReason",
+"value": ""
+},
+{
+"name": "clientInn",
+"value": "test-client_inn"
+},
+{
+"name": "clientName",
+"value": "test-client_name"
+},
+{
+"name": "specificationApprovalRequired",
+"value": ""
+},
+{
+"name": "address",
+"value": ""
+},
+{
+"name": "promissedDeliveryDate",
+"value": ""
+},
+{
+"name": "partnerGuid",
+"value": ""
+},
+{
+"name": "documentTimeZone",
+"value": ""
+},
+{
+"name": "dispatchWarehouseSlotBooked",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsNote",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoods",
+"value": ""
+},
+{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/update/delete/custom_attribute_delete_response.json
+Content:
+{
+"orderId": "### custom_attributes response Ok"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/update/delete/custom_attribute_update_request.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "test_order"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "documentLink",
+"value": "e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test"
+},
+{
+"name": "contractType",
+"value": "INVOICE_OFFER"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": ""
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "4-test-erp_guid"
+},
+{
+"name": "paymentAmount",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": ""
+},
+{
+"name": "approvalProcessStatus",
+"value": ""
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "invoiceSent",
+"value": ""
+},
+{
+"name": "deliveryDocumentId",
+"value": ""
+},
+{
+"name": "deliveryDocumentLink",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": ""
+},
+{
+"name": "shippingDeliveryMethod",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/external/update/delete/items_delete_request1.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾",
+"productId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 78730.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "4"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",

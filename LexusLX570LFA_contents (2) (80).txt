@@ -1,0 +1,486 @@
+﻿import ru.liga.evraz.aggregation.domain.model.Partner;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpDeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderAgreement;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderContractType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentSource;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentStatus;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderPaymentMethod;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import javax.validation.constraints.NotNull;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Order {
+
+private String id;
+private OrderDocumentType documentType;
+private String baseErpGuid;
+private String documentId;
+private ZonedDateTime documentDateTime;
+private OrderDocumentSource documentSource;
+private Boolean orderType;
+private String documentLink;
+private OrderContractType contractType;
+private String saleManagerResponsibleId;
+
+private String saleManagerResponsibleEmail;
+private OrderDocumentStatus documentStatus;
+private ZonedDateTime documentStatusModifiedAt;
+private CancellationReason documentCancellationReason;
+private OrderPaymentMethod paymentMethod;
+private OrderAgreement agreement;
+private Double totalCost;
+private ErpDeliveryMethod deliveryMethod;
+private String recipientFullName;
+private String recipientPhone;
+private String recipientEmail;
+private Partner partner;
+private String customerFullName;
+private String customerPhone;
+private String customerEmail;
+private String subdivisionId;
+private String erpGuid;
+private boolean deleted;
+private boolean deletedMark;
+
+private boolean active;
+private String sfOrderId;
+private Set<OrderItem> orderItems = new HashSet<>();
+private OffsetDateTime createdAt;
+private OffsetDateTime modifiedAt;
+
+private String contractNumber;
+private String saleManagerResponsibleName;
+private String customerComment;
+private Boolean erpPipeline;
+
+private Boolean omsPipeline;
+private boolean inPieces;
+private Integer deliveryPeriod;
+private Boolean pricesAgreed;
+private String customerGuid;
+private Boolean orderPaid;
+private ZonedDateTime orderPaidAssignmentDate;
+private Boolean specificationApprovalRequired;
+private BigDecimal itemsPrice;
+private BigDecimal itemsDiscountPrice;
+private BigDecimal itemsServiceDiscountPrice;
+private BigDecimal discountValue;
+private String partnerGuid;
+private String documentTimeZone;
+private Boolean requiredQuotation;
+@NotNull
+private Boolean requiredCall;
+@NotNull
+private Boolean branching;
+private String address;
+private Boolean invoiceWithout;
+private String paymentLink;
+
+public Order update(Order updOrder) {
+this.documentType = updOrder.getDocumentType();
+this.baseErpGuid = updOrder.getBaseErpGuid();
+this.documentId = updOrder.getDocumentId();
+this.documentDateTime = updOrder.getDocumentDateTime();
+this.documentSource = updOrder.getDocumentSource();
+this.orderType = updOrder.getOrderType();
+this.documentLink = updOrder.getDocumentLink();
+this.contractType = updOrder.getContractType();
+this.saleManagerResponsibleId = updOrder.getSaleManagerResponsibleId();
+this.saleManagerResponsibleEmail = updOrder.getSaleManagerResponsibleEmail();
+this.documentStatus = updOrder.getDocumentStatus();
+this.documentCancellationReason = updOrder.getDocumentCancellationReason();
+this.paymentMethod = updOrder.getPaymentMethod();
+this.agreement = updOrder.getAgreement();
+this.deliveryMethod = updOrder.getDeliveryMethod();
+this.recipientFullName = updOrder.getRecipientFullName();
+this.recipientEmail = updOrder.getRecipientEmail();
+this.recipientPhone = updOrder.getRecipientPhone();
+this.partner = updOrder.getPartner();
+this.customerFullName = updOrder.getCustomerFullName();
+this.customerEmail = updOrder.getCustomerEmail();
+this.customerPhone = updOrder.getCustomerPhone();
+this.subdivisionId = updOrder.getSubdivisionId();
+this.erpGuid = updOrder.getErpGuid();
+//this.sfOrderId = updOrder.getSfOrderId();
+this.orderItems = updOrder.getOrderItems();
+this.deleted = updOrder.isDeleted();
+this.deletedMark = updOrder.isDeletedMark();
+this.active = updOrder.isActive();
+this.totalCost = updOrder.getTotalCost();
+this.contractNumber = updOrder.getContractNumber();
+this.saleManagerResponsibleName = updOrder.getSaleManagerResponsibleName();
+this.customerComment = updOrder.getCustomerComment();
+this.erpPipeline = updOrder.getErpPipeline();
+this.inPieces = updOrder.isInPieces();
+this.deliveryPeriod = updOrder.getDeliveryPeriod();
+this.pricesAgreed = updOrder.getPricesAgreed();
+this.customerGuid = updOrder.getCustomerGuid();
+this.orderPaid = updOrder.getOrderPaid();
+this.orderPaidAssignmentDate = updOrder.getOrderPaidAssignmentDate();
+this.specificationApprovalRequired = updOrder.getSpecificationApprovalRequired();
+this.itemsPrice = updOrder.getItemsPrice();
+this.itemsDiscountPrice = updOrder.getItemsDiscountPrice();
+this.itemsServiceDiscountPrice = updOrder.getItemsServiceDiscountPrice();
+this.discountValue = updOrder.getDiscountValue();
+this.partnerGuid = updOrder.getPartnerGuid();
+this.documentTimeZone = updOrder.getDocumentTimeZone();
+this.requiredQuotation = updOrder.getRequiredQuotation();
+this.requiredCall = updOrder.getRequiredCall();
+this.branching = updOrder.getBranching();
+this.address = updOrder.getAddress();
+this.invoiceWithout = updOrder.getInvoiceWithout();
+this.paymentLink = updOrder.getPaymentLink();
+return this;
+}
+
+public Order updateSfOrderId(String sfOrderId) {
+this.sfOrderId = sfOrderId;
+return this;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/OrderAdditionalAttributes.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderAdditionalAttributes {
+
+private String invoiceCreated;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/OrderItem.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+import ru.liga.evraz.aggregation.domain.model.product.SkuStatus;
+import ru.liga.evraz.aggregation.domain.model.product.SkuType;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class OrderItem {
+private String id;
+@NotNull
+@Positive
+private Long positionCode;
+private Long linkedSkuPositionCode;
+@NotEmpty
+private String skuId;
+@NotEmpty
+private String skuName;
+@NotEmpty
+private String skuTypeName;
+@NotNull
+private SkuType skuType;
+// for CLIENT_ORDER
+private SkuStatus skuStatus;
+@PositiveOrZero
+@NotNull
+private Double quantity;
+@NotEmpty
+private String measureUnit;
+@PositiveOrZero
+private Double price;
+@PositiveOrZero
+private Double positionCost;
+@NotEmpty
+private String currency;
+// Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð¾Ñ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð½Ñ‹Ñ… Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ñ skuStatus = CANCELED
+private CancellationReason positionCancellationReason;
+
+private String warehouseId;
+
+private Boolean provideFromOtherOrders;
+
+private Order order;
+
+private LocalDateTime itemDateTime;
+private String skuComment;
+private String productVariantAttribute;
+
+private Double discount;
+
+public boolean equalsToUpdateInProduct(OrderItem orderItem) {
+return Objects.equals(positionCode, orderItem.getPositionCode())
+&& Objects.equals(linkedSkuPositionCode, orderItem.getLinkedSkuPositionCode())
+&& Objects.equals(skuId, orderItem.getSkuId())
+&& Objects.equals(skuName, orderItem.getSkuName())
+&& Objects.equals(skuTypeName, orderItem.getSkuTypeName());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/CancellationReason.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+import java.util.EnumSet;
+
+/**
+* ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°.
+* Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð¾Ñ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð½Ñ‹Ñ… Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²
+* Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  NO_REASON = Ð‘ÐµÐ· ÑƒÐºÐ°Ð·Ð°Ð½Ð¸Ñ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹;
+* â€¢  RETURN_TO_DEPOSITOR = Ð’Ð¾Ð·Ð²Ñ€Ð°Ñ‚ Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ÐºÐ»Ð°Ð¶ÐµÐ´Ð°Ñ‚ÐµÐ»ÑŽ;
+* â€¢  COMPLETED = Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½;
+* â€¢  TASK_HIGH_VOLUME = Ð—Ð°Ð´Ð°Ð½Ð¸Ðµ (Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð¹ Ð¾Ð±ÑŠÐµÐ¼);
+* â€¢  INTERESTED_IN_LOADING_KATYUSHAE = Ð˜Ð½Ñ‚ÐµÑ€ÐµÑÐ¾Ð²Ð°Ð»Ð° Ð¿Ð¾Ð³Ñ€ÑƒÐ·ÐºÐ° ÐšÐ°Ñ‚ÑŽÑˆÐµÐ¹;
+* â€¢  PRICE_MONITORING = ÐœÐ¾Ð½Ð¸Ñ‚Ð¾Ñ€Ð¸Ð½Ð³ Ñ†ÐµÐ½;
+* â€¢  NOT_OUR_RANGE = ÐÐµ Ð½Ð°Ñˆ ÑÐ¾Ñ€Ñ‚Ð°Ð¼ÐµÐ½Ñ‚;
+* â€¢  BAD_LENGTH = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ð´Ð»Ð¸Ð½Ð°;
+* â€¢  BAD_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð°;
+* â€¢  BAD_METAL_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¼ÐµÑ‚Ð°Ð»Ð»;
+* â€¢  BAD_PROCESSING_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÑƒ;
+* â€¢  NOT_FIT = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð¸ ÑÑ€Ð¾ÐºÐ¸;
+* â€¢  NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸;
+* â€¢  PART_NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸;
+* â€¢  NO_PAYMENT = ÐÐµÑ‚ Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹;
+* â€¢  NO_RESPONSE_FROM_CLIENT = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+* â€¢  NO_RESPONSE_FROM_MANAGER = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð°;
+* â€¢  IMPOSSIBLE_MANUFACTURING = ÐÐµÑ‚ Ñ‚ÐµÑ…. Ð²Ð¾Ð·Ð¼Ð¾Ð¶. Ð¸Ð·Ð³Ð¾Ñ‚Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ;
+* â€¢  SHIPPED = ÐžÑ‚Ð³Ñ€ÑƒÐ¶ÐµÐ½;
+* â€¢  CLIENT_REJECTION = ÐžÑ‚ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+* â€¢  CANCELED = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½;
+* â€¢  NO_LONGER_NEEDED = ÐžÑ‚Ð¿Ð°Ð»Ð° Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð½Ð¾ÑÑ‚ÑŒ;
+* â€¢  ORDER_RECEATED = ÐŸÐµÑ€ÐµÑÐ¾Ð·Ð´Ð°Ð½ Ð·Ð°ÐºÐ°Ð·;
+* â€¢  DIFFERENT_REASONS = Ð Ð°Ð·Ð½Ñ‹Ðµ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹;
+* â€¢  TEST_ORDER = Ð¢ÐµÑÑ‚Ð¾Ð²Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·;
+* â€¢  GOZ = Ð“ÐžÐ— (Ð“Ð¾ÑÐžÐ±Ð¾Ñ€Ð¾Ð½Ð—Ð°ÐºÐ°Ð·).
+* <p>
+* ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹ Ð·Ð°ÐºÐ°Ð·Ð°.
+* Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð¾Ñ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð½Ñ‹Ñ… Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²
+* Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  NO_REASON = Ð‘ÐµÐ· ÑƒÐºÐ°Ð·Ð°Ð½Ð¸Ñ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹;
+* â€¢  RETURN_TO_DEPOSITOR = Ð’Ð¾Ð·Ð²Ñ€Ð°Ñ‚ Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ÐºÐ»Ð°Ð¶ÐµÐ´Ð°Ñ‚ÐµÐ»ÑŽ;
+* â€¢  COMPLETED = Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½;
+* â€¢  TASK_HIGH_VOLUME = Ð—Ð°Ð´Ð°Ð½Ð¸Ðµ (Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð¹ Ð¾Ð±ÑŠÐµÐ¼);
+* â€¢  INTERESTED_IN_LOADING_KATYUSHAE = Ð˜Ð½Ñ‚ÐµÑ€ÐµÑÐ¾Ð²Ð°Ð»Ð° Ð¿Ð¾Ð³Ñ€ÑƒÐ·ÐºÐ° ÐšÐ°Ñ‚ÑŽÑˆÐµÐ¹;
+* â€¢  PRICE_MONITORING = ÐœÐ¾Ð½Ð¸Ñ‚Ð¾Ñ€Ð¸Ð½Ð³ Ñ†ÐµÐ½;
+* â€¢  NOT_OUR_RANGE = ÐÐµ Ð½Ð°Ñˆ ÑÐ¾Ñ€Ñ‚Ð°Ð¼ÐµÐ½Ñ‚;
+* â€¢  BAD_LENGTH = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ð´Ð»Ð¸Ð½Ð°;
+* â€¢  BAD_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð°;
+* â€¢  BAD_METAL_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¼ÐµÑ‚Ð°Ð»Ð»;
+* â€¢  BAD_PROCESSING_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÑƒ;
+* â€¢  NOT_FIT = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð¸ ÑÑ€Ð¾ÐºÐ¸;
+* â€¢  NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸;
+* â€¢  PART_NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸;
+* â€¢  NO_PAYMENT = ÐÐµÑ‚ Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹;
+* â€¢  NO_RESPONSE_FROM_CLIENT = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+* â€¢  NO_RESPONSE_FROM_MANAGER = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð°;
+* â€¢  IMPOSSIBLE_MANUFACTURING = ÐÐµÑ‚ Ñ‚ÐµÑ…. Ð²Ð¾Ð·Ð¼Ð¾Ð¶. Ð¸Ð·Ð³Ð¾Ñ‚Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ;
+* â€¢  SHIPPED = ÐžÑ‚Ð³Ñ€ÑƒÐ¶ÐµÐ½;
+* â€¢  CLIENT_REJECTION = ÐžÑ‚ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+* â€¢  CANCELED = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½;
+* â€¢  NO_LONGER_NEEDED = ÐžÑ‚Ð¿Ð°Ð»Ð° Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð½Ð¾ÑÑ‚ÑŒ;
+* â€¢  ORDER_RECEATED = ÐŸÐµÑ€ÐµÑÐ¾Ð·Ð´Ð°Ð½ Ð·Ð°ÐºÐ°Ð·;
+* â€¢  DIFFERENT_REASONS = Ð Ð°Ð·Ð½Ñ‹Ðµ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹;
+* â€¢  TEST_ORDER = Ð¢ÐµÑÑ‚Ð¾Ð²Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·;
+* â€¢  GOZ = Ð“ÐžÐ— (Ð“Ð¾ÑÐžÐ±Ð¾Ñ€Ð¾Ð½Ð—Ð°ÐºÐ°Ð·).
+*/
+@Getter
+public enum CancellationReason {
+// CLIENT_REQUEST
+NO_REASON,
+RETURN_TO_DEPOSITOR,
+COMPLETED,
+TASK_HIGH_VOLUME,
+INTERESTED_IN_LOADING_KATYUSHAE,
+PRICE_MONITORING,
+NOT_OUR_RANGE,
+BAD_LENGTH,
+BAD_PRICE,
+BAD_METAL_PRICE,
+BAD_PROCESSING_PRICE,
+NOT_FIT,
+NOT_AVAILABLE,
+PART_NOT_AVAILABLE,
+NO_PAYMENT,
+NO_RESPONSE_FROM_CLIENT,
+NO_RESPONSE_FROM_MANAGER,
+IMPOSSIBLE_MANUFACTURING,
+SHIPPED,
+CLIENT_REJECTION,
+CANCELED,
+NO_LONGER_NEEDED,
+ORDER_RECEATED,
+DIFFERENT_REASONS,
+TEST_ORDER,
+GOZ,
+
+// additional for positionCancellationReason
+CLOSED_BY_DEADLINE,
+EXPENSIVE,
+TECHNICAL_TRANSFER,
+NEED_FIXATION,
+REJECTION_MEASURED_GOODS,
+TRANSFER_TO_ANOTHER_ORDER,
+NO_ITEM_TO_COMPLETE_ORDER,
+NO_TRANSPORT;
+
+public static final EnumSet<CancellationReason> CLIENT_REQUEST_SET = EnumSet.of(
+NO_REASON,
+RETURN_TO_DEPOSITOR,
+COMPLETED,
+TASK_HIGH_VOLUME,
+INTERESTED_IN_LOADING_KATYUSHAE,
+PRICE_MONITORING,
+NOT_OUR_RANGE,
+BAD_LENGTH,
+BAD_PRICE,
+BAD_METAL_PRICE,
+BAD_PROCESSING_PRICE,
+NOT_FIT,
+NOT_AVAILABLE,
+PART_NOT_AVAILABLE,
+NO_PAYMENT,
+NO_RESPONSE_FROM_CLIENT,
+NO_RESPONSE_FROM_MANAGER,
+IMPOSSIBLE_MANUFACTURING,
+SHIPPED,
+CLIENT_REJECTION,
+CANCELED,
+NO_LONGER_NEEDED,
+ORDER_RECEATED,
+DIFFERENT_REASONS,
+TEST_ORDER,
+GOZ
+);
+
+public static final EnumSet<CancellationReason> CLIENT_ORDER_SET = EnumSet.of(
+NO_REASON,
+RETURN_TO_DEPOSITOR,
+COMPLETED,
+TASK_HIGH_VOLUME,
+INTERESTED_IN_LOADING_KATYUSHAE,
+PRICE_MONITORING,
+NOT_OUR_RANGE,
+BAD_LENGTH,
+BAD_PRICE,
+BAD_METAL_PRICE,
+BAD_PROCESSING_PRICE,
+NOT_FIT,
+NOT_AVAILABLE,
+PART_NOT_AVAILABLE,
+NO_PAYMENT,
+NO_RESPONSE_FROM_CLIENT,
+NO_RESPONSE_FROM_MANAGER,
+IMPOSSIBLE_MANUFACTURING,
+SHIPPED,
+CLIENT_REJECTION,
+CANCELED,
+NO_LONGER_NEEDED,
+ORDER_RECEATED,
+DIFFERENT_REASONS,
+TEST_ORDER,
+GOZ
+);
+
+public static final EnumSet<CancellationReason> POSITION_CANCELLATION_REASON = EnumSet.of(
+NO_REASON,
+CLOSED_BY_DEADLINE,
+EXPENSIVE,
+TECHNICAL_TRANSFER,
+NEED_FIXATION,
+REJECTION_MEASURED_GOODS,
+NOT_AVAILABLE,
+CLIENT_REJECTION,
+TRANSFER_TO_ANOTHER_ORDER,
+SHIPPED,
+BAD_METAL_PRICE,
+BAD_PROCESSING_PRICE,
+NOT_FIT,
+NO_RESPONSE_FROM_CLIENT,
+IMPOSSIBLE_MANUFACTURING,
+NO_LONGER_NEEDED,
+NO_ITEM_TO_COMPLETE_ORDER,
+NO_TRANSPORT,
+GOZ
+);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/CmdStatus.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² 1Ð¡.
+* â€¢ OK = ÐºÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1Ð¡ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ð»Ð°ÑÑŒ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾;
+* â€¢ ERROR = Ð¾ÑˆÐ¸Ð±ÐºÐ° Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ Ð´Ð°Ð½Ð½Ñ‹Ñ….
+*/
+@Getter
+public enum CmdStatus {
+OK,
+ERROR
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/CountEnum.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÑÐµÐ¼Ð¾Ð³Ð¾ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ð³Ð¾ Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð°.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  NONE
+* â€¢  ONE
+* â€¢  MANY
+*/
+@Getter
+public enum CountEnum {
+NONE,
+ONE,
+NO_ZNP,
+MANY;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/enums/ErpDeliveryMethod.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order.enums;
+
+import lombok.Getter;
+
+/**
+* Ð¡Ð¿Ð¾ÑÐ¾Ð± Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸.
+* ÐŸÐ¾Ð»Ðµ Ð¿ÐµÑ€ÐµÐ´Ð°ÐµÐ¼ ÐºÐ°Ðº ÐµÑÑ‚ÑŒ, Ð»Ð¾Ð³Ð¸ÐºÑƒ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ð³Ð¾ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð½Ð° MVP1 Ð½Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÑ‚ÑÑ
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  PICKUP_FROM_OUR_WAREHOUSE = Ð¡Ð°Ð¼Ð¾Ð²Ñ‹Ð²Ð¾Ð· (Ñ Ð½Ð°ÑˆÐµÐ³Ð¾ ÑÐºÐ»Ð°Ð´Ð°);
+* â€¢  DELIVERY_BY_RAILWAY_TRANSPORT = Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð¶/Ð´ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼;

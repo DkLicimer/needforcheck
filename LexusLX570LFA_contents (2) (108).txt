@@ -1,0 +1,443 @@
+﻿
+CamundaProcessVariablesCmd map(String methodName, EnrichCamundaVariablesRequestHttp body);
+
+EnrichCamundaVariablesResponseHttp map(ControllerResult source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/OrderController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import ru.liga.evraz.aggregation.api.adapter.in.http.OrderApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.*;
+import ru.liga.evraz.aggregation.application.CreateUpdateOrderAttributeUseCase;
+import ru.liga.evraz.aggregation.application.CreateUpdateOrderReserveUseCase;
+import ru.liga.evraz.aggregation.application.CreateUpdateOrderUseCase;
+import ru.liga.evraz.aggregation.application.GetOrderAdditionalAttributesUseCase;
+import ru.liga.evraz.aggregation.application.GetOrderUseCase;
+import ru.liga.evraz.aggregation.application.ReloadOrdersUseCase;
+import ru.liga.evraz.aggregation.application.usecase.GenerateOrderCopyLinkUseCase;
+
+import javax.validation.Valid;
+
+@Api(tags = "Order")
+@RestController
+@Validated
+@RequiredArgsConstructor
+class OrderController implements OrderApi {
+
+private final CreateUpdateOrderUseCase ucCreateUpdateOrder;
+private final CreateUpdateOrderAttributeUseCase ucCreateUpdateAttribute;
+private final ReloadOrdersUseCase reloadOrdersUseCase;
+private final CreateUpdateOrderReserveUseCase ucCreateUpdateOrderReserve;
+private final GetOrderUseCase ucGetOrder;
+private final GetOrderAdditionalAttributesUseCase ucGetOrderAdditionalAttributes;
+private final OrderHttpMapper orderHttpMapper;
+private final GenerateOrderCopyLinkUseCase generateOrderCopyLinkUseCase;
+
+@Override
+public ResponseEntity<CreateUpdateOrderResponseHttp> createOrUpdateOrder(@Valid CreateUpdateOrderRequestHttp body) {
+final var cmd = orderHttpMapper.map(body);
+final var order = ucCreateUpdateOrder.createUpdateOrder(cmd);
+return ResponseEntity.ok(orderHttpMapper.map(order));
+}
+
+@Override
+public ResponseEntity<CreateUpdateOrderAttributeResponseHttp> createOrUpdateOrderAttribute(
+CreateUpdateOrderAttributeRequestHttp body) {
+final var cmd = orderHttpMapper.map(body.getPayload());
+final var attribute = ucCreateUpdateAttribute.createUpdateOrderAttribute(cmd);
+return ResponseEntity.ok(
+CreateUpdateOrderAttributeResponseHttp.builder()
+.payload(orderHttpMapper.map(attribute))
+.build()
+);
+}
+
+@Override
+public ResponseEntity<OrdersReloadResponseHttp> reloadOrders(MultipartFile file) {
+final var orderIds = reloadOrdersUseCase.reloadOrders(file);
+return ResponseEntity.ok(OrdersReloadResponseHttp.builder().payload(orderIds).build());
+}
+
+@Override
+public ResponseEntity<CreateUpdateOrderReserveResponseHttp> createOrUpdateOrderReserve(
+CreateUpdateOrderReserveRequestHttp body) {
+final var cmd = orderHttpMapper.map(body.getPayload());
+final var orderReserve = ucCreateUpdateOrderReserve.createUpdateOrderReserve(cmd);
+return ResponseEntity.ok(
+CreateUpdateOrderReserveResponseHttp.builder()
+.payload(orderHttpMapper.map(orderReserve))
+.build()
+);
+}
+
+@Deprecated
+@Override
+public ResponseEntity<GetOrderDocumentStatusModifiedAtResponseHttp> getOrderDocumentStatusModifiedAt(String orderId) {
+final var order = ucGetOrder.getOrderUseCase(orderId);
+return ResponseEntity.ok(
+GetOrderDocumentStatusModifiedAtResponseHttp.builder()
+.payload(orderHttpMapper.mapDocumentStatusModifiedAt(order))
+.build()
+);
+}
+
+@Override
+public ResponseEntity<GetOrderAttributesResponseHttp> getOrderAttributes(String orderId) {
+final var order = ucGetOrder.getOrderUseCase(orderId);
+final var orderAdditionalAttributes = ucGetOrderAdditionalAttributes.getOrderAdditionalAttributesCase(order.getErpGuid());
+return ResponseEntity.ok(
+GetOrderAttributesResponseHttp.builder()
+.payload(orderHttpMapper.map(order, orderAdditionalAttributes))
+.build()
+);
+}
+
+@Override
+public ResponseEntity<GenerateCopyLinkResponseHttp> generateOrderCopyLink(String sfOrderId) {
+String link = generateOrderCopyLinkUseCase.generate(sfOrderId);
+
+return ResponseEntity.ok(GenerateCopyLinkResponseHttp.builder()
+.payload(new GenerateCopyLinkPayloadHttp(link))
+.build());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/OrderHttpMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateOrderRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateOrderResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.DocumentItemHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetOrderAttributesPayloadHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetOrderDocumentStatusModifiedAtPayloadHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderAttributeHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderReserveHttp;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderAttributeCmd;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderCmd;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderReserveCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.OrderReserve;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.OrderAdditionalAttributes;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderHttpMapper {
+
+@Mapping(target = ".", source = "payload")
+@Mapping(target = "orderItems", source = "payload.documentItems")
+@Mapping(target = "recipientFullName", ignore = true)
+@Mapping(target = "recipientPhone", ignore = true)
+@Mapping(target = "customerComment", source = "payload.orderComment")
+CreateUpdateOrderCmd map(CreateUpdateOrderRequestHttp source);
+
+@Mapping(target = "payload", source = ".")
+CreateUpdateOrderResponseHttp map(Order source);
+
+@AfterMapping
+default void mapDocumentItemsForResponse(@MappingTarget OrderHttp.OrderHttpBuilder target, Order source) {
+final List<DocumentItemHttp> items = mapOrderItemsForResponse(source.getOrderItems()).stream()
+.sorted(Comparator.comparing(DocumentItemHttp::getPositionCode))
+.collect(toList());
+
+target.documentItems(items);
+}
+
+@AfterMapping
+default void mapPartnerForResponse(@MappingTarget OrderHttp.OrderHttpBuilder target, Order source) {
+if (source.getPartner() != null) {
+target.clientGuid(source.getPartner().getClientGuid());
+target.clientType(source.getPartner().getClientType());
+target.clientInn(source.getPartner().getClientInn());
+target.clientName(source.getPartner().getClientName());
+}
+}
+
+List<DocumentItemHttp> mapOrderItemsForResponse(Set<OrderItem> source);
+
+CreateUpdateOrderAttributeCmd map(OrderAttributeHttp source);
+
+OrderAttributeHttp map(OrderAttribute source);
+
+@Mapping(target = "itemDateTime", source = "skuDateTime")
+OrderItem map(DocumentItemHttp source);
+
+@Mapping(source = "erpGuid", target = "erpOrderGuid")
+CreateUpdateOrderReserveCmd map(OrderReserveHttp source);
+
+@Mapping(source = "erpOrderGuid", target = "erpGuid")
+OrderReserveHttp map(OrderReserve source);
+
+GetOrderDocumentStatusModifiedAtPayloadHttp mapDocumentStatusModifiedAt(Order order);
+
+@Mapping(source = "order.documentStatusModifiedAt", target = "documentStatusModifiedAt")
+@Mapping(source = "orderAdditionalAttributes", target = "additionalAttributes")
+GetOrderAttributesPayloadHttp map(Order order, OrderAdditionalAttributes orderAdditionalAttributes);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/RestExceptionHandler.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.liga.evraz.aggregation.application.exception.BusinessException;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+
+import java.util.HashSet;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+
+import static org.apache.commons.lang3.StringUtils.SPACE;
+
+@RestControllerAdvice
+@ConditionalOnWebApplication
+@Slf4j
+public class RestExceptionHandler {
+
+@ExceptionHandler(NotImplementedException.class)
+ResponseEntity<?> processRuntimeException(NotImplementedException e) {
+final var status = HttpStatus.NOT_IMPLEMENTED;
+final var fault = Fault.builder()
+.code(status.name())
+.details(e.getMessage())
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, status);
+}
+
+@ExceptionHandler(ConstraintViolationException.class)
+ResponseEntity<?> processRuntimeException(ConstraintViolationException e) {
+final var status = HttpStatus.BAD_REQUEST;
+final var fault = Fault.builder()
+.code(status.name())
+.details(e.getMessage())
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, status);
+}
+
+@ExceptionHandler(MethodArgumentNotValidException.class)
+ResponseEntity<?> processRuntimeException(MethodArgumentNotValidException e) {
+final var status = HttpStatus.BAD_REQUEST;
+
+final var errorMessages = new HashSet<String>();
+if (CollectionUtils.isNotEmpty(e.getFieldErrors())) {
+e.getFieldErrors().forEach(errorMessage -> {
+final var sb = new StringBuilder()
+.append(errorMessage.getObjectName()).append(SPACE)
+.append("ÐŸÐ¾Ð»Ðµ ").append(errorMessage.getField()).append(SPACE)
+.append(errorMessage.getDefaultMessage());
+errorMessages.add(sb.toString());
+});
+}
+if (CollectionUtils.isNotEmpty(e.getGlobalErrors())) {
+e.getGlobalErrors().forEach(errorMessage -> {
+final var sb = new StringBuilder()
+.append(errorMessage.getObjectName()).append(SPACE)
+.append(errorMessage.getDefaultMessage());
+errorMessages.add(sb.toString());
+});
+}
+
+final var fault = Fault.builder()
+.code(status.name())
+.details(String.join("; ", errorMessages))
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, status);
+}
+
+@ExceptionHandler(ValidationException.class)
+ResponseEntity<?> processRuntimeException(ValidationException e) {
+final var status = HttpStatus.BAD_REQUEST;
+final var fault = Fault.builder()
+.code(status.name())
+.details(e.getMessage())
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, status);
+}
+
+@ExceptionHandler(BusinessException.class)
+ResponseEntity<?> processRuntimeException(BusinessException e) {
+final var status = HttpStatus.BAD_REQUEST;
+final var fault = Fault.builder()
+.code(status.name())
+.details(e.getMessage())
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, status);
+}
+
+@ExceptionHandler(RuntimeException.class)
+ResponseEntity<?> processRuntimeException(RuntimeException e) {
+final var fault = Fault.builder()
+.code(HttpStatus.INTERNAL_SERVER_ERROR.name())
+.details(e.getMessage())
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, HttpStatus.INTERNAL_SERVER_ERROR);
+}
+
+@ExceptionHandler(NotFoundException.class)
+ResponseEntity<?> processNotFoundException(NotFoundException e) {
+final var fault = Fault.builder()
+.code(HttpStatus.NOT_FOUND.name())
+.details(e.getMessage())
+.build();
+
+log.error("Fault: {}", fault, e);
+
+return new ResponseEntity<>(fault, HttpStatus.NOT_FOUND);
+}
+
+@Builder
+@Getter
+@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
+@JsonTypeName(value = "fault")
+private static class Fault {
+private String code;
+private String details;
+
+@Override
+public String toString() {
+return String.format("Fault { Code: %s, Details: %s }", this.code, this.details);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/SubdivisionController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.UserSubdivisionApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateSubdivisionRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateSubdivisionResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetSubdivisionResponseHttp;
+import ru.liga.evraz.aggregation.application.CreateUpdateSubdivisionUseCase;
+import ru.liga.evraz.aggregation.application.GetSubdivisionUseCase;
+
+@Api(tags = "UserSubdivision")
+@RestController
+@Validated
+@RequiredArgsConstructor
+class SubdivisionController implements UserSubdivisionApi {
+// Mapper
+private final SubdivisionMapper mapper;
+// UseCase
+private final CreateUpdateSubdivisionUseCase ucPostSubdivision;
+private final GetSubdivisionUseCase ucGetSubdivision;
+
+@Override
+public ResponseEntity<GetSubdivisionResponseHttp> getSubdivision(String subdivisionId) {
+final var result = ucGetSubdivision.get(subdivisionId);
+return new ResponseEntity<>(mapper.mapGetSubdivisionResponse(result), HttpStatus.OK);
+}
+
+@Override
+public ResponseEntity<CreateUpdateSubdivisionResponseHttp> createOrUpdateSubdivision(CreateUpdateSubdivisionRequestHttp body) {
+final var result = ucPostSubdivision.update(mapper.mapToCmd(body));
+
+return new ResponseEntity<>(mapper.mapToResponse(result), HttpStatus.OK);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/SubdivisionMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateSubdivisionRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateSubdivisionResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.GetSubdivisionResponseHttp;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateSubdivisionCmd;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+
+@Mapper(componentModel = "spring")
+interface SubdivisionMapper {
+
+CreateUpdateSubdivisionCmd mapToCmd(CreateUpdateSubdivisionRequestHttp source);
+
+CreateUpdateSubdivisionResponseHttp mapToResponse(Subdivision source);
+
+@Mapping(target = "payload", source = ".")
+GetSubdivisionResponseHttp mapGetSubdivisionResponse(Subdivision source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/UserGroupController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.UserGroupApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateUserGroupRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateUserGroupResponseHttp;
+import ru.liga.evraz.aggregation.application.CreateUpdateUserGroupUseCase;
+
+@Api(tags = "UserGroup")
+@RestController
+@Validated
+@RequiredArgsConstructor
+class UserGroupController implements UserGroupApi {

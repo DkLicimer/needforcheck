@@ -1,0 +1,488 @@
+﻿import ru.liga.evraz.aggregation.adapter.db.converter.SubdivisionEntityMapper;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+import ru.liga.evraz.aggregation.domain.repository.SubdivisionService;
+
+import java.util.Collections;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+class SubdivisionServiceImpl implements SubdivisionService {
+
+private final SubdivisionEntityMapper mapper;
+private final SubdivisionJpaRepository subdivisionRepo;
+
+private final WarehouseJpaRepository warehouseRepo;
+
+@Override
+public Subdivision update(Subdivision subdivision) {
+log.info("{}", subdivision);
+var entity = mapper.toEntity(subdivision);
+entity.getWorkDays().forEach(workDay -> {
+workDay.setSubdivision(entity);
+workDay.getWorkSchedule().forEach(workSchedule ->
+workSchedule.setWorkDay(workDay));
+});
+
+if (warehouseRepo.existsBySubdivision(entity)) {
+final var warehouses = warehouseRepo.findAllBySubdivision(entity);
+entity.setWarehouses(warehouses);
+} else {
+entity.setWarehouses(Collections.emptySet());
+}
+
+log.info("{}", entity);
+return mapper.toDto(subdivisionRepo.save(entity));
+}
+
+@Override
+public boolean existsById(String subdivisionId) {
+return subdivisionRepo.existsById(subdivisionId);
+}
+
+@Override
+public Subdivision getById(String subdivisionId) {
+final var found = subdivisionRepo.getById(subdivisionId);
+return mapper.toDto(found);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/SubdivisionUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Component
+public class SubdivisionUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/SubdivisionWorkDayRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.entity.WorkDayEntity;
+
+@Repository
+interface SubdivisionWorkDayRepository extends JpaRepository<WorkDayEntity, Long> {
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/SubdivisionWorkScheduleRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.entity.WorkScheduleEntity;
+
+@Repository
+interface SubdivisionWorkScheduleRepository extends JpaRepository<WorkScheduleEntity, Long> {
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/UserGroupJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.UserGroupEntity;
+
+import javax.validation.constraints.NotEmpty;
+
+@Repository
+@Validated
+interface UserGroupJpaRepository extends JpaRepository<UserGroupEntity, String> {
+UserGroupEntity getByGroupId(@NotEmpty String groupId);
+
+boolean existsByGroupId(@NotEmpty String groupId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/UserGroupParticipantJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.UserGroupParticipantEntity;
+
+import javax.validation.constraints.NotEmpty;
+
+@Repository
+@Validated
+interface UserGroupParticipantJpaRepository extends JpaRepository<UserGroupParticipantEntity, String> {
+UserGroupParticipantEntity getByPersonId(@NotEmpty String userGroupParticipantId);
+
+boolean existsByPersonId(@NotEmpty String userGroupParticipantId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/UserGroupParticipantServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.UserGroupEntityMapper;
+import ru.liga.evraz.aggregation.domain.model.UserGroupParticipant;
+import ru.liga.evraz.aggregation.domain.repository.usergroup.UserGroupParticipantService;
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class UserGroupParticipantServiceImpl implements UserGroupParticipantService {
+
+private final UserGroupEntityMapper mapper;
+private final UserGroupParticipantJpaRepository repo;
+
+@Override
+public UserGroupParticipant getByPersonId(String personId) {
+try {
+final var entity = repo.getByPersonId(personId);
+return mapper.map(entity);
+} catch (Exception e) {
+log.error(e.getLocalizedMessage());
+return null;
+}
+}
+
+@Override
+public boolean existsByPersonId(String personId) {
+return repo.existsByPersonId(personId);
+}
+
+@Override
+public UserGroupParticipant create(UserGroupParticipant userGroup) {
+final var draftEntity = mapper.map(userGroup);
+draftEntity.setNewEntity(true);
+final var createdEntity = repo.save(draftEntity);
+return mapper.map(createdEntity);
+}
+
+@Override
+public UserGroupParticipant update(UserGroupParticipant userGroup) {
+final var draftEntity = mapper.map(userGroup);
+draftEntity.setNewEntity(false);
+final var createdEntity = repo.save(draftEntity);
+return mapper.map(createdEntity);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/UserGroupServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.UserGroupEntityMapper;
+import ru.liga.evraz.aggregation.domain.model.UserGroup;
+import ru.liga.evraz.aggregation.domain.repository.usergroup.UserGroupService;
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class UserGroupServiceImpl implements UserGroupService {
+
+private final UserGroupEntityMapper mapper;
+private final UserGroupJpaRepository groupsJpaRepo;
+//private final UserGroupParticipantRepo participantsRepo;
+
+@Override
+public UserGroup getByExtUserGroupId(String userGroupId) {
+try {
+final var entity = groupsJpaRepo.getByGroupId(userGroupId);
+return mapper.map(entity);
+} catch (Exception e) {
+log.error(e.getLocalizedMessage());
+return null;
+}
+}
+
+@Override
+public boolean existsByExtUserGroupId(String userGroupId) {
+return groupsJpaRepo.existsByGroupId(userGroupId);
+}
+
+@Override
+public UserGroup create(UserGroup userGroup) {
+/*final var participantsUpdate = userGroup.getParticipants().stream()
+.map(participant -> {
+if (participantsRepo.existsByPersonId(participant.getPersonId())) {
+return participantsRepo.update(participant);
+} else {
+return participantsRepo.create(participant);
+}
+}).collect(Collectors.toList());
+userGroup.setParticipants(participantsUpdate);*/
+
+final var draftEntity = mapper.map(userGroup);
+draftEntity.setNewEntity(true);
+final var createdEntity = groupsJpaRepo.save(draftEntity);
+return mapper.map(createdEntity);
+}
+
+@Override
+public UserGroup update(UserGroup userGroup) {
+final var draftEntity = mapper.map(userGroup);
+draftEntity.setNewEntity(false);
+final var createdEntity = groupsJpaRepo.save(draftEntity);
+return mapper.map(createdEntity);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/UuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import java.util.UUID;
+
+public interface UuidGenerator {
+default String generateUuid() {
+return UUID.randomUUID().toString();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/WarehouseJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.SubdivisionEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.WarehouseEntity;
+
+import java.util.Set;
+
+@Repository
+@Validated
+interface WarehouseJpaRepository extends JpaRepository<WarehouseEntity, String> {
+WarehouseEntity getById(String id);
+
+boolean existsById(String id);
+
+boolean existsBySubdivision(SubdivisionEntity subdivision);
+
+Set<WarehouseEntity> findAllBySubdivision(SubdivisionEntity subdivision);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/WarehouseServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.WarehouseEntityMapper;
+import ru.liga.evraz.aggregation.domain.model.Warehouse;
+import ru.liga.evraz.aggregation.domain.repository.WarehouseService;
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class WarehouseServiceImpl implements WarehouseService {
+
+private final WarehouseEntityMapper mapper;
+private final WarehouseJpaRepository warehouseJpaRepo;
+
+@Override
+public boolean existsById(String warehouseId) {
+return warehouseJpaRepo.existsById(warehouseId);
+}
+
+@Override
+public Warehouse create(Warehouse warehouse) {
+log.info("{}", warehouse);
+var entity = mapper.map(warehouse);
+entity.getWorkDays().forEach(workDay -> {
+workDay.setWarehouse(entity);
+workDay.getWorkSchedule().forEach(workSchedule ->
+workSchedule.setWorkDay(workDay));
+});
+log.info("{}", entity);
+entity.setNewEntity(true);
+return mapper.map(warehouseJpaRepo.save(entity));
+}
+
+@Override
+public Warehouse update(Warehouse warehouse) {
+log.info("{}", warehouse);
+var entity = mapper.map(warehouse);
+entity.getWorkDays().forEach(workDay -> {
+workDay.setWarehouse(entity);
+workDay.getWorkSchedule().forEach(workSchedule ->
+workSchedule.setWorkDay(workDay));
+});
+log.info("{}", entity);
+entity.setNewEntity(false);
+return mapper.map(warehouseJpaRepo.save(entity));
+}
+
+@Override
+public Warehouse getById(String id) {
+final var entity = warehouseJpaRepo.getById(id);
+return mapper.map(entity);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/WarehouseWorkDayRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.entity.WarehouseWorkDayEntity;
+
+@Repository
+interface WarehouseWorkDayRepository extends JpaRepository<WarehouseWorkDayEntity, Long> {
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/WarehouseWorkScheduleRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.entity.WarehouseWorkScheduleEntity;
+
+@Repository
+interface WarehouseWorkScheduleRepository extends JpaRepository<WarehouseWorkScheduleEntity, Long> {
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/ErpTaskEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskDocumentType;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskSourceCode;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpTaskStatus;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "erp_task")
+public class ErpTaskEntity implements Persistable<String> {
+@Id
+@Column(name = "id", nullable = false)
+private String id;
+
+@Enumerated(EnumType.STRING)
+@Column(name = "source_code", nullable = false)
+private ErpTaskSourceCode sourceCode;
+
+@Column(name = "title", nullable = false)
+private String title;
+
+@Column(name = "description")
+private String description;
+
+@Column(name = "document_erp_guid", nullable = false)
+private String documentErpGuid;
+
+@Enumerated(EnumType.STRING)
+@Column(name = "document_type", nullable = false)
+private ErpTaskDocumentType documentType;
+
+@Column(name = "responsible_id")
+private String responsibleId;
+
+@Column(name = "responsible_full_name")
+private String responsibleFullName;
+
+@Column(name = "responsible_email")
+private String responsibleEmail;
+
+@Column(name = "role_id")
+private String roleId;
+
+@Column(name = "subdivision_id")
+private String subdivisionId;
+
+@Column(name = "deadline")
+private ZonedDateTime deadline;
+
+@Column(name = "task_type", nullable = false)
+@Enumerated(EnumType.STRING)
+private ErpTaskType taskType;
+
+@Column(name = "order_id", nullable = false)
+private String orderId;
+
+@Column(name = "sent", nullable = false)
+private Boolean sent;
+
+@Column(name = "active", nullable = false)
+private Boolean active;
+
+@Column(name = "canceled")
+private Boolean canceled;
+
+@Column(name = "erp_status")
+@Enumerated(EnumType.STRING)
+private ErpTaskStatus erpStatus;
+
+@Column(name = "decision")
+private String decision;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdDate;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedDate;
+
+@Transient
+private transient boolean newEntity;
+

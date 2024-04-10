@@ -1,0 +1,489 @@
+﻿}
+
+abstract void setCountDownLatch(int count);
+
+public void reset() {
+this.payload = null;
+this.payloads.clear();
+this.correlationUid = null;
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/kafka/TestTestKafkaOrderReloadConsumer.java
+Content:
+package ru.liga.evraz.aggregation.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.kafka.OrderReloadProcessingService;
+import ru.liga.evraz.aggregation.domain.model.OrderReloadDto;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+/**
+* Ð¡Ð»ÑƒÑˆÐ°Ñ‚ÐµÐ»ÑŒ Ñ‚Ð¾Ð¿Ð¸ÐºÐ°.
+*/
+@Component
+@Slf4j
+@Validated
+public class TestTestKafkaOrderReloadConsumer extends OrderReloadProcessingService {
+@Setter
+@Getter
+protected CountDownLatch latch;
+private String payload = null;
+private String correlationUid = null;
+private final List<String> payloads = new ArrayList<>();
+
+public TestTestKafkaOrderReloadConsumer(ApplicationEventPublisher applicationEventPublisher) {
+super(applicationEventPublisher);
+setCountDownLatch(1);
+}
+
+@Override
+public void process(ConsumerRecord<String, OrderReloadDto> consumerRecord, Acknowledgment acknowledgment) {
+super.process(consumerRecord, acknowledgment);
+log.info("received payload = '{}'", consumerRecord);
+correlationUid = consumerRecord.key();
+payload = consumerRecord.value().toString();
+payloads.add(payload);
+latch.countDown();
+}
+
+public void setCountDownLatch(int count) {
+setLatch(new CountDownLatch(count));
+}
+
+public void resetWithCountDown(int countDownLatch) {
+reset();
+setCountDownLatch(countDownLatch);
+}
+
+public void reset() {
+this.payload = null;
+this.payloads.clear();
+this.correlationUid = null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/dispatcher/BaseDispatcher.java
+Content:
+package ru.liga.evraz.aggregation.dispatcher;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static ru.liga.evraz.aggregation.util.ResourceUtils.getResourceAsString;
+
+@Slf4j
+abstract class BaseDispatcher extends Dispatcher {
+List<DispatcherData> dispatcherDataList;
+
+@Getter
+@Setter
+int validDispatches = 0;
+
+@Getter
+@Setter
+List<DispatcherData> validDispatcherDataList = new LinkedList<>();
+
+@SneakyThrows
+@Override
+public MockResponse dispatch(RecordedRequest request) {
+for (DispatcherData dispatcherData : dispatcherDataList) {
+if (dispatcherData != null
+&& request.getMethod().equals(dispatcherData.getHttpMethod())
+&& request.getPath().equals(dispatcherData.getPath())
+&& checkRequest(request, dispatcherData)) {
+
+validDispatches++;
+validDispatcherDataList.add(dispatcherData);
+
+final var expectedResponse = dispatcherData.getExpectedResponse();
+return new MockResponse()
+.setResponseCode(dispatcherData.getStatus().value())
+.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+.setBody(expectedResponse == null ? EMPTY : getResourceAsString(expectedResponse));
+}
+}
+return new MockResponse().setResponseCode(HttpStatus.METHOD_NOT_ALLOWED.value());
+}
+
+private boolean checkRequest(RecordedRequest request, DispatcherData dispatcherData) throws JSONException {
+try (var bufferClone = request.getBody().clone()) {
+if (dispatcherData.getExpectedRequest() != null) {
+final var expect = getResourceAsString(dispatcherData.getExpectedRequest());
+final var actual = bufferClone.readString(StandardCharsets.UTF_8);
+log.info("=== Expected result path: \n{}", ((ClassPathResource) dispatcherData.getExpectedRequest()).getPath());
+JSONAssert.assertEquals(expect, actual, false);
+}
+return true;
+} catch (AssertionError error) {
+log.error("", error);
+return false;
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/dispatcher/BpmDispatcher.java
+Content:
+package ru.liga.evraz.aggregation.dispatcher;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+@Slf4j
+public class BpmDispatcher extends BaseDispatcher {
+public BpmDispatcher(List<DispatcherData> dispatcherDataList) {
+this.dispatcherDataList = dispatcherDataList;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/dispatcher/DispatcherData.java
+Content:
+package ru.liga.evraz.aggregation.dispatcher;
+
+import lombok.Builder;
+import lombok.Getter;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+
+/**
+* Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¼Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°.
+*/
+@Getter
+@Builder
+public class DispatcherData {
+private final String token;
+private final String path;
+private final int skipReqCount;
+private final Resource expectedRequest;
+private final String httpMethod;
+private final Resource expectedResponse;
+private final HttpStatus status;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/dispatcher/StarfishOrderDispatcher.java
+Content:
+package ru.liga.evraz.aggregation.dispatcher;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+public class StarfishOrderDispatcher extends BaseDispatcher {
+public StarfishOrderDispatcher(List<DispatcherData> dispatcherDataList) {
+this.dispatcherDataList = dispatcherDataList;
+}
+
+public void reset() {
+this.validDispatcherDataList = new ArrayList<>();
+this.validDispatches = 0;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/dispatcher/StarfishProductDispatcher.java
+Content:
+package ru.liga.evraz.aggregation.dispatcher;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+@Slf4j
+public class StarfishProductDispatcher extends BaseDispatcher {
+public StarfishProductDispatcher(List<DispatcherData> dispatcherDataList) {
+this.dispatcherDataList = dispatcherDataList;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/TestConfig.java
+Content:
+package ru.liga.evraz.aggregation.config;
+
+import feign.RequestInterceptor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.task.SyncTaskExecutor;
+
+import java.util.concurrent.Executor;
+
+@TestConfiguration
+public class TestConfig {
+@Bean
+public RequestInterceptor testRequestInterceptor() {
+return new TestRequestInterceptor();
+}
+
+// "Ð›Ð¸Ð½ÐµÐ¹Ð½Ð¾Ðµ" Ð¸ÑÐ¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ðµ Ð°ÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð½Ñ‹Ñ… Ð·Ð°Ð´Ð°Ñ‡
+@Bean
+@Primary
+@Qualifier("asyncSecurityCtxTaskExecutor")
+public Executor testExecutor() {
+return new SyncTaskExecutor();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/TestRequestInterceptor.java
+Content:
+package ru.liga.evraz.aggregation.config;
+
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import feign.Target;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class TestRequestInterceptor implements RequestInterceptor {
+
+@Override
+public void apply(RequestTemplate requestTemplate) {
+log.info("Intercept request to add prefix to path");
+final Target<?> target = requestTemplate.feignTarget();
+switch (target.name()) {
+case "test-aggregation-service":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9200", "", ""));
+break;
+case "test-bitrix-adapter":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9201", "", ""));
+break;
+case "test-erp-adapter":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9202", "", ""));
+break;
+case "test-api-gateway":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9203", "", ""));
+break;
+case "test-settings":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9204", "", ""));
+break;
+case "test-dictionary":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9205", "", ""));
+break;
+case "test-camunda":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9206", "", ""));
+break;
+case "test-bpm":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9207", "", ""));
+break;
+case "test-order":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9208", "", ""));
+break;
+case "test-product":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9209", "", ""));
+break;
+case "test-stock":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9210", "", ""));
+break;
+case "test-adapter":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9211", "", ""));
+break;
+case "test-camunda-worker":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9212", "", ""));
+break;
+case "test-custom-camunda-worker":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9213", "", ""));
+break;
+case "test-delivery":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9214", "", ""));
+break;
+case "test-message-gateway":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9215", "", ""));
+break;
+case "test-parser":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9216", "", ""));
+break;
+case "test-report":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9217", "", ""));
+break;
+case "test-websocket":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9218", "", ""));
+break;
+case "test-sso":
+requestTemplate.target(
+String.format("%s%s/%s",
+"http://localhost:9219", "", ""));
+break;
+default:
+throw new IllegalArgumentException("unknown service");
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/TestTimeConfig.java
+Content:
+package ru.liga.evraz.aggregation.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+/**
+* ÐšÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð´Ð»Ñ Ð·Ð°Ð³Ð»ÑƒÑˆÐºÐ¸ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸.
+*/
+@Configuration
+public class TestTimeConfig {
+private static final LocalDate DEFAULT_LOCAL_DATE_NOW = LocalDate.of(2023, 6, 29);
+
+@Bean
+@Primary
+public Clock clock() {
+final var zoneId = ZoneId.systemDefault();
+return Clock.fixed(DEFAULT_LOCAL_DATE_NOW.atStartOfDay(zoneId).toInstant(), zoneId);
+}
+}
+
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/path/BaseEnum.java
+Content:
+package ru.liga.evraz.aggregation.config.path;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+
+import java.util.Map;
+
+public interface BaseEnum {
+
+String getPathTemplate();
+
+default DispatcherData buildDispatcherData(Pair<Resource, Resource> req2resp,
+HttpMethod httpMethod, HttpStatus httpStatus) {
+return buildDispatcherData(req2resp, httpMethod, httpStatus, null);
+}
+
+default DispatcherData buildDispatcherData(Pair<Resource, Resource> req2resp, HttpMethod httpMethod,
+HttpStatus httpStatus, Map<String, Object> templateParameters) {
+return DispatcherData.builder()
+.path(MessageFormatter.format(getPathTemplate(), templateParameters))
+.httpMethod(httpMethod.toString())
+.expectedRequest(req2resp.getLeft())
+.expectedResponse(req2resp.getRight())
+.status(httpStatus)
+.build();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/path/BpmPath.java
+Content:
+package ru.liga.evraz.aggregation.config.path;
+
+import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+
+import java.util.Map;
+
+@Getter
+public enum BpmPath implements BaseEnum {
+
+BPM_SET_VARIABLES("/variable/${orderId}/set") {
+},
+BPM_SEND_MESSAGE("/message/${messageId}/send?orderId=${orderId}");
+
+private final String pathTemplate;
+
+BpmPath(String pathTemplate) {
+this.pathTemplate = pathTemplate;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/path/MessageFormatter.java
+Content:
+package ru.liga.evraz.aggregation.config.path;
+
+import lombok.experimental.UtilityClass;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+@UtilityClass
+class MessageFormatter {

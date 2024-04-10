@@ -1,0 +1,511 @@
+﻿},
+{
+"name": "metalProcessingStartTime",
+"value": ""
+},
+{
+"name": "metalProcessingStartTimeDescription",
+"value": ""
+},
+{
+"name": "metalProcessingCompleted",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 484025.5,
+"positionCode": 1
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request_with_OA_delete_olurTaskSent.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "ÐÑ€Ð¼Ð°Ñ‚ÑƒÑ€Ð° 16 (2Ñ„) Ð500Ð¡ Ð“ÐžÐ¡Ð¢ 34028-2016_11700 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾",
+"productId": "62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 57200.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.19,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "2"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 2
+},
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾",
+"productId": "2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 78730.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.234,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "4"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 4
+},
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ",
+"productId": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 67980.0,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 0.315,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "1"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "RESERVE_IN_WAREHOUSE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"
+},
+{
+"name": "skuType",
+"value": "ITEM"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð¢Ð¾Ð²Ð°Ñ€"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": "3269a17a-1957-11e4-80bf-f0921c005714"
+},
+{
+"name": "provideFromOtherOrders",
+"value": "false"
+},
+{
+"name": "linkedItemServiceIds",
+"value": ""
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 0.0,
+"positionCode": 1
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_request_with_OA_orderExistsInStarfish.json
+Content:
+[
+{
+"id": null,
+"externalId": null,
+"dateTimeCreated": null,
+"statusId": null,
+"title": "test_sku_name",
+"productId": "test_sku_id",
+"type": "weight",
+"link": null,
+"quantity": 1,
+"price": 160114.29,
+"discount": 0.0,
+"tax": null,
+"picture": null,
+"weight": 3.023,
+"pickedweight": null,
+"datamatrixCode": null,
+"deleted": false,
+"loyaltyPointsEarn": null,
+"loyaltyPointsBurn": null,
+"loyaltyPointsReturned": null,
+"customAttributes": [
+{
+"name": "positionCode",
+"value": "1"
+},
+{
+"name": "linkedSkuPositionCode",
+"value": ""
+},
+{
+"name": "skuStatus",
+"value": "TO_PROVIDE"
+},
+{
+"name": "skuStatusDescription",
+"value": "Ðš Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸ÑŽ"
+},
+{
+"name": "skuType",
+"value": "ITEM_GP"
+},
+{
+"name": "skuTypeDescription",
+"value": "Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ"
+},
+{
+"name": "positionCancellationReason",
+"value": ""
+},
+{
+"name": "measureUnit",
+"value": "Ñ‚"
+},
+{
+"name": "warehouseId",
+"value": ""
+},
+{
+"name": "provideFromOtherOrders",
+"value": "true"
+},
+{
+"name": "linkedItemServiceIds",
+"value": "test_service_sku_id"
+},
+{
+"name": "skuComment",
+"value": ""
+},
+{
+"name": "productVariantAttribute",
+"value": ""
+},
+{
+"name": "metalProcessingStartTime",
+"value": "2022-11-16T20:27:51.704+00:00"
+},
+{
+"name": "metalProcessingStartTimeDescription",
+"value": "16.11.2022 20:27:51"
+},
+{
+"name": "metalProcessingCompleted",
+"value": ""
+},
+{
+"name": "shippedQuantity",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+}
+],
+"discountPrice": 484025.5,
+"positionCode": 1
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/item/update/update_items_response.json
+Content:
+[]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_reload_order_request.json
+Content:
+{
+"clientOrderId": "test_order___10.08.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": false,
+"contactEmail": null,
+"contactPhone": null,
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": "ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚",
+"totalCost": 0.0,
+"payableCost": 0.0,
+"currencyId": "RUB",
+"notification": null,
+"responsibleManager": "test_sale_manager_responsible_id",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_delivery_delete_for_update_request.json
+Content:
+{
+"clientOrderId": "documentId___27.12.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": false,
+"contactEmail": "test-email",
+"contactPhone": "test-phone",
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": "ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚",
+"totalCost": 0.0,
+"payableCost": 0.0,
+"currencyId": "RUB",
+"notification": null,
+"responsibleManager": "test_saleManagerResponsibleId",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_for_oa_attributes_request.json
+Content:
+{
+"clientOrderId": "test_order___10.08.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": false,
+"contactEmail": null,
+"contactPhone": null,
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": "ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚",
+"totalCost": 0.0,
+"payableCost": 0.0,
+"currencyId": "RUB",
+"notification": null,
+"responsibleManager": "test_sale_manager_responsible_id",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_for_oa_attributes_request2.json
+Content:
+{
+"clientOrderId": "test_order___10.08.2022",
+"sourceId": "ERP",
+"brandId": null,
+"customerId": "test-client_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": false,
+"contactEmail": "test-email",
+"contactPhone": "test-phone",
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": "ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚",
+"totalCost": 10869.0,
+"payableCost": 10869.0,
+"currencyId": "RUB",
+"links": null,
+"notification": null,
+"responsibleManager": "test_sale_manager_responsible_id",
+"analyticsClientId": null,
+"priceClusterId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_for_oa_attributes_response.json
+Content:
+{
+
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/details/order_details_update_request.json
+Content:
+{
+"clientOrderId": "documentId___27.12.2022",
+"customerId": "test-customer_guid",
+"paymentTypeId": "INVOICE",
+"statusId": null,
+"isPaid": false,
+"contactEmail": "test_recipient_email",
+"contactPhone": "test_recipient_phone",
+"callRequested": null,
+"deliveryDate": null,
+"customerComment": null,
+"totalCost": 485490.7,
+"payableCost": 485490.7,
+"currencyId": "RUB",
+"notification": null,

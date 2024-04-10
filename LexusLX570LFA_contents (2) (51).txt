@@ -1,0 +1,395 @@
+﻿File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/subdivision/GetSubdivisionTest.java
+Content:
+package ru.liga.evraz.aggregation.module.subdivision;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.SubdivisionUuidGenerator;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class GetSubdivisionTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/subdivision/truncate_subdivision_entities.sql";
+private static final String DB_FILL = "/db/subdivision/fill-subdivision.sql";
+
+@Value("classpath:/api/subdivision/subdivision_success_get_response.json")
+private Resource subdivisionSuccessResponse;
+@Value("classpath:/api/subdivision/subdivision_not_found_response.json")
+private Resource subdivisionNotFoundResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void success() {
+customGetScenarioFromResource("/v1/subdivision/GX-8", subdivisionSuccessResponse, true, 200);
+}
+
+@Test
+@DisplayName("ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void notFound() {
+customGetScenarioFromResource("/v1/subdivision/not_found", subdivisionNotFoundResponse, 404);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/subdivision/UpdateSubdivisionTest.java
+Content:
+package ru.liga.evraz.aggregation.module.subdivision;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.SubdivisionUuidGenerator;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class UpdateSubdivisionTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/subdivision/truncate_subdivision_entities.sql";
+private static final String DB_FILL = "/db/subdivision/fill-subdivision.sql";
+
+
+@Value("classpath:/api/subdivision/subdivision_update_request_1.json")
+private Resource updateSubdivisionRequest;
+@Value("classpath:/api/subdivision/subdivision_update_response_1.json")
+private Resource updateSubdivisionResponse;
+
+
+@MockBean
+private SubdivisionUuidGenerator subdivisionUuidGenerator;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void updateSubdivision() {
+final var uuid1 = "b57f84f2-ea02-11e3-80c5-f0921c007974";
+doReturn(uuid1).when(subdivisionUuidGenerator).generateUuid();
+
+customPostScenarioFromResource("/v1/subdivision",
+updateSubdivisionRequest, updateSubdivisionResponse, true, 200);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/order_reserve/OrderReserveTest.java
+Content:
+package ru.liga.evraz.aggregation.module.order_reserve;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.OrderReserveUuidGenerator;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð·Ð°ÐºÐ°Ð·Ð°")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class OrderReserveTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order_reserve/truncate_order_reserve_entities.sql";
+
+@Value("classpath:/api/order_reserve/order_reserve_create_request_1.json")
+private Resource orderReserveCreateRequest;
+@Value("classpath:/api/order_reserve/order_reserve_create_response_1.json")
+private Resource orderReserveCreateResponse;
+
+
+@MockBean
+private OrderReserveUuidGenerator orderReserveUuidGenerator;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð·Ð°ÐºÐ°Ð·Ð°")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createOrderReserve() {
+final var uuid1 = "test-order-reserve-guid";
+doReturn(uuid1).when(orderReserveUuidGenerator).generateUuid();
+
+customPostScenarioFromResource("/v1/order-reserve",
+orderReserveCreateRequest, orderReserveCreateResponse, true, 200);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/order_reserve/UpdateOrderReserveTest.java
+Content:
+package ru.liga.evraz.aggregation.module.order_reserve;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.OrderReserveUuidGenerator;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð·Ð°ÐºÐ°Ð·Ð°")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class UpdateOrderReserveTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order_reserve/truncate_order_reserve_entities.sql";
+private static final String DB_FILL = "/db/order_reserve/fill-order-reserve.sql";
+
+
+@Value("classpath:/api/order_reserve/order_reserve_update_request_1.json")
+private Resource orderReserveUpdateRequest;
+@Value("classpath:/api/order_reserve/order_reserve_update_response_1.json")
+private Resource orderReserveUpdateResponse;
+
+
+@MockBean
+private OrderReserveUuidGenerator orderReserveUuidGenerator;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void updateOrderReserve() {
+final var uuid1 = "aaaf84f2-ea02-11e3-80c5-f0921c007974";
+doReturn(uuid1).when(orderReserveUuidGenerator).generateUuid();
+
+customPostScenarioFromResource("/v1/order-reserve",
+orderReserveUpdateRequest, orderReserveUpdateResponse, true, 200);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/order_attribute/CreateOrderAttributeTest.java
+Content:
+package ru.liga.evraz.aggregation.module.order_attribute;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.config.path.OrderPath;
+import ru.liga.evraz.aggregation.config.path.ProductPath;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDERS_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDERS_SHIPPING_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CREATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMER_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOM_ATTRIBUTES_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DELETE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEMS_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEM_SERVICES_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SET_CANCELLATION_REASON;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SHIPPING_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.CUSTOMERSERVICE_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.PRODUCT_UPDATE;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð·Ð°ÐºÐ°Ð·Ð°, Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð½Ñ‹Ñ… Ð¾Ñ‚ 1Ð¡")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+"async.task.executor.log.cron=-" // ÐžÑ‚ÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ Ð»Ð¾Ð³Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ LoggableAsyncTaskExecutor
+})
+public class CreateOrderAttributeTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order_attribute/truncate_order_attributes.sql";
+private static final String DB_FILL = "/db/order_attribute/order_created.sql";
+private static final String DB_FILL_FOR_METAL_PROCESSING_ATTR = "/db/order_attribute/order_created_for_metalProcessingAttribute.sql";
+private static final String DB_FILL_DUPLICATE_ATTRIBUTE = "/db/order_attribute/fill_duplicate_attribute.sql";
+
+@Value("classpath:api/order_attribute/create/request/create_invalid_metal_processing_start_time_request.json")
+private Resource createMetalProcessingStartTimeFailRequest;
+@Value("classpath:api/order_attribute/create/response/create_invalid_metal_processing_start_time_response.json")
+private Resource createMetalProcessingStartTimeFailResponse;
+@Value("classpath:api/order_attribute/create/request/create_valid_metal_processing_start_time_request.json")
+private Resource createMetalProcessingStartTimeSuccessRequest;
+@Value("classpath:api/order_attribute/create/response/create_valid_metal_processing_start_time_response.json")
+private Resource createMetalProcessingStartTimeSuccessResponse;
+
+@Value("classpath:api/order_attribute/create/request/create_order_attribute_boolean_value_request.json")
+private Resource createOrderAttributeBooleanValueRequest;
+@Value("classpath:api/order_attribute/create/response/create_order_attribute_boolean_value_response.json")
+private Resource createOrderAttributeBooleanValueResponse;
+
+@Value("classpath:external/product/customer_service/createMetalProcessingStartTimeWithValidDateShouldSuccess.json")
+private Resource extCustomerServiceUpdateRequest;
+@Value("classpath:external/product/customer_service/service_create_response.json")
+private Resource extCustomerServiceUpdateResponse;
+
+@Value("classpath:/external/order/item_service/update/update_createMetalProcessingStartTimeWithValidDateShouldSuccessRequest.json")
+private Resource extCreateMetalProcessingStartTimeWithValidDateShouldSuccessRequest_itemServices;
+
+@Value("classpath:/external/order/custom_attributes/update_custom_attributes_for_CreateMetalProcessingStartTimeWithValidDateShouldSuccess.json")
+private Resource extCreateMetalProcessingStartTimeWithValidDateShouldSuccessRequest_customAttributes;
+
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_request.json")
+private Resource legalEntityUpdateRequest;
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_response.json")
+private Resource legalEntityUpdateResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð·Ð°ÐºÐ°Ð·Ð° c boolean value")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createOrderAttributeBooleanValueSuccess() {
+customPostScenarioFromResource("/v1/order/additional-attribute",
+createOrderAttributeBooleanValueRequest, createOrderAttributeBooleanValueResponse, true, 200);
+
+/*final var orderDispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(0, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");*/
+}
+
+@Test
+@DisplayName("Fail. Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ metalProcessingStartTime Ñ ÐÐ•(!)Ð’ÐÐ›Ð˜Ð”ÐÐ«Ðœ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸ÐµÐ¼ Ð´Ð°Ñ‚Ñ‹")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL_FOR_METAL_PROCESSING_ATTR, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createMetalProcessingStartTimeWithInvalidDateShouldFail() {
+customPostScenarioFromResource("/v1/order/additional-attribute",
+createMetalProcessingStartTimeFailRequest, createMetalProcessingStartTimeFailResponse, true, 400);
+}
+
+@Test
+@DisplayName("Success. Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ metalProcessingStartTime Ñ Ð’ÐÐ›Ð˜Ð”ÐÐ«Ðœ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸ÐµÐ¼ Ð´Ð°Ñ‚Ñ‹")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL_FOR_METAL_PROCESSING_ATTR, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createMetalProcessingStartTimeWithValidDateShouldSuccess() {
+final var productPathsToExpectedResources = Map.of(
+CUSTOMERSERVICE_UPDATE, List.of(Pair.of(extCustomerServiceUpdateRequest, extCustomerServiceUpdateResponse))
+);
+
+initProductScenario(productPathsToExpectedResources, Map.of());
+
+final var pathsToExpectedResources = Map.of(
+ORDER_CUSTOMER_UPDATE, Pair.of(extOrderCustomerUpdateRequest, extOrderCustomerUpdateResponse),
+ORDERS_DETAILS_UPDATE, Pair.of(extOrderDetailsUpdateRequest, extOrderDetailsUpdateResponse),
+ORDER_CUSTOM_ATTRIBUTES_UPDATE, Pair.of(extCreateMetalProcessingStartTimeWithValidDateShouldSuccessRequest_customAttributes, extOrderCustomAttributesForOASuccessUpdateResponse),
+ORDER_ITEMS_UPDATE_TEMPLATE, Pair.of(extOrderItemsEmptyListRequest, extOrderItemsForOAUpdateResponse),
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, Pair.of(extCreateMetalProcessingStartTimeWithValidDateShouldSuccessRequest_itemServices, extOrderItemServicesForOAUpdateResponse),
+ORDERS_SHIPPING_UPDATE_TEMPLATE, Pair.of(extOrderShippingUpdateRequest, extOrderShippingUpdateResponse),
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse)
+);
+
+final var pathsTemplateParams = Map.<String, Object>of(
+"expected_starfish_order_id", "test_starfish24_erp_guid",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_customer_id", "test-customer_guid",
+"legalEntityId", "test-client_guid");
+
+initOrderScenario(pathsToExpectedResources, pathsTemplateParams);
+
+customPostScenarioFromResource("/v1/order/additional-attribute",
+createMetalProcessingStartTimeSuccessRequest, createMetalProcessingStartTimeSuccessResponse, true, 200);
+
+final var orderDispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(7, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");

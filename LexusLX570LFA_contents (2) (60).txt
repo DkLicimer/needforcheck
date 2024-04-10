@@ -1,0 +1,440 @@
+﻿.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id(uuid2).build());
+
+Thread.sleep(2000);
+assertThat(deliveryTransaction).isEqualTo(null);
+assertThat(itemsList.size()).isEqualTo(0L);
+
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(0, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(0, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+
+@Value("classpath:api/erp_delivery/external/create/custom_attribute_update_request.json")
+private Resource customAttributeRequest;
+@Value("classpath:api/erp_delivery/external/create/custom_attribute_update_response.json")
+private Resource customAttributeResponse;
+
+@Value("classpath:api/erp_delivery/external/create/shipping_update_request.json")
+private Resource shippingRequest;
+@Value("classpath:api/erp_delivery/external/create/shipping_update_response.json")
+private Resource shippingResponse;
+
+@Value("classpath:api/erp_delivery/external/create/order_details_update_request.json")
+private Resource orderDetailsRequest;
+@Value("classpath:api/erp_delivery/external/create/order_details_update_response.json")
+private Resource orderDetailsResponse;
+
+@Value("classpath:api/erp_delivery/external/create/items_update_request.json")
+private Resource itemsRequest;
+@Value("classpath:api/erp_delivery/external/create/items_update_response.json")
+private Resource itemsResponse;
+
+@Value("classpath:api/erp_delivery/external/create/items_service_update_request.json")
+private Resource itemsServiceRequest;
+@Value("classpath:api/erp_delivery/external/create/items_service_update_response.json")
+private Resource itemsServiceResponse;
+
+@Value("classpath:api/erp_delivery/external/create/order_customer_update_request.json")
+private Resource customerUpdateRequest;
+@Value("classpath:api/erp_delivery/external/create/order_customer_update_response.json")
+private Resource customerUpdateResponse;
+
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_request.json")
+private Resource legalEntityUpdateRequest;
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_response.json")
+private Resource legalEntityUpdateResponse;
+
+private void initDeliveryScenario() {
+final var customAttributeData = DispatcherData.builder()
+.path("/order/test_starfish24_erp_guid/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingData = DispatcherData.builder()
+.path("/shipping/test_starfish24_erp_guid/update")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(shippingRequest)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut = DispatcherData.builder()
+.path("/orders/test_starfish24_erp_guid/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsData = DispatcherData.builder()
+.path("/order/test_starfish24_erp_guid")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(orderDetailsRequest)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut = DispatcherData.builder()
+.path("/orders/test_starfish24_erp_guid/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData = DispatcherData.builder()
+.path("/item/test_starfish24_erp_guid/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData = DispatcherData.builder()
+.path("/itemservice/test_starfish24_erp_guid/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var customerData = DispatcherData.builder()
+.path("/customer/test-customer_guid")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customerUpdateRequest)
+.expectedResponse(customerUpdateResponse)
+.status(HttpStatus.OK)
+.build();
+final var legalEntityData = ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse), HttpMethod.PUT, HttpStatus.OK, Map.of("legalEntityId", "test-client_guid"));
+var dispatcher = new StarfishOrderDispatcher(
+List.of(customAttributeData, shippingDataPut, orderDetailsDataPut, itemsData, itemsServiceData, customerData, legalEntityData));
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+/**
+* Ð—Ð°Ð³Ð»ÑƒÑˆÐºÐ¸.
+*
+* @param pathToExpectedResources   - Ð¼Ð°Ð¿Ð° {@link ProductPath} Ð¿ÑƒÑ‚Ð¸ Ðº product-service Ð½Ð° Ð¿Ð°Ñ€Ñƒ Ð¾Ñ‚Ð²ÐµÑ‚-Ð·Ð°Ð¿Ñ€Ð¾Ñ
+* Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ.
+* @param pathTemplateParameters    - Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð² {@link ProductPath} Ð¿ÑƒÑ‚Ð¸.
+*/
+@SuppressWarnings("PMD.UnusedPrivateMethod")
+private void initProductScenario(Map<ProductPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(PRODUCT_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(PRODUCT_UPDATE);
+dispatcherDatas.add(
+PRODUCT_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(CUSTOMERSERVICE_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(CUSTOMERSERVICE_UPDATE);
+dispatcherDatas.add(
+CUSTOMERSERVICE_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+var dispatcher = new StarfishProductDispatcher(dispatcherDatas);
+sfProductServer.setDispatcher(dispatcher);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/delivery/DeleteErpDeliveryTest.java
+Content:
+package ru.liga.evraz.aggregation.module.delivery;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryOrderItemJpaRepository;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.config.path.ProductPath;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.CUSTOMERSERVICE_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.PRODUCT_UPDATE;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð˜Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ñ‚ÐµÑÑ‚ Ð¿Ð¾ Ñ€Ð°Ð±Ð¾Ñ‚Ðµ Ñ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸ÐµÐ¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ ERP")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class DeleteErpDeliveryTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/erp_delivery/fill-db-1.sql";
+private static final String DB_FILL = "/db/erp_delivery/fill-db-4-test-delete.sql";
+@Autowired
+private ErpDeliveryJpaRepository deliveryRepository;
+@Autowired
+private DeliveryOrderJpaRepository deliveryOrderJpaRepository;
+@Autowired
+private ErpDeliveryOrderItemJpaRepository itemJpaRepository;
+
+@Value("classpath:api/erp_delivery/update/delete_request.json")
+private Resource deleteRequest;
+@Value("classpath:api/erp_delivery/update/delete_response.json")
+private Resource deleteResponse;
+
+@Value("classpath:/external/product/customer_service/deleteDeliverySuccess_Req.json")
+private Resource extCustomerServiceCatalogRequest_deleteDeliverySuccess;
+
+@Value("classpath:/external/product/customer_service/service_create_response.json")
+private Resource extCustomerServiceCatalogResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· ERP")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+void deleteDeliverySuccess() {
+final var productPathesToExpectedResources = Map.of(
+CUSTOMERSERVICE_UPDATE, Pair.of(extCustomerServiceCatalogRequest_deleteDeliverySuccess, extCustomerServiceCatalogResponse)
+);
+initProductScenario(productPathesToExpectedResources, Map.of());
+
+initDeliveryScenario();
+final var url = "/v1/delivery";
+customPostScenarioFromResource(url, deleteRequest, deleteResponse, true, 200);
+
+final var delivery = deliveryRepository.findByErpGuid("1-test-erp_guid");
+
+final var orderList = deliveryOrderJpaRepository
+.findAllByDelivery(ErpDeliveryEntity.builder().id("1-uuid-test").build());
+
+final var orderItemList = itemJpaRepository
+.findAllByDeliveryOrder(DeliveryOrderEntity.builder().id("2-uuid-test").build());
+
+Assertions.assertAll(
+() -> assertThat(delivery.isPresent()).isEqualTo(false),
+() -> assertThat(orderList.isEmpty()).isEqualTo(true),
+() -> assertThat(orderItemList.isEmpty()).isEqualTo(true)
+);
+
+final var dispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+assertEquals(14, dispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+
+@Value("classpath:api/erp_delivery/external/update/delete/custom_attribute_delete_request1.json")
+private Resource customAttributeRequest1;
+@Value("classpath:api/erp_delivery/external/update/delete/custom_attribute_delete_request2.json")
+private Resource customAttributeRequest2;
+@Value("classpath:api/erp_delivery/external/update/delete/custom_attribute_delete_response.json")
+private Resource customAttributeResponse;
+@Value("classpath:api/erp_delivery/external/update/delete/order_details_delete_request1.json")
+private Resource orderDetailsRequest1;
+@Value("classpath:api/erp_delivery/external/update/delete/order_details_delete_request2.json")
+private Resource orderDetailsRequest2;
+@Value("classpath:api/erp_delivery/external/update/delete/order_details_delete_response.json")
+private Resource orderDetailsResponse;
+@Value("classpath:api/erp_delivery/external/update/delete/items_service_delete_request1.json")
+private Resource itemsServiceRequest1;
+@Value("classpath:api/erp_delivery/external/update/delete/items_service_delete_request2.json")
+private Resource itemsServiceRequest2;
+@Value("classpath:api/erp_delivery/external/update/delete/items_service_delete_response.json")
+private Resource itemsServiceResponse;
+@Value("classpath:api/erp_delivery/external/update/delete/shipping_delete_request1.json")
+private Resource shippingRequest1;
+@Value("classpath:api/erp_delivery/external/update/delete/shipping_delete_request2.json")
+private Resource shippingRequest2;
+@Value("classpath:api/erp_delivery/external/update/delete/shipping_delete_response.json")
+private Resource shippingResponse;
+@Value("classpath:api/erp_delivery/external/update/delete/items_delete_request1.json")
+private Resource itemsRequest1;
+@Value("classpath:api/erp_delivery/external/update/delete/items_delete_response.json")
+private Resource itemsResponse;
+@Value("classpath:api/erp_delivery/external/update/delete/items_delete_request2.json")
+private Resource itemsRequest2;
+@Value("classpath:api/erp_delivery/external/update/delete/order_customer_update_request.json")
+private Resource customerUpdateRequest;
+@Value("classpath:api/erp_delivery/external/update/delete/order_customer_update_response.json")
+private Resource customerUpdateResponse;
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_request.json")
+private Resource legalEntityUpdateRequest;
+@Value("classpath:api/legal_entity/order_customers_legal_entity_update_response.json")
+private Resource legalEntityUpdateResponse;
+
+private void initDeliveryScenario() {
+final var customAttributeData1 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid1/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest1)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData2 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid4/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest2)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsData1 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid1")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(orderDetailsRequest1)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsData2 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid4")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(orderDetailsRequest2)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut1 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid1/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest1)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut2 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid4/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest2)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData1 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid1/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest1)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData2 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid4/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest2)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingData1 = DispatcherData.builder()
+.path("/shipping/test_Sf_erp_guid4/update")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(shippingRequest1)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingData2 = DispatcherData.builder()
+.path("/shipping/test_Sf_erp_guid1/update")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(shippingRequest2)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut1 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid4/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest1)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut2 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid1/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest2)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData1 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid1/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest1)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData2 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid4/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest2)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var customerData = DispatcherData.builder()
+.path("/customer/test-customer_guid")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customerUpdateRequest)
+.expectedResponse(customerUpdateResponse)
+.status(HttpStatus.OK)
+.build();
+final var legalEntityData = ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse), HttpMethod.PUT, HttpStatus.OK, Map.of("legalEntityId", "test-client_guid"));
+
+var dispatcher = new StarfishOrderDispatcher(
+List.of(customAttributeData1, customAttributeData2,
+shippingDataPut1, shippingDataPut2,
+orderDetailsDataPut1, orderDetailsDataPut2,
+itemsData1, itemsData2,
+itemsServiceData1, itemsServiceData2,
+customerData, legalEntityData));
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+/**
+* Ð—Ð°Ð³Ð»ÑƒÑˆÐºÐ¸.
+*
+* @param pathToExpectedResources   - Ð¼Ð°Ð¿Ð° {@link ProductPath} Ð¿ÑƒÑ‚Ð¸ Ðº product-service Ð½Ð° Ð¿Ð°Ñ€Ñƒ Ð¾Ñ‚Ð²ÐµÑ‚-Ð·Ð°Ð¿Ñ€Ð¾Ñ
+* Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ.
+* @param pathTemplateParameters    - Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð² {@link ProductPath} Ð¿ÑƒÑ‚Ð¸.
+*/
+@SuppressWarnings("PMD.UnusedPrivateMethod")
+private void initProductScenario(Map<ProductPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(PRODUCT_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(PRODUCT_UPDATE);
+dispatcherDatas.add(
+PRODUCT_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(CUSTOMERSERVICE_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(CUSTOMERSERVICE_UPDATE);
+dispatcherDatas.add(
+CUSTOMERSERVICE_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+var dispatcher = new StarfishProductDispatcher(dispatcherDatas);
+sfProductServer.setDispatcher(dispatcher);

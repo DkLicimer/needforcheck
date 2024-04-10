@@ -1,0 +1,479 @@
+﻿}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/OrderItemEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderItemEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderItemEntityMapper {
+@Mappings({
+@Mapping(target = "skuId", source = "product.id"),
+@Mapping(target = "skuName", source = "product.name"),
+@Mapping(target = "skuType", source = "product.type"),
+@Mapping(target = "skuTypeName", source = "product.typeName"),
+})
+OrderItem mapOrderItemWithShortOrder(OrderItemEntity source);
+
+default Order shortOrderInfo(OrderEntity source) {
+if (source != null) {
+final var order = new Order();
+order.setId(source.getId());
+order.setSfOrderId(source.getSfOrderId());
+order.setErpGuid(source.getErpGuid());
+return order;
+}
+return null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/OrderReserveEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.OrderReserve.OrderReserveEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.OrderReserve;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderReserveEntityMapper {
+
+OrderReserveEntity map(OrderReserve source);
+
+OrderReserve map(OrderReserveEntity source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/PartnerEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.partner.PartnerEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.Partner;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface PartnerEntityMapper {
+PartnerEntity mapToEntity(Partner model);
+
+Partner mapToModel(PartnerEntity entity);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/ProductSkuEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.product.ProductSkuEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSku;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ProductSkuEntityMapper {
+ProductSku map(ProductSkuEntity source);
+
+ProductSkuEntity map(ProductSku source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/SubdivisionEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.SubdivisionEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface SubdivisionEntityMapper {
+SubdivisionEntity toEntity(Subdivision source);
+
+Subdivision toDto(SubdivisionEntity source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/UserGroupEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.UserGroupEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.UserGroupParticipantEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.UserGroup;
+import ru.liga.evraz.aggregation.domain.model.UserGroupParticipant;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface UserGroupEntityMapper {
+UserGroupEntity map(UserGroup model);
+
+UserGroup map(UserGroupEntity entity);
+
+UserGroupParticipantEntity map(UserGroupParticipant model);
+
+UserGroupParticipant map(UserGroupParticipantEntity entity);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/WarehouseEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.adapter.db.entity.WarehouseEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.Warehouse;
+
+@Mapper(componentModel = "spring", uses = {CommonMapper.class})
+public interface WarehouseEntityMapper {
+@Mapping(target = "type", source = "warehouseType")
+@Mapping(target = "modifiedAt", ignore = true)
+WarehouseEntity map(Warehouse model);
+
+@Mapping(target = "warehouseType", source = "type")
+Warehouse map(WarehouseEntity entity);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/config/AuditConfig.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+/**
+* ÐšÐ¾Ð½Ñ„Ð¸Ð³ÑƒÑ€Ð°Ñ†Ð¸Ñ Ð´Ð»Ñ Ð°ÑƒÐ´Ð¸Ñ‚Ð°. TODO:: need to check workability.
+*/
+@Configuration
+@EnableTransactionManagement
+@EnableJpaAuditing(dateTimeProviderRef = "evrazDateTimeProvider")
+class AuditConfig {
+
+/**
+* Ð”Ð»Ñ Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹ Ð¿Ð¾Ð»ÐµÐ¹ Ð´Ð°Ñ‚ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÐµÐ¹ Ð‘Ð”.
+*
+* @param clock - {@link Clock}
+* @return - {@link DateTimeProvider}
+*/
+@Bean(name = "evrazDateTimeProvider")
+public DateTimeProvider evrazDateTimeProvider(Clock clock) {
+return () -> Optional.of(LocalDateTime.now(clock));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/api.yaml
+Content:
+openapi: 3.0.3
+info:
+title: Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ñ†Ð¸Ñ Ð¿Ð¾ API
+description: ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ API
+contact:
+email: no-reply@liga.ru
+version: 0.1.0
+tags:
+- name: UserGroup
+description: Ð Ð°Ð±Ð¾Ñ‚Ð° Ð³Ñ€ÑƒÐ¿Ð¿Ð°Ð¼Ð¸ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+- name: UserSubdivision
+description: Ð Ð°Ð±Ð¾Ñ‚Ð° Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸ÑÐ¼Ð¸ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+- name: Warehouse
+description: Ð Ð°Ð±Ð¾Ñ‚Ð° ÑÐ¾ ÑÐºÐ»Ð°Ð´Ð°Ð¼Ð¸
+- name: ErpDelivery
+description: Ð Ð°Ð±Ð¾Ñ‚Ð° Ñ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¾Ð¹
+- name: Order
+description: Ð Ð°Ð±Ð¾Ñ‚Ð° Ñ Ð·Ð°ÐºÐ°Ð·Ð°Ð¼Ð¸
+- name: EventHandler
+description: ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° event-Ð¾Ð² Ð¾Ñ‚ settings-service
+- name: Command
+description: ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° ÐºÐ¾Ð¼Ð°Ð½Ð´ Ð´Ð»Ñ ERP:1Ð¡
+
+components:
+securitySchemes:
+bearerAuth:
+type: http
+scheme: bearer
+bearerFormat: JWT
+security:
+- bearerAuth: [ ]
+
+paths:
+/v1/subdivision/{subdivisionId}:
+get:
+tags:
+- UserSubdivision
+operationId: getSubdivision
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ Ð¿Ð¾ Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ñƒ
+parameters:
+- in: path
+name: subdivisionId
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/subdivision.get.yaml#/GetSubdivisionResponse'
+/v1/subdivision:
+post:
+tags:
+- UserSubdivision
+operationId: createOrUpdateSubdivision
+description: Ð¡Ð¾Ð·Ð´Ð°Ñ‚ÑŒ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/subdivision.create.update.yaml#/CreateUpdateSubdivisionRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/subdivision.create.update.yaml#/CreateUpdateSubdivisionResponse'
+/v1/warehouse:
+post:
+tags:
+- Warehouse
+operationId: createOrUpdateWarehouse
+description: Ð¡Ð¾Ð·Ð´Ð°Ñ‚ÑŒ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´ Ð´Ð»Ñ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/warehouse.create.update.yaml#/CreateUpdateWarehouseRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/warehouse.create.update.yaml#/CreateUpdateWarehouseResponse'
+/v1/warehouse/{warehouseId}:
+get:
+tags:
+- Warehouse
+operationId: getWarehouse
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ ÑÐºÐ»Ð°Ð´Ð° Ð¿Ð¾ Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ñƒ
+parameters:
+- in: path
+name: warehouseId
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ ÑÐºÐ»Ð°Ð´Ð°
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/warehouse.get.yaml#/GetWarehouseResponse'
+/v1/usergroup:
+post:
+tags:
+- UserGroup
+operationId: createOrUpdateUserGroup
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð“Ñ€ÑƒÐ¿Ð¿Ð°Ð¼ ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/user.group.create.update.yaml#/CreateUpdateUserGroupRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/user.group.create.update.yaml#/CreateUpdateUserGroupResponse'
+/v1/erp/task:
+post:
+tags:
+- ErpTask
+operationId: createErpTask
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð·Ð°Ð´Ð°Ñ‡Ð°Ð¼ ERP
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/erp.task.create.update.yaml#/CreateErpTaskRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/erp.task.create.update.yaml#/CreateErpTaskResponse'
+/v1/erp/task/cancel:
+post:
+tags:
+- ErpTask
+operationId: cancelErpTask
+description: ÐžÑ‚Ð¼ÐµÐ½Ð° Ð·Ð°Ð´Ð°Ñ‡ ERP
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/erp.task.create.update.yaml#/CancelErpTaskRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/erp.task.create.update.yaml#/CancelErpTaskResponse'
+/v1/erp/task/status:
+post:
+tags:
+- ErpTask
+operationId: createOrUpdateErpTaskStatus
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð·Ð°Ð´Ð°Ñ‡Ð°Ð¼ ERP
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/erp.task.status.create.update.yaml#/CreateUpdateErpTaskStatusRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/erp.task.status.create.update.yaml#/CreateUpdateErpTaskStatusResponse'
+/v1/order:
+post:
+tags:
+- Order
+operationId: createOrUpdateOrder
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð—Ð°ÐºÐ°Ð·Ð°/Ð—Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð· 1Ð¡
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/order.create.update.yaml#/CreateUpdateOrderRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/order.create.update.yaml#/CreateUpdateOrderResponse'
+/v1/delivery:
+post:
+tags:
+- ErpDelivery
+operationId: createOrUpdateErpDelivery
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ°Ð¼ Ð·Ð°ÐºÐ°Ð·Ð¾Ð² ERP
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/erp.delivery.create.update.yaml#/CreateUpdateErpDeliveryRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/erp.delivery.create.update.yaml#/CreateUpdateErpDeliveryResponse'
+/v1/delivery/{deliveryGuid}:
+get:
+tags:
+- ErpDelivery
+operationId: findDelivery
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ
+parameters:
+- in: path
+name: deliveryGuid
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/erp.delivery.find.yaml#/FindErpDeliveryResponse'
+/v1/order/additional-attribute:
+post:
+tags:
+- Order
+operationId: createOrUpdateOrderAttribute
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð°Ð¼ Ð·Ð°ÐºÐ°Ð·Ð°
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/order.attribute.create.update.yaml#/CreateUpdateOrderAttributeRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/order.attribute.create.update.yaml#/CreateUpdateOrderAttributeResponse'
+/v1/order/sf/{sfOrderId}/copy-link:
+get:
+tags:
+- Order
+operationId: generateOrderCopyLink
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ ÑÑÑ‹Ð»ÐºÐ¸ Ð½Ð° ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð°
+parameters:
+- in: path
+name: sfOrderId
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMS
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:

@@ -1,0 +1,487 @@
+﻿@Pattern(regexp = "^UTC((\\+1[0-4]|\\+[1-9])|(-1[0-2]|-[1-9])|([-+Â±]0))$",
+message = "timeZone format must be UTC-12 ... UTC+14")
+private String timeZone;
+@NotEmpty
+@Valid
+private List<WorkDay> workDays;
+@NotNull
+private Boolean deleted;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateUserGroupCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.Builder;
+import lombok.Getter;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.UserGroupParticipant;
+
+import java.util.List;
+
+@Builder
+@Validated
+@Getter
+public class CreateUpdateUserGroupCmd {
+private String groupId;
+private String groupName;
+private List<UserGroupParticipant> participants;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateWarehouseCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.Builder;
+import lombok.Getter;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.WarehouseWorkDay;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+@Builder
+@Validated
+@Getter
+public class CreateUpdateWarehouseCmd {
+@NotEmpty
+private String id;
+@NotEmpty
+private String name;
+@NotEmpty
+@Pattern(regexp = "^UTC((\\+1[0-4]|\\+[1-9])|(-1[0-2]|-[1-9])|([-+Â±]0))$",
+message = "timeZone format must be UTC-12 ... UTC+14")
+private String timeZone;
+@NotEmpty
+private String subdivisionId;
+@NotEmpty
+private String subdivisionName;
+@NotEmpty
+@Valid
+private List<WarehouseWorkDay> workDays;
+
+private String warehouseType;
+@NotEmpty
+private String address;
+@NotEmpty
+private String city;
+@NotNull
+private Boolean active;
+@NotNull
+private Boolean deleted;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/ErpTaskStatusCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.domain.model.Responsible;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpTaskStatus;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ErpTaskStatusCmd {
+@NotEmpty
+private String guid;
+@NotNull
+private ErpTaskStatus status;
+private String decision;
+private Responsible responsible;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/OrderReserveRenewalCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.Builder;
+import lombok.Getter;
+import org.springframework.validation.annotation.Validated;
+
+import java.time.LocalDate;
+import javax.validation.constraints.NotEmpty;
+
+@Builder
+@Validated
+@Getter
+public class OrderReserveRenewalCmd {
+@NotEmpty
+private String instanceId;
+@NotEmpty
+private String orderId;
+private LocalDate reservationRemovalDate;
+private String reservationExtensionReason; // Ð’ Ð±ÑƒÐ´ÑƒÑ‰ÐµÐ¼ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿ÐµÑ€ÐµÑ€Ð°ÑÑ‚Ð¸ Ð² enum
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/OrderShipPermissionItemsCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.command.OrderItemShortData;
+
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class OrderShipPermissionItemsCmd {
+@NotEmpty
+private String instanceId;
+@NotEmpty
+private String orderId;
+@Valid
+@NotNull
+private List<OrderItemShortData> documentItems;
+
+private String documentStatus;
+
+@AssertTrue(message = "must not be empty")
+private boolean isDocumentItems() {
+return StringUtils.isNotBlank(documentStatus) || CollectionUtils.isNotEmpty(documentItems);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/OrderSignPipelineCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderSignPipelineCmd {
+
+@NotEmpty
+private String commandType;
+@NotEmpty
+private String instanceId;
+@NotEmpty
+private String orderId;
+@NotEmpty
+private String erpGuid;
+@NotNull
+private Boolean omsPipeline;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/ShippingRequestShipPermissionItemsCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class ShippingRequestShipPermissionItemsCmd {
+@NotEmpty
+private String commandType;
+@NotEmpty
+private String instanceId;
+@NotEmpty
+private String orderId;
+@NotEmpty
+private String shippingErpGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/dto/OrderReserveRenewalCmdDto.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.ZonedDateTime;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrderReserveRenewalCmdDto {
+private String commandGuid;
+private String commandName;
+private String commandTopic;
+private ZonedDateTime commandDateTime;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/dto/OrderShipPermissionItemsCmdDto.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.ZonedDateTime;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrderShipPermissionItemsCmdDto {
+private String commandGuid;
+private String commandName;
+private String commandTopic;
+private ZonedDateTime commandDateTime;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/dto/ShippingRequestShipPermissionItemsCmdDto.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.ZonedDateTime;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ShippingRequestShipPermissionItemsCmdDto {
+private String commandGuid;
+private String commandName;
+private String commandTopic;
+private ZonedDateTime commandDateTime;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/annotations/NullOrNotBlank.java
+Content:
+package ru.liga.evraz.aggregation.annotations;
+
+import org.hibernate.validator.constraints.ConstraintComposition;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.constraints.CompositionType.OR;
+
+@ConstraintComposition(OR)
+@Null
+@NotBlank
+@ReportAsSingleViolation
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+@Retention(RUNTIME)
+@Constraint(validatedBy = {})
+public @interface NullOrNotBlank {
+String message() default "{org.hibernate.validator.constraints.NullOrNotBlank.message}";
+
+Class<?>[] groups() default {};
+
+Class<? extends Payload>[] payload() default {};
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/CommandGuidKey.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
+
+@Builder
+@AllArgsConstructor
+@Getter
+@ToString
+@Jacksonized
+public class CommandGuidKey {
+private String commandGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/EvrazErrorHandlingDeserializer.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
+import org.springframework.kafka.support.serializer.FailedDeserializationInfo;
+import org.springframework.kafka.support.serializer.SerializationUtils;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+
+import java.util.Map;
+import java.util.function.Function;
+
+@Slf4j
+public class EvrazErrorHandlingDeserializer<T> extends ErrorHandlingDeserializer<T> {
+
+/**
+* Header name for deserialization exceptions.
+*
+* @deprecated in favor of {@link SerializationUtils#DESERIALIZER_EXCEPTION_HEADER_PREFIX}.
+*/
+@Deprecated
+public static final String KEY_DESERIALIZER_EXCEPTION_HEADER_PREFIX =
+SerializationUtils.DESERIALIZER_EXCEPTION_HEADER_PREFIX;
+
+/**
+* Header name for deserialization exceptions.
+*
+* @deprecated in favor of {@link SerializationUtils#KEY_DESERIALIZER_EXCEPTION_HEADER}.
+*/
+@Deprecated
+public static final String KEY_DESERIALIZER_EXCEPTION_HEADER = SerializationUtils.KEY_DESERIALIZER_EXCEPTION_HEADER;
+
+/**
+* Header name for deserialization exceptions.
+*
+* @deprecated in favor of {@link SerializationUtils#VALUE_DESERIALIZER_EXCEPTION_HEADER}.
+*/
+@Deprecated
+public static final String VALUE_DESERIALIZER_EXCEPTION_HEADER = SerializationUtils.VALUE_DESERIALIZER_EXCEPTION_HEADER;
+
+/**
+* Supplier for a T when deserialization fails.
+*/
+public static final String KEY_FUNCTION = "spring.deserializer.key.function";
+
+/**
+* Supplier for a T when deserialization fails.
+*/
+public static final String VALUE_FUNCTION = "spring.deserializer.value.function";
+
+/**
+* Property name for the delegate key deserializer.
+*/
+public static final String KEY_DESERIALIZER_CLASS = "spring.deserializer.key.delegate.class";
+
+/**
+* Property name for the delegate value deserializer.
+*/
+public static final String VALUE_DESERIALIZER_CLASS = "spring.deserializer.value.delegate.class";
+
+private Deserializer<T> delegate;
+
+private boolean isForKey;
+
+private Function<FailedDeserializationInfo, T> failedDeserializationFunction;
+
+public EvrazErrorHandlingDeserializer() {
+}
+
+public EvrazErrorHandlingDeserializer(Deserializer<T> delegate) {
+this.delegate = setupDelegate(delegate);
+}
+
+/**
+* Provide an alternative supplying mechanism when deserialization fails.
+*
+* @param failedDeserializationFunction the {@link Function} to use.
+* @since 2.2.8
+*/
+public void setFailedDeserializationFunction(Function<FailedDeserializationInfo, T> failedDeserializationFunction) {
+this.failedDeserializationFunction = failedDeserializationFunction;
+}
+
+public boolean isForKey() {
+return this.isForKey;
+}
+
+/**
+* Set to true if this deserializer is to be used as a key deserializer when
+* configuring outside of Kafka.
+*
+* @param isKey true for a key deserializer, false otherwise.
+* @since 2.2.3
+*/
+public void setForKey(boolean isKey) {
+this.isForKey = isKey;
+}
+
+/**
+* Set to true if this deserializer is to be used as a key deserializer when
+* configuring outside of Kafka.
+*
+* @param isKey true for a key deserializer, false otherwise.
+* @return this
+* @since 2.2.3
+*/
+public ErrorHandlingDeserializer<T> keyDeserializer(boolean isKey) {
+this.isForKey = isKey;
+return this;
+}
+
+@Override
+public void configure(Map<String, ?> configs, boolean isKey) {
+if (this.delegate == null) {
+setupDelegate(configs, isKey ? KEY_DESERIALIZER_CLASS : VALUE_DESERIALIZER_CLASS);
+}
+Assert.state(this.delegate != null, "No delegate deserializer configured");

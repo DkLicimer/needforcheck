@@ -1,0 +1,391 @@
+﻿File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/handlers/AdditionalOrderAttributeEventHandler.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.handlers;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.event.AdditionalOrderAttributeEvent;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.concurrent.Executor;
+
+import static java.util.Objects.isNull;
+
+@Component
+@Slf4j
+public class AdditionalOrderAttributeEventHandler extends BaseEventHandler {
+
+public AdditionalOrderAttributeEventHandler(StarfishOrderEnricher starfishOrderEnricher,
+ProductService productService, OrderService sfOrderService,
+OrderRepository orderRepo, OrderTransactionRepository orderTransactionRepo,
+DeliveryTransactionRepository deliveryTransactionRepo, ErpDeliveryRepository deliveryRepo,
+SfOrderMapper sfOrderMapper, OrderAttributeRepository orderAttributeRepo,
+DeliveryAttributeRepository deliveryAttributeRepo,
+@Qualifier("asyncSecurityCtxTaskExecutor") Executor executor) {
+super(starfishOrderEnricher, productService, sfOrderService, orderRepo, orderTransactionRepo, deliveryTransactionRepo,
+deliveryRepo, orderAttributeRepo, deliveryAttributeRepo, sfOrderMapper, executor);
+}
+
+@EventListener(classes = AdditionalOrderAttributeEvent.class)
+public void handleAdditionalOrderAttribute(AdditionalOrderAttributeEvent event) {
+final var eventType = event.getEventType();
+final var orderErpGuid = event.getOrderErpGuid();
+final var attribute = event.getAttribute();
+final var transactionId = event.getTransactionId();
+
+if (scheduledUpdateEnabled) {
+log.info("""
+Scheduled create/update order enabled.
+Skip handling AdditionalOrderAttributeEvent for
+eventType {}, orderErpGuid: {}, attribute: {}, transactionId: {}""",
+eventType, orderErpGuid, attribute, transactionId);
+return;
+}
+
+// ÐžÐ±Ð½Ð¾Ð²Ð»ÑÐµÐ¼ ÑƒÑÐ»ÑƒÐ³Ð¸
+productService.updateCustomerServiceCatalogForOrderErpGuid(orderErpGuid);
+
+final var deliveryList = starfishOrderEnricher.getAllDeliveryDataIfExist(orderErpGuid);
+final var delivery = starfishOrderEnricher.getDeliveryDataIfExist(deliveryList);
+
+log.info("""
+Handled AdditionalOrderAttributeEvent.
+Type: {}. For order id: {}. OrderAttribute: {}. TransactionId {}
+""", eventType, orderErpGuid, attribute, transactionId);
+
+final var order = orderRepo.getByErpGuid(orderErpGuid);
+final var orderAttributes = orderAttributeRepo.findByErpOrderGuid(orderErpGuid);
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+
+if (isNull(order)) {
+log.info("""
+Missing order with order erpGuid = {}.\040
+Do not update in Starfish24. Waiting for order...
+""", orderErpGuid);
+return;
+}
+if (StringUtils.isBlank(order.getSfOrderId())) {
+log.info("Starfish orderId not found for erpGuid {}", orderErpGuid);
+// TODO:: Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð¿Ð¾ clientOrderId, ÐµÑÐ»Ð¸ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ -> ÑÐ¾Ð·Ð´Ð°ÐµÐ¼ Ð·Ð°ÐºÐ°Ð·
+final var clientOrderId = sfOrderMapper.buildClientOrderId(order);
+
+log.info("Search for starfish orderId by clientOrderId {} for order.erpGuid {}", clientOrderId, orderErpGuid);
+final var optSfOrder = sfOrderService.getShortOrderInfoByClientOrderId(clientOrderId);
+
+processingWithResultFromSf(optSfOrder, event, orderErpGuid, order, delivery, orderAttributes, clientOrderId, deliveryList);
+} else {
+final var sfOrderId = order.getSfOrderId();
+log.info("Starfish order id was found ({}) for erpGuid {} with", sfOrderId, orderErpGuid);
+
+var orderCreateExtendedDto = sfOrderMapper.mapToCreateDto(order, deliveryList); // Ð¤Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·
+
+enrichAndUpdateStarfishOrderData(
+event, sfOrderId, orderCreateExtendedDto,
+orderAttributes, deliveryAttributes,
+delivery, orderErpGuid, order, deliveryList);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/handlers/BaseEventHandler.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.handlers;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.event.BaseEvent;
+import ru.liga.evraz.aggregation.application.event.DeliveryAttributeEvent;
+import ru.liga.evraz.aggregation.application.event.DeliveryEvent;
+import ru.liga.evraz.aggregation.application.event.EventType;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static ru.liga.evraz.aggregation.application.event.EventType.isDeliveryEventType;
+import static ru.liga.evraz.aggregation.application.event.EventType.isOrderEventType;
+
+@RequiredArgsConstructor
+@Slf4j
+class BaseEventHandler {
+
+@Value("${scheduled.order.createUpdate.enabled:true}")
+protected boolean scheduledUpdateEnabled;
+
+@Value("${async.order.createUpdate.enabled:false}")
+protected boolean asyncOrderCreateUpdateEnabled;
+
+
+protected final StarfishOrderEnricher starfishOrderEnricher;
+protected final ProductService productService;
+protected final OrderService sfOrderService;
+protected final OrderRepository orderRepo;
+protected final OrderTransactionRepository orderTransactionRepo;
+protected final DeliveryTransactionRepository deliveryTransactionRepo;
+protected final ErpDeliveryRepository deliveryRepo;
+protected final OrderAttributeRepository orderAttributeRepo;
+protected final DeliveryAttributeRepository deliveryAttributeRepo;
+
+protected final SfOrderMapper sfOrderMapper;
+
+protected final Executor executor;
+
+protected <T extends BaseEvent> void createOrderAndCloseOrderTransaction(T event, Order order,
+List<OrderAttribute> orderAttributes,
+List<DeliveryAttribute> deliveryAttributes,
+ErpDelivery delivery, List<ErpDelivery> deliveryList) {
+
+final var orderErpGuid = event.getOrderErpGuid();
+final var transactionId = event.getTransactionId();
+log.info("Try to create order in Starfish. Order.erpGuid {}, transactionId {}",
+orderErpGuid, transactionId);
+final var sfOrder = sfOrderMapper.mapToCreateDto(order, deliveryList);
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithOrderAttributes(sfOrder, orderAttributes, orderErpGuid);
+if (nonNull(delivery)) {
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDelivery(sfOrder, delivery, deliveryList);
+}
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDeliveryAttributes(sfOrder, delivery, deliveryAttributes);
+sfOrder.enrichOrderItemsAndServicesWithShippingErpGuid(delivery);
+// TODO:: Another enrich operations
+
+if (asyncOrderCreateUpdateEnabled) {
+CompletableFuture
+.runAsync(() -> {
+final var sfOrderId = sfOrderService.createOrder(order, sfOrder);
+orderRepo.setStarfishOrderId(orderErpGuid, sfOrderId);
+}, executor)
+.thenAcceptAsync(v -> setShouldSentFalse(event), executor);
+} else {
+final var sfOrderId = sfOrderService.createOrder(order, sfOrder);
+orderRepo.setStarfishOrderId(orderErpGuid, sfOrderId);
+log.info("Try to update transactionId {} order.erpGuid {} with shouldSent = false",
+transactionId, orderErpGuid);
+setShouldSentFalse(event);
+}
+}
+
+protected boolean isFirstDelivery(ErpDelivery delivery, String orderErpGuid) {
+final var deliveryIdsForOrder = deliveryRepo.findAllByErpOrderGuid(orderErpGuid)
+.stream().map(DeliveryOrder::getDeliveryId).toList();
+if (CollectionUtils.isEmpty(deliveryIdsForOrder)) {
+return true;
+}
+if (deliveryIdsForOrder.size() == 1) {
+return true;
+}
+final var deliveryList = deliveryRepo.findAllByIds(deliveryIdsForOrder);
+final var firstDelivery = deliveryList.stream()
+.min(Comparator.comparing(ErpDelivery::getCreatedDate)).get();
+return Objects.equals(firstDelivery.getErpGuid(), delivery.getErpGuid());
+}
+
+protected boolean isNeedFurtherProcessing(Order order, EventType eventType,
+String deliveryErpGuid, String orderErpGuid, ErpDelivery delivery) {
+
+if (isNull(order)) {
+log.info("Missing order with orderErpGuid = {} for delivery with deliveryErpGuid = {}",
+orderErpGuid, deliveryErpGuid);
+return false;
+}
+final var isFirstDelivery = isFirstDelivery(delivery, orderErpGuid);
+
+if (!isFirstDelivery) {
+log.warn("""
+Delivery with erpGuid = {} is not first for order with orderErpGuid = {}.
+Order should not be updated in StarFish
+""", deliveryErpGuid, orderErpGuid);
+return false;
+}
+return true;
+}
+
+protected <T extends BaseEvent> void enrichAndUpdateStarfishOrderData(T event, String sfOrderId, OrderCreateExtendedDto sfOrder,
+List<OrderAttribute> additionalOrderAttributes,
+List<DeliveryAttribute> additionalDeliveryAttributes,
+ErpDelivery delivery, String orderErpGuid,
+Order erpOrder, List<ErpDelivery> deliveryList) {
+
+log.info("Call starfish update methods for sfOrderId {}, erpGuid {}", sfOrderId, erpOrder.getErpGuid());
+
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithOrderAttributes(sfOrder, additionalOrderAttributes, erpOrder.getErpGuid());
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDelivery(sfOrder, delivery, deliveryList);
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDeliveryAttributes(sfOrder, delivery, additionalDeliveryAttributes);
+sfOrder.enrichOrderItemsAndServicesWithShippingErpGuid(delivery);
+starfishOrderEnricher.enrichOrderWithCalculatedAttributes(sfOrder, deliveryList); //Ð·Ð²Ð°Ñ‚ÑŒ Ð¿Ð¾ÑÐ»ÐµÐ´Ð½ÐµÐ¹, Ñ‚.Ðº. Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÑŽÑ‚ÑÑ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñ‹ enrichOrderItemsAndServicesWithShippingErpGuid
+starfishOrderEnricher.enrichOrderWithSubdivisionNameAttribute(sfOrder, erpOrder);
+starfishOrderEnricher.enrichOrderWithReserveAttribute(sfOrder, erpOrder);
+// TODO:: Another enrich operations
+
+fullOrderUpdateInStarfish(event, sfOrderId, sfOrder, erpOrder);
+}
+
+protected <T extends BaseEvent> void processingWithResultFromSf(Optional<OrderSearchDto> optSfOrder,
+T event, String orderErpGuid, Order order, ErpDelivery delivery,
+List<OrderAttribute> orderAttributes, String clientOrderId,
+List<ErpDelivery> deliveryList) {
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+if (optSfOrder.isPresent()) {
+log.info("Starfish order found by clientOrderId {} for order.erpGuid {}", clientOrderId,
+orderErpGuid);
+final var sfOrderId = optSfOrder.get().getId();
+orderRepo.setStarfishOrderId(order.getErpGuid(), sfOrderId);
+final var orderCreateExtendedDto = sfOrderMapper.mapToCreateDto(order, deliveryList); // Ð¤Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·
+
+enrichAndUpdateStarfishOrderData(
+event,
+sfOrderId, orderCreateExtendedDto,
+orderAttributes, deliveryAttributes,
+delivery, orderErpGuid, order, deliveryList);
+} else {
+log.warn("Order not found by clientOrderId {}. Try to create..", clientOrderId);
+
+createOrderAndCloseOrderTransaction(
+event, order,
+orderAttributes, deliveryAttributes,
+delivery, deliveryList);
+}
+}
+
+protected <T extends BaseEvent> void fullOrderUpdateInStarfish(T event, String sfOrderId, OrderCreateExtendedDto sfOrder, Order erpOrder) {
+log.info("Try to update full order with sfOrderId {}", sfOrderId);
+
+if (asyncOrderCreateUpdateEnabled) {
+CompletableFuture
+.runAsync(() -> sfOrderService.createOrUpdateShipping(sfOrderId, sfOrder.getShipping()), executor)
+.thenAcceptAsync(v -> sfOrderService.updateItems(sfOrderId, sfOrder.getItems()), executor)
+.thenAcceptAsync(v -> sfOrderService.updateItemServices(sfOrderId, sfOrder.getItemServices()), executor)
+.thenAcceptAsync(v -> sfOrderService.updateCustomer(sfOrder.getCustomer()), executor)
+.thenAcceptAsync(v -> sfOrderService.updateOrderCustomAttributes(sfOrderId, sfOrder.getCustomAttributes()), executor)
+.thenAcceptAsync(v -> sfOrderService.updateOrdersDetails(sfOrderId, sfOrder.getOrderDetails()), executor)
+.thenAcceptAsync(v -> sfOrderService.updateLegalEntity(sfOrder.getLegalEntity()), executor)
+.thenAcceptAsync(v -> setShouldSentFalse(event), executor);
+} else {
+sfOrderService.createOrUpdateShipping(sfOrderId, sfOrder.getShipping());
+sfOrderService.updateItems(sfOrderId, sfOrder.getItems());
+sfOrderService.updateItemServices(sfOrderId, sfOrder.getItemServices());
+sfOrderService.updateCustomer(sfOrder.getCustomer());
+sfOrderService.updateOrderCustomAttributes(sfOrderId, sfOrder.getCustomAttributes());
+sfOrderService.updateOrdersDetails(sfOrderId, sfOrder.getOrderDetails());
+sfOrderService.updateLegalEntity(sfOrder.getLegalEntity());
+setShouldSentFalse(event);
+}
+}
+
+protected <T extends BaseEvent> void setShouldSentFalse(T event) {
+final var transactionId = event.getTransactionId();
+final var orderErpGuid = event.getOrderErpGuid();
+
+if (StringUtils.isBlank(event.getTransactionId())) {
+// Ð¡Ñ†ÐµÐ½Ð°Ñ€Ð¸Ð¹ Ð´Ð»Ñ EventType.RELOAD_ORDER ->
+// ÐºÐ°Ðº Ð²Ð°Ñ€Ð¸Ð°Ð½Ñ‚ Ð¼Ð¾Ð¶Ð½Ð¾ Ð±ÑƒÐ´ÐµÑ‚ Ð² Ð´Ð¾Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ°Ñ… Ð²Ñ‹Ñ‚Ð°Ñ‰Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ñ‚Ñ€Ð°Ð½Ð·Ð°ÐºÑ†Ð¸Ð¸ Ð¸ Ð·Ð°"Ñ„Ð¾Ð»Ñ"Ð¸Ñ‚ÑŒ,
+// Ð½Ð¾ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ ÐºÐ¾Ð½Ñ„Ð»Ð¸ÐºÑ‚ Ñ ÑˆÐµÐ´ÑƒÐ»ÐµÑ€Ð¾Ð¼ (ScheduledOrderUpdateJob).
+return;
+}
+
+if (isOrderEventType(event.getEventType())) {
+log.info("Try to update transactionId {} order.erpGuid {} with shouldSent = false",
+transactionId, orderErpGuid);
+orderTransactionRepo.setShouldSentFalse(transactionId);
+} else if (isDeliveryEventType(event.getEventType())) {
+String deliveryErpGuid = null;
+if (event instanceof DeliveryAttributeEvent deliveryAttributeEvent) {
+deliveryErpGuid = deliveryAttributeEvent.getDeliveryErpGuid();
+} else if (event instanceof DeliveryEvent deliveryEvent) {
+deliveryErpGuid = deliveryEvent.getDeliveryErpGuid();
+}
+log.info("Try to update for transactionId {} delivery.erpGuid {} with shouldSent = false", transactionId, deliveryErpGuid);
+deliveryTransactionRepo.setShouldSentFalse(transactionId);
+orderTransactionRepo.setShouldSentFalse(transactionId);
+}
+}
+
+// Do not call in Async context
+protected List<DeliveryAttribute> getDeliveryAttributesForDelivery(ErpDelivery delivery) {
+return delivery != null && StringUtils.isNotBlank(delivery.getErpGuid())
+? deliveryAttributeRepo.findByDeliveryErpGuid(delivery.getErpGuid())
+: List.of();
+}
+
+protected <T extends BaseEvent> void createOrUpdateFullOrderInSF(T event) {
+final var orderErpGuid = event.getOrderErpGuid();
+final var erpOrder = orderRepo.getByErpGuid(orderErpGuid);
+final var orderAttributes = orderAttributeRepo.findByErpOrderGuid(orderErpGuid);
+final var deliveryList = starfishOrderEnricher.getAllDeliveryDataIfExist(orderErpGuid);
+final var delivery = starfishOrderEnricher.getDeliveryDataIfExist(deliveryList);
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+
+if (nonNull(erpOrder)) {
+var starfishOrderId = erpOrder.getSfOrderId();
+
+if (StringUtils.isBlank(starfishOrderId)) {
+log.info("Starfish orderId not found for erpGuid {}", orderErpGuid);
+
+// Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° Ð¿Ð¾ clientOrderId, ÐµÑÐ»Ð¸ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ -> ÑÐ¾Ð·Ð´Ð°ÐµÐ¼ Ð·Ð°ÐºÐ°Ð·
+final var clientOrderId = sfOrderMapper.buildClientOrderId(erpOrder);
+
+log.info("Search for starfish orderId by clientOrderId {} for order.erpGuid {}",
+clientOrderId,
+orderErpGuid);
+final var optSfOrder = sfOrderService.getShortOrderInfoByClientOrderId(
+clientOrderId);
+if (optSfOrder.isPresent()) {
+log.info("Starfish order found by clientOrderId {} for order.erpGuid {}",
+clientOrderId,
+orderErpGuid);
+final var sfOrderId = optSfOrder.get().getId();
+orderRepo.setStarfishOrderId(erpOrder.getErpGuid(), sfOrderId);
+var sfFullOrder = sfOrderMapper.mapToCreateDto(
+erpOrder, deliveryList); // Ð¤Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·
+
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithOrderAttributes(sfFullOrder, orderAttributes, orderErpGuid);
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDelivery(sfFullOrder, delivery, deliveryList);
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDeliveryAttributes(sfFullOrder, delivery, deliveryAttributes);
+sfFullOrder.enrichOrderItemsAndServicesWithShippingErpGuid(delivery);
+starfishOrderEnricher.enrichOrderWithCalculatedAttributes(sfFullOrder, deliveryList);
+starfishOrderEnricher.enrichOrderWithSubdivisionNameAttribute(sfFullOrder, erpOrder);
+starfishOrderEnricher.enrichOrderWithReserveAttribute(sfFullOrder, erpOrder);
+// TODO:: Another enrich operations
+fullOrderUpdateInStarfish(event, sfOrderId, sfFullOrder, erpOrder);
+} else {
+log.warn("Order not found by clientOrderId {}. Try to create..", clientOrderId);
+createOrderAndCloseOrderTransaction(event, erpOrder, orderAttributes, deliveryAttributes, delivery, deliveryList);
+}
+} else {

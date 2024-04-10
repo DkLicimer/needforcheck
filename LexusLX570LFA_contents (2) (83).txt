@@ -1,0 +1,435 @@
+﻿import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.adapter.kafka.KafkaOrderReserveRenewalProperties;
+import ru.liga.evraz.aggregation.application.cmd.OrderReserveRenewalCmd;
+import ru.liga.evraz.aggregation.application.cmd.dto.OrderReserveRenewalCmdDto;
+import ru.liga.evraz.aggregation.application.config.CommandProperties;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.common.KafkaUtil;
+import ru.liga.evraz.aggregation.domain.model.OrderReserveRenewalDto;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import static java.time.ZoneId.systemDefault;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateOrderReserveRenewalCmdUseCase {
+private final CommandRepository commandRepo;
+private final OrderRepository orderRepo;
+private final CommandProperties commandProperties;
+private final CommandMapper mapper;
+private final KafkaTemplate<CommandGuidKey, OrderReserveRenewalDto> kafkaTemplate;
+private final KafkaOrderReserveRenewalProperties kafkaProperties;
+private final Clock clock;
+
+
+public OrderReserveRenewalCmdDto process(@NotNull @Valid OrderReserveRenewalCmd cmd) {
+final var order = orderRepo.getByStarfishOrderId(cmd.getOrderId());
+
+if (order == null) {
+throw new NotFoundException("Order not found by starfish order id: " + cmd.getOrderId());
+}
+
+final var command = mapper.map(cmd, order.getErpGuid());
+final var commandSaveResult = commandRepo.createErpCommand(command);
+final var commandGuid = commandSaveResult.getCommandGuid();
+final var commandType = commandSaveResult.getCommandType();
+final var topic = kafkaProperties.getRequest().getTopic();
+
+OrderReserveRenewalCmdDto resultDto = OrderReserveRenewalCmdDto.builder()
+.commandGuid(commandGuid)
+.commandName(String.join(". ", List.of(commandType, commandProperties.meta().get(commandType).messageDescription())))
+.commandTopic(topic)
+.commandDateTime(ZonedDateTime.of(LocalDateTime.now(clock), systemDefault()))
+.build();
+
+final var orderReserveRenewalDto = mapper.map(commandSaveResult);
+
+log.info("Create record to order reserve renewal for erpOrderGuid: {} in topic {}",
+orderReserveRenewalDto.getErpGuid(), topic);
+
+final var record = KafkaUtil.createRecord(topic, orderReserveRenewalDto, mapper.mapCommandGuidKey(commandGuid));
+final var future = kafkaTemplate.send(record);
+future.addCallback(new ListenableFutureCallback<>() {
+@Override
+public void onFailure(Throwable throwable) {
+log.error("Error occurred on sending message: " + orderReserveRenewalDto, throwable);
+}
+@Override
+public void onSuccess(SendResult<CommandGuidKey, OrderReserveRenewalDto> sendResult) {
+RecordMetadata recordMetadata = sendResult.getRecordMetadata();
+log.info("Message successfully sent: partition: {}, offset: {}, key: {}, msg: {}", recordMetadata.partition(),
+recordMetadata.offset(), sendResult.getProducerRecord().key(), sendResult.getProducerRecord().value());
+commandRepo.updateSendStatusByCommandGuid(commandGuid);
+}
+});
+return resultDto;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateOrderShipPermissionItemsUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.adapter.kafka.KafkaOrderShipPermissionProperties;
+import ru.liga.evraz.aggregation.application.cmd.OrderShipPermissionItemsCmd;
+import ru.liga.evraz.aggregation.application.cmd.dto.OrderShipPermissionItemsCmdDto;
+import ru.liga.evraz.aggregation.application.config.CommandProperties;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.common.KafkaUtil;
+import ru.liga.evraz.aggregation.domain.model.OrderShipPermissionDto;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import static java.time.ZoneId.systemDefault;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateOrderShipPermissionItemsUseCase {
+
+private final CommandRepository commandRepo;
+private final OrderRepository orderRepo;
+private final CommandProperties commandProperties;
+private final CommandMapper mapper;
+private final KafkaTemplate<CommandGuidKey, OrderShipPermissionDto> kafkaTemplate;
+private final KafkaOrderShipPermissionProperties kafkaProperties;
+private final Clock clock;
+
+
+public OrderShipPermissionItemsCmdDto process(@NotNull @Valid OrderShipPermissionItemsCmd cmd) {
+final var order = orderRepo.getByStarfishOrderId(cmd.getOrderId());
+
+if (order == null) {
+throw new NotFoundException("Order not found by starfish order id: " + cmd.getOrderId());
+}
+
+final var command = mapper.map(cmd, order.getErpGuid());
+final var commandSaveResult = commandRepo.createErpCommand(command);
+final var commandGuid = commandSaveResult.getCommandGuid();
+final var commandType = commandSaveResult.getCommandType();
+final var topic = kafkaProperties.getRequest().getTopic();
+
+OrderShipPermissionItemsCmdDto resultDto = OrderShipPermissionItemsCmdDto.builder()
+.commandGuid(commandGuid)
+.commandName(String.join(". ", List.of(commandType, commandProperties.meta().get(commandType).messageDescription())))
+.commandTopic(topic)
+.commandDateTime(ZonedDateTime.of(LocalDateTime.now(clock), systemDefault()))
+.build();
+
+final var orderShipPermissionDto = mapper.map(commandSaveResult);
+
+log.info("Create record to set ship permission for order items with erpOrderGuid: {} in topic {}",
+orderShipPermissionDto.getErpGuid(), topic);
+
+final var record = KafkaUtil.createRecord(topic, orderShipPermissionDto, mapper.mapCommandGuidKey(commandGuid));
+final var future = kafkaTemplate.send(record);
+future.addCallback(new ListenableFutureCallback<>() {
+@Override
+public void onFailure(Throwable throwable) {
+log.error("Error occurred on sending message: " + orderShipPermissionDto, throwable);
+}
+@Override
+public void onSuccess(SendResult<CommandGuidKey, OrderShipPermissionDto> sendResult) {
+RecordMetadata recordMetadata = sendResult.getRecordMetadata();
+log.info("Message successfully sent: partition: {}, offset: {}, key: {}, msg: {}", recordMetadata.partition(),
+recordMetadata.offset(), sendResult.getProducerRecord().key(), sendResult.getProducerRecord().value());
+commandRepo.updateSendStatusByCommandGuid(commandGuid);
+}
+});
+return resultDto;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateOrderSignPipelineUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.adapter.kafka.KafkaOrderSignPipelineProperties;
+import ru.liga.evraz.aggregation.application.cmd.OrderSignPipelineCmd;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.common.KafkaUtil;
+import ru.liga.evraz.aggregation.domain.model.OrderSignPipelineDto;
+import ru.liga.evraz.aggregation.domain.model.command.OrderSignPipelineCommand;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateOrderSignPipelineUseCase {
+
+private static final String OMS_PIPELINE_CMD_TYPE = "ORDER_FULFILMENT_PIPELINE";
+private final CommandRepository commandRepo;
+private final CommandMapper mapper;
+private final KafkaTemplate<CommandGuidKey, OrderSignPipelineDto> kafkaTemplate;
+private final KafkaOrderSignPipelineProperties kafkaProperties;
+
+public String process(@NotNull @Valid OrderSignPipelineCmd cmd) {
+final var command = mapper.map(cmd);
+
+final var alreadySentOmsPipelineCmdGuid = checkCmdAlreadySuccessfullySent(command);
+if (StringUtils.isNotBlank(alreadySentOmsPipelineCmdGuid)) {
+log.warn("""
+Command with this data has already been sent [ {} ],\040
+message was processed by ERP and will not be sent to ERP.\040
+Return existing commandGuid: {}.
+""", cmd, alreadySentOmsPipelineCmdGuid);
+return alreadySentOmsPipelineCmdGuid;
+}
+
+final var commandSaveResult = commandRepo.createErpCommand(command);
+final var commandGuid = commandSaveResult.getCommandGuid();
+final var orderSignPipelineDto = mapper.map(commandSaveResult);
+
+final var topic = kafkaProperties.getRequest().getTopic();
+log.info("Create record to set sign pipeline order erpOrderGuid: {} in topic {}",
+orderSignPipelineDto.getErpGuid(), topic);
+final var record = KafkaUtil.createRecord(topic, orderSignPipelineDto, mapper.mapCommandGuidKey(commandGuid));
+final var future = kafkaTemplate.send(record);
+future.addCallback(new ListenableFutureCallback<>() {
+@Override
+public void onFailure(Throwable throwable) {
+log.error("Error occurred on sending message: " + orderSignPipelineDto, throwable);
+}
+
+@Override
+public void onSuccess(SendResult<CommandGuidKey, OrderSignPipelineDto> sendResult) {
+RecordMetadata recordMetadata = sendResult.getRecordMetadata();
+log.info("Message successfully sent: partition: {}, offset: {}, msg: {}", recordMetadata.partition(),
+recordMetadata.offset(), sendResult.getProducerRecord().value());
+commandRepo.updateSendStatusByCommandGuid(commandGuid);
+}
+});
+return commandGuid;
+}
+
+private String checkCmdAlreadySuccessfullySent(OrderSignPipelineCommand command) {
+final var optLastOrderFulfilmentPipeline = commandRepo
+.findLatestByOrderIdAndTypeWithPositiveErpStatus(command.getOrderId(), OMS_PIPELINE_CMD_TYPE);
+if (optLastOrderFulfilmentPipeline.isPresent()) {
+final var erpCommandDto = optLastOrderFulfilmentPipeline.get();
+
+final var lastOmsPipeline = erpCommandDto.getOmsPipeline();
+if (lastOmsPipeline != null && !lastOmsPipeline.equals(command.getOmsPipeline())) {
+return null;
+}
+
+return erpCommandDto.getCommandGuid();
+}
+return null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateShippingRequestShipPermissionCmdUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.adapter.kafka.KafkaShippingRequestShipPermissionProperties;
+import ru.liga.evraz.aggregation.application.cmd.ShippingRequestShipPermissionItemsCmd;
+import ru.liga.evraz.aggregation.application.cmd.dto.ShippingRequestShipPermissionItemsCmdDto;
+import ru.liga.evraz.aggregation.application.config.CommandProperties;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.common.KafkaUtil;
+import ru.liga.evraz.aggregation.domain.model.ShippingRequestShipPermissionDto;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import static java.time.ZoneId.systemDefault;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateShippingRequestShipPermissionCmdUseCase {
+
+private final CommandRepository commandRepo;
+private final CommandProperties commandProperties;
+private final ErpDeliveryRepository erpDeliveryRepository;
+private final OrderRepository orderRepository;
+private final CommandMapper mapper;
+private final KafkaTemplate<CommandGuidKey, ShippingRequestShipPermissionDto> kafkaTemplate;
+private final KafkaShippingRequestShipPermissionProperties kafkaProperties;
+private final Clock clock;
+
+public ShippingRequestShipPermissionItemsCmdDto process(@NotNull @Valid ShippingRequestShipPermissionItemsCmd cmd) {
+final var command = mapper.map(cmd);
+final var commandSaveResult = commandRepo.createErpCommand(command);
+final var commandGuid = commandSaveResult.getCommandGuid();
+final var commandType = commandSaveResult.getCommandType();
+final var topic = kafkaProperties.getRequest().getTopic();
+
+ShippingRequestShipPermissionItemsCmdDto resultDto = ShippingRequestShipPermissionItemsCmdDto.builder()
+.commandGuid(commandGuid)
+.commandName(String.join(". ", List.of(commandType, commandProperties.meta().get(commandType).messageDescription())))
+.commandTopic(topic)
+.commandDateTime(ZonedDateTime.of(LocalDateTime.now(clock), systemDefault()))
+.build();
+
+final var erpDelivery = erpDeliveryRepository.getByErpGuidOrError(command.getShippingErpGuid());
+final var order = orderRepository.getByStarfishOrderId(command.getOrderId());
+
+final var deliveryOrderOpt = Optional.ofNullable(erpDelivery.getOrders())
+.flatMap(deliveryOrders -> deliveryOrders.stream()
+.filter(deliveryOrder -> order.getErpGuid().equals(deliveryOrder.getErpOrderGuid()))
+.findFirst());
+
+if (deliveryOrderOpt.isEmpty()) {
+throw new NotFoundException(
+String.format("""
+Could not find order [erpGuid: %s, documentId: %s, cmd.sfOrderId: %s]\040
+in ERP delivery {erpGuid: %s]\040
+to send command.
+""", order.getErpGuid(), order.getDocumentId(), cmd.getOrderId(), cmd.getShippingErpGuid()));
+}
+
+final var shippingRequestShipPermissionDto = mapper.map(commandSaveResult, order.getErpGuid());
+
+log.info("""
+Create record to set ship permission for shippingRequest items with\040
+shippingErpGuid: {} in topic {}""",
+shippingRequestShipPermissionDto.getShippingErpGuid(),
+topic);
+
+final var record = KafkaUtil.createRecord(topic, shippingRequestShipPermissionDto, mapper.mapCommandGuidKey(commandGuid));
+final var future = kafkaTemplate.send(record);
+future.addCallback(new ListenableFutureCallback<>() {
+@Override
+public void onFailure(Throwable throwable) {
+log.error("Error occurred on sending message: " + shippingRequestShipPermissionDto, throwable);
+}
+
+@Override
+public void onSuccess(SendResult<CommandGuidKey, ShippingRequestShipPermissionDto> sendResult) {
+RecordMetadata recordMetadata = sendResult.getRecordMetadata();
+log.info("Message successfully sent: partition: {}, offset: {}, key: {}, msg: {}", recordMetadata.partition(),
+recordMetadata.offset(), sendResult.getProducerRecord().key(), sendResult.getProducerRecord().value());
+commandRepo.updateSendStatusByCommandGuid(commandGuid);
+}
+});
+
+return resultDto;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateDeliveryAttributeUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateDeliveryAttributeCmd;
+import ru.liga.evraz.aggregation.application.converter.ErpDeliveryModelMapper;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import static java.util.Objects.nonNull;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+@Transactional
+public class CreateUpdateDeliveryAttributeUseCase {
+
+private final DeliveryAttributeRepository deliveryAttributeRepo;
+private final ErpDeliveryModelMapper mapper;
+
+public DeliveryAttribute createUpdateDeliveryAttribute(@Valid @NotNull CreateUpdateDeliveryAttributeCmd cmd) {
+
+final var erpDeliveryGuid = cmd.getErpDeliveryGuid();
+final var attributeName = cmd.getName();
+final var positionCode = cmd.getPositionCode();
+final var deliveryAttribute = mapper.map(cmd);
+
+if (cmd.getDeleted()) {
+log.info("Try to delete deliveryAttribute with name {}, with erpDeliveryGuid {}, with positionCode {}",
+attributeName, erpDeliveryGuid, positionCode);
+deliveryAttributeRepo.deleteByErpDeliveryGuidAndNameAndPositionCode(deliveryAttribute);
+return deliveryAttribute;
+}
+
+final var deliveryAttributeIsExist = deliveryAttributeRepo.findByErpOrderGuidAndNameAndPositionCode(deliveryAttribute);
+
+if (nonNull(deliveryAttributeIsExist)) {
+deliveryAttribute.setId(deliveryAttributeIsExist.getId());

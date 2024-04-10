@@ -1,0 +1,458 @@
+﻿return bpmService.updateProcessVariables(sfOrderId, optSfOrder, orderCustomAttributes);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/GetErpCommandUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.domain.model.command.ErpCommandDto;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class GetErpCommandUseCase {
+
+private final CommandRepository commandRepo;
+
+public ErpCommandDto getErpCommand(@NotNull String commandGuid) {
+Optional<ErpCommandDto> commandOpt = commandRepo.findErpCommandByCommandGuid(commandGuid);
+if (commandOpt.isEmpty()) {
+log.error("Command not found: {}", commandGuid);
+throw new NotFoundException(String.format("Command not found, guid: %s", commandGuid));
+}
+return commandOpt.get();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/GetOrderAdditionalAttributesUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.OrderAdditionalAttributes;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+
+import javax.validation.constraints.NotEmpty;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+@Service
+@Validated
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class GetOrderAdditionalAttributesUseCase {
+private static final Set<String> ORDER_CUSTOM_ATTRIBUTES_ADDITIONAL_SET = Set.of("invoiceCreated");
+private final OrderAttributeRepository orderAttributeRepo;
+
+public OrderAdditionalAttributes getOrderAdditionalAttributesCase(@NotEmpty String orderErpGuid) {
+final var orderAttributes = orderAttributeRepo.findByErpOrderGuid(orderErpGuid);
+return map(orderAttributes);
+}
+
+private OrderAdditionalAttributes map(List<OrderAttribute> orderAttributes) {
+OrderAdditionalAttributes orderAdditionalAttributes = new OrderAdditionalAttributes();
+if (CollectionUtils.isNotEmpty(orderAttributes)) {
+ORDER_CUSTOM_ATTRIBUTES_ADDITIONAL_SET.forEach(attributeName -> {
+try {
+Field field = OrderAdditionalAttributes.class.getDeclaredField(attributeName);
+field.setAccessible(true);
+field.set(orderAdditionalAttributes, getAttributeValueByAttributeName(orderAttributes, attributeName));
+} catch (Exception e) {
+log.error("error while mapping order additional attribute {}", attributeName, e);
+}
+});
+}
+return orderAdditionalAttributes;
+}
+
+private String getAttributeValueByAttributeName(List<OrderAttribute> customAttributes, String attributeName) {
+return customAttributes.stream()
+.filter(ca -> Objects.equals(ca.getName(), attributeName))
+.findFirst()
+.map(OrderAttribute::getValue)
+.orElse(StringUtils.EMPTY);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/GetOrderUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import javax.validation.constraints.NotEmpty;
+
+@Service
+@Validated
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class GetOrderUseCase {
+private final OrderRepository orderRepo;
+
+public Order getOrderUseCase(@NotEmpty String orderId) {
+final var order = orderRepo.getByStarfishOrderId(orderId);
+if (order == null) {
+throw new NotFoundException(String.format("Order %s not found", orderId));
+}
+return order;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/GetSubdivisionUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.converter.SubdivisionModelMapper;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+import ru.liga.evraz.aggregation.domain.repository.SubdivisionService;
+
+import javax.validation.constraints.NotEmpty;
+
+@Service
+@Validated
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class GetSubdivisionUseCase {
+private final SubdivisionService service;
+private final SubdivisionModelMapper mapper;
+
+public Subdivision get(@NotEmpty String subdivisionId) {
+final var existsById = service.existsById(subdivisionId);
+
+if (existsById) {
+return service.getById(subdivisionId);
+}
+
+throw new NotFoundException(String.format("Subdivision %s not found", subdivisionId));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/ReloadOrdersUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+import ru.liga.evraz.aggregation.adapter.kafka.KafkaOrderReloadProperties;
+import ru.liga.evraz.aggregation.common.KafkaUtil;
+import ru.liga.evraz.aggregation.domain.model.OrderReloadDto;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.ValidationException;
+import javax.validation.constraints.NotNull;
+
+import static java.util.Objects.isNull;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class ReloadOrdersUseCase {
+
+private final KafkaTemplate<String, OrderReloadDto> kafkaTemplate;
+private final KafkaOrderReloadProperties kafkaOrderReloadProperties;
+
+public List<String> reloadOrders(@NotNull MultipartFile file) {
+validate(file);
+final var topic = kafkaOrderReloadProperties.getRequest().getTopic();
+final var orderErpGuids = getOrderErpGuids(file);
+
+for (String orderErpGuid : orderErpGuids) {
+final var orderReloadDto = OrderReloadDto.builder()
+.orderErpGuid(orderErpGuid)
+.build();
+log.info("Create record to reload order to Starfish24 by orderErpGuid: {} in topic {}",
+orderReloadDto.getOrderErpGuid(), topic);
+ProducerRecord<String, OrderReloadDto> record = KafkaUtil.createRecord(topic, orderReloadDto);
+final var future = kafkaTemplate.send(record);
+future.addCallback(new ListenableFutureCallback<>() {
+@Override
+public void onFailure(Throwable throwable) {
+log.error("Error occurred on sending message: " + orderReloadDto, throwable);
+}
+@Override
+public void onSuccess(SendResult<String, OrderReloadDto> orderReloadDtoSendResult) {
+RecordMetadata recordMetadata = orderReloadDtoSendResult.getRecordMetadata();
+log.info("Message successfully sent: partition: {}, offset: {}, msg: {}", recordMetadata.partition(),
+recordMetadata.offset(), orderReloadDtoSendResult.getProducerRecord().value());
+}
+});
+}
+return orderErpGuids;
+}
+
+private List<String> getOrderErpGuids(MultipartFile file) {
+List<String> orderErpGuids = new ArrayList<>();
+
+try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+String line;
+while ((line = br.readLine()) != null) {
+orderErpGuids.add(line);
+}
+} catch (IOException ex) {
+log.warn("Error occurred while reading data from the uploaded file");
+}
+return orderErpGuids;
+}
+
+private void validate(MultipartFile file) {
+if (isNull(file)) {
+throw new ValidationException("Passed file is null");
+}
+final var contentType = FilenameUtils.getExtension(file.getOriginalFilename());
+if (!"csv".equals(contentType)) {
+throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CSV file required");
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/usecase/CancelErpTaskUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application.usecase;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.converter.ErpTaskConverter;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CancelErpTaskDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.ErpTaskFeignWrapper;
+import ru.liga.evraz.aggregation.application.cmd.CancelErpTaskCmd;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+import ru.liga.evraz.aggregation.domain.model.command.ErpTaskCommand;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpTaskStatus;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpTaskService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Validated
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CancelErpTaskUseCase {
+private final ErpTaskService erpTaskService;
+private final CommandRepository commandRepository;
+private final CommandMapper commandMapper;
+private final ErpTaskConverter erpTaskConverter;
+private final ErpTaskFeignWrapper erpTaskFeignWrapper;
+
+public List<String> cancelTask(CancelErpTaskCmd cmd) {
+List<ErpTask> tasks = erpTaskService.findActiveByOrderAndType(cmd.orderId(), cmd.taskType());
+
+List<String> commandGuids = new ArrayList<>();
+for (ErpTask task : tasks) {
+boolean canceledInErp = task.getCanceled();
+
+if (shouldCancelTaskInErp(task)) {
+String commandGuid = sendCancelCommand(cmd, task);
+if (StringUtils.isNotBlank(commandGuid)) {
+commandGuids.add(commandGuid);
+canceledInErp = true;
+}
+}
+
+erpTaskService.deactivate(task.getId(), canceledInErp);
+}
+
+return commandGuids;
+}
+
+private Boolean shouldCancelTaskInErp(ErpTask task) {
+boolean cancelAllowed = !ErpTaskStatus.COMPLETED.equals(task.getErpStatus()) && !task.getCanceled() && task.getSent();
+if (!cancelAllowed) {
+log.info("Erp task should not cancel in Erp. TaskId: {}, orderId: {}, taskType: {}, status: {}, canceled: {}, sent: {}",
+task.getId(), task.getOrderId(), task.getTaskType(), task.getErpStatus(), task.getCanceled(), task.getSent());
+}
+return cancelAllowed;
+}
+
+private String sendCancelCommand(CancelErpTaskCmd cmd, ErpTask task) {
+try {
+log.info("Try send cancel command for erp task. TaskId: {}, orderId: {}, taskType: {}", task.getId(), task.getOrderId(), task.getTaskType());
+ErpTaskCommand erpCommand = commandRepository.createErpCommand(commandMapper.map(cmd, task));
+CancelErpTaskDto cancelErpTaskDto = erpTaskConverter.convertToCancelDto(task, erpCommand.getCommandGuid());
+Boolean success = erpTaskFeignWrapper.cancelErpTask(cancelErpTaskDto);
+if (success) {
+commandRepository.updateSendStatusByCommandGuid(erpCommand.getCommandGuid());
+return cancelErpTaskDto.getCommandGuid();
+}
+} catch (Exception e) {
+log.error("Exception during cancel erp task. Task guid: {}", task.getId(), e);
+}
+
+return null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/usecase/CloseErpOrderUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application.usecase;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.adapter.kafka.KafkaCloseErpOrderProperties;
+import ru.liga.evraz.aggregation.application.cmd.CloseErpOrderCmd;
+import ru.liga.evraz.aggregation.application.converter.CommandMapper;
+import ru.liga.evraz.aggregation.common.KafkaUtil;
+import ru.liga.evraz.aggregation.domain.model.CloseErpOrderDto;
+import ru.liga.evraz.aggregation.domain.model.command.CloseErpOrderCommand;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CloseErpOrderUseCase {
+private final CommandRepository commandRepository;
+private final CommandMapper mapper;
+private final KafkaCloseErpOrderProperties kafkaProperties;
+private final KafkaTemplate<CommandGuidKey, CloseErpOrderDto> kafkaTemplate;
+private final OrderService orderService;
+
+public String process(@NotNull @Valid CloseErpOrderCmd cmd) {
+String erpGuid = orderService.findErpGuidByStarfishOrderId(cmd.getOrderId());
+if (StringUtils.isBlank(erpGuid)) {
+log.error("Erp guid not found by order id {}", cmd.getOrderId());
+return null;
+}
+
+CloseErpOrderCommand commandSaveResult = saveCommand(cmd, erpGuid);
+CloseErpOrderDto closeErpOrderDto = mapper.map(commandSaveResult);
+
+sendKafkaMessage(closeErpOrderDto);
+return commandSaveResult.getCommandGuid();
+}
+
+private CloseErpOrderCommand saveCommand(CloseErpOrderCmd cmd, String erpGuid) {
+CloseErpOrderCommand command = mapper.map(cmd, erpGuid);
+return commandRepository.createErpCommand(command);
+}
+
+private void sendKafkaMessage(CloseErpOrderDto closeErpOrderDto) {
+String topic = kafkaProperties.getRequest().getTopic();
+log.info("Create record to set close erp order erpOrderGuid: {} in topic {}", closeErpOrderDto.getErpGuid(), topic);
+
+CommandGuidKey key = mapper.mapCommandGuidKey(closeErpOrderDto.getCommandGuid());
+ProducerRecord<CommandGuidKey, CloseErpOrderDto> record = KafkaUtil.createRecord(topic, closeErpOrderDto, key);
+ListenableFuture<SendResult<CommandGuidKey, CloseErpOrderDto>> future = kafkaTemplate.send(record);
+future.addCallback(new ListenableFutureCallback<>() {
+@Override
+public void onFailure(Throwable throwable) {
+log.error("Error occurred on sending message: " + closeErpOrderDto, throwable);
+}
+@Override
+public void onSuccess(SendResult<CommandGuidKey, CloseErpOrderDto> sendResult) {
+RecordMetadata recordMetadata = sendResult.getRecordMetadata();
+log.info("Message successfully sent: partition: {}, offset: {}, msg: {}", recordMetadata.partition(),
+recordMetadata.offset(), sendResult.getProducerRecord().value());
+commandRepository.updateSendStatusByCommandGuid(closeErpOrderDto.getCommandGuid());
+}
+});
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/usecase/CreateErpTaskUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application.usecase;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.converter.ErpTaskConverter;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CreateErpTaskDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.ErpTaskFeignWrapper;
+import ru.liga.evraz.aggregation.application.CreateErpTaskCmdResult;
+import ru.liga.evraz.aggregation.application.cmd.CreateErpTaskCmd;

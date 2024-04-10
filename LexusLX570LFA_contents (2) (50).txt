@@ -1,0 +1,444 @@
+﻿"status": "OK",
+"details": "some details"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/send_command_status/order_fulfilment_pipeline_error.json
+Content:
+{
+"payload": {
+"commandGuid": "222-commandGuid",
+"status": "ERROR",
+"details": "test error in details"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/send_command_status/request.json
+Content:
+{
+"payload": {
+"commandGuid": "111-commandGuid",
+"status": "OK",
+"details": "some details"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_sign_pipeline/omsPipelineFalseRequest.json
+Content:
+{
+"payload": {
+"commandType": "ORDER_FULFILMENT_PIPELINE",
+"instanceId": "instanceId",
+"orderId": "orderId",
+"erpGuid": "erpGuid",
+"omsPipeline": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_sign_pipeline/repeat_response.json
+Content:
+{
+"payload": {
+"commandGuid": "222-commandGuid"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_sign_pipeline/request.json
+Content:
+{
+"payload": {
+"commandType": "ORDER_FULFILMENT_PIPELINE",
+"instanceId": "instanceId",
+"orderId": "orderId",
+"erpGuid": "erpGuid",
+"omsPipeline": true
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_sign_pipeline/response.json
+Content:
+{
+"payload": {
+"commandGuid": "commandGuid"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_ship_permission_items/request.json
+Content:
+{
+"payload": {
+"commandType": "ORDER_SHIP_PERMISSION",
+"instanceId": "instanceId",
+"orderId": "test_starfish24_erp_guid",
+"documentItems": [
+{
+"skuId": "skuId1",
+"positionCode": 1,
+"skuStatus": "SHIP"
+},
+{
+"skuId": "skuId2",
+"positionCode": 2,
+"skuStatus": "SHIP"
+},
+{
+"skuId": "skuId3",
+"positionCode": 3,
+"skuStatus": "SHIP"
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_ship_permission_items/response.json
+Content:
+{
+"payload": {
+"commandGuid": "commandGuid",
+"commandName": "ORDER_SHIP_PERMISSION. ÐšÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð¾Ðº Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° \"Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ\" Ð² 1Ð¡",
+"commandTopic": "em-int-test-oms-erp-cmd-order-items_status_change-v1",
+"commandDateTime" : "29.06.2023 00:00:00 +03:00"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_reserve_renewal/request.json
+Content:
+{
+"payload": {
+"instanceId": "instanceId",
+"orderId": "test_starfish24_erp_guid",
+"reservationRemovalDate": "2023-12-31",
+"reservationExtensionReason": "RESERVATION_EXTENSION_PREPAYMENT"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_reserve_renewal/request_order_not_found.json
+Content:
+{
+"payload": {
+"instanceId": "instanceId",
+"orderId": "ORDER_NOT_FOUND_SF_ID",
+"reservationRemovalDate": "2023-12-31",
+"reservationExtensionReason": "RESERVATION_EXTENSION_PREPAYMENT"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_reserve_renewal/response.json
+Content:
+{
+"payload": {
+"commandGuid": "commandGuid",
+"commandName": "ORDER_RESERVE_RENEWAL. ",
+"commandTopic": "em-int-test-erp-oms-order-reserve-renewal-v1",
+"commandDateTime" : "29.06.2023 00:00:00 +03:00"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/order_reserve_renewal/response_order_not_found.json
+Content:
+{
+"fault": {
+"code": "NOT_FOUND",
+"details": "Order not found by starfish order id: ORDER_NOT_FOUND_SF_ID"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/get_erp_command/command_not_found_response.json
+Content:
+{
+"fault": {
+"code": "NOT_FOUND",
+"details": "Command not found, guid: not_found"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/command/get_erp_command/command_success_get_response.json
+Content:
+{
+"payload": {
+"commandGuid": "222-commandGuid",
+"commandType": "ORDER_FULFILMENT_PIPELINE",
+"instanceId": "instance-id",
+"orderId": "111-orderId",
+"erpGuid": "order_erp_guid",
+"shippingErpGuid": "123-123",
+"documentCancellationReason": "doc cancelation reason 2",
+"positionCancellationReason": "position cancelation reason 2",
+"erpStatus": "OK",
+"erpDetails": null,
+"taskGuid": "task erp guid2",
+"omsPipeline": true
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/util/KafkaUtils.java
+Content:
+package ru.liga.evraz.aggregation.util;
+
+import lombok.experimental.UtilityClass;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverOptions;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.domain.model.OrderReserveRenewalDto;
+import ru.liga.evraz.aggregation.domain.model.OrderShipPermissionDto;
+import ru.liga.evraz.aggregation.domain.model.OrderSignPipelineDto;
+import ru.liga.evraz.aggregation.domain.model.ShippingRequestShipPermissionDto;
+
+import java.util.Collections;
+import java.util.Map;
+
+@UtilityClass
+@SuppressWarnings({"MissingJavadocType", "MissingJavadocMethod"})
+public class KafkaUtils {
+public static KafkaReceiver<CommandGuidKey, OrderShipPermissionDto> createOrderShipPermissionReceiver(KafkaProperties properties, String topic) {
+Map<String, Object> consumerProps = properties.buildConsumerProperties();
+consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "some-service-sender-test");
+consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+var receiverOptions =
+ReceiverOptions.<CommandGuidKey, OrderShipPermissionDto>create(consumerProps)
+.commitBatchSize(0).subscription(Collections.singleton(topic));
+return KafkaReceiver.create(receiverOptions);
+}
+
+public static KafkaReceiver<CommandGuidKey, OrderReserveRenewalDto> createOrderReserveRenewalReceiver(KafkaProperties properties, String topic) {
+Map<String, Object> consumerProps = properties.buildConsumerProperties();
+consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "some-service-sender-test");
+consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+var receiverOptions =
+ReceiverOptions.<CommandGuidKey, OrderReserveRenewalDto>create(consumerProps)
+.commitBatchSize(0).subscription(Collections.singleton(topic));
+return KafkaReceiver.create(receiverOptions);
+}
+
+public static KafkaReceiver<CommandGuidKey, ShippingRequestShipPermissionDto> createShippingRequestShipPermissionReceiver(
+KafkaProperties properties, String topic) {
+
+Map<String, Object> consumerProps = properties.buildConsumerProperties();
+consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "some-service-sender-test");
+consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+var receiverOptions =
+ReceiverOptions.<CommandGuidKey, ShippingRequestShipPermissionDto>create(consumerProps)
+.commitBatchSize(0).subscription(Collections.singleton(topic));
+return KafkaReceiver.create(receiverOptions);
+}
+
+public static KafkaReceiver<CommandGuidKey, OrderSignPipelineDto> createSignPipelineReceiver(KafkaProperties properties, String topic) {
+Map<String, Object> consumerProps = properties.buildConsumerProperties();
+consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "some-service-sender-test");
+consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+var receiverOptions =
+ReceiverOptions.<CommandGuidKey, OrderSignPipelineDto>create(consumerProps)
+.commitBatchSize(0).subscription(Collections.singleton(topic));
+return KafkaReceiver.create(receiverOptions);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/util/ResourceUtils.java
+Content:
+package ru.liga.evraz.aggregation.util;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.SneakyThrows;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+
+/**
+* ÐšÐ»Ð°ÑÑ Ð´Ð»Ñ ÑÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ð½Ð¸Ñ Ñ‚ÐµÑÑ‚Ð¾Ð²Ñ‹Ñ… Ñ€ÐµÑÑƒÑ€ÑÐ¾Ð².
+*/
+public class ResourceUtils {
+
+
+/**
+* Load Resource from class path as string.
+*
+* @param resourcePath path
+* @return string - resource
+*/
+public static String getResourceAsString(String resourcePath) {
+if (resourcePath.startsWith("classpath:")) {
+resourcePath = resourcePath.replace("classpath:", "");
+}
+var resource = new ClassPathResource(resourcePath);
+try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
+return FileCopyUtils.copyToString(reader);
+} catch (IOException e) {
+throw new UncheckedIOException(e);
+}
+}
+
+/**
+* Load Resource from class path as string.
+*
+* @param resource resource
+* @return string - resource
+*/
+public static String getResourceAsString(Resource resource) {
+try (Reader reader = new InputStreamReader(resource.getInputStream(), UTF_8)) {
+return FileCopyUtils.copyToString(reader);
+} catch (IOException e) {
+throw new UncheckedIOException(e);
+}
+}
+
+@SneakyThrows
+public static <T> T readResourceToObject(Resource resource, Class<T> clazz) {
+return mapper().readValue(resource.getFile(), clazz);
+}
+
+@SneakyThrows
+public static <T> T readJsonStringToObject(String jsonString, Class<T> clazz) {
+return mapper().readValue(jsonString, clazz);
+}
+
+@SneakyThrows
+public static String writeObjectAsJsonString(Object content) {
+return mapper().writeValueAsString(content);
+}
+/**
+* ÐœÐµÑ‚Ð¾Ð´ Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð¸ Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ñ {@link ObjectMapper} Ð´Ð»Ñ Ñ‚ÐµÑÑ‚Ð¾Ð².
+*
+* @return - {@link ObjectMapper}
+*/
+public static ObjectMapper mapper() {
+ObjectMapper mapper = new ObjectMapper();
+mapper.registerModule(new JavaTimeModule());
+mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+return mapper;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/usergroup/UserGroupModuleTest.java
+Content:
+package ru.liga.evraz.aggregation.module.usergroup;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DisplayName("ÐœÐ¾Ð´ÑƒÐ»ÑŒ Ñ‚ÐµÑÑ‚ Ð´Ð»Ñ Ð³Ñ€ÑƒÐ¿Ð¿ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹")
+public class UserGroupModuleTest extends BaseIntegrationTest {
+
+@Value("classpath:/api/usergroup/usergroup_seccess_request.json")
+private Resource userGroupSuccessRequest;
+
+@Value("classpath:/api/usergroup/usergroup_seccess_response.json")
+private Resource userGroupSuccessResponse;
+
+//@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð³Ñ€ÑƒÐ¿Ð¿ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹")
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+@SneakyThrows
+void getUserGroupSuccess() {
+// TODO:: if will be used - need fix
+/*Assertions.assertTrue(super
+.customPostScenarioFromResource("/v1/usergroup",
+userGroupSuccessRequest,
+userGroupSuccessResponse,
+200));*/
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/subdivision/CreateSubdivisionTest.java
+Content:
+package ru.liga.evraz.aggregation.module.subdivision;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.SubdivisionUuidGenerator;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+
+import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CreateSubdivisionTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/subdivision/truncate_subdivision_entities.sql";
+
+@Value("classpath:/api/subdivision/subdivision_create_request_1.json")
+private Resource subdivisionCreateRequest;
+@Value("classpath:/api/subdivision/subdivision_create_response_1.json")
+private Resource subdivisionCreateResponse;
+
+
+@MockBean
+private SubdivisionUuidGenerator subdivisionUuidGenerator;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createSubdivision() {
+final var uuid1 = "b41db9b3-27d6-4c00-a6e6-c15b7df73306";
+doReturn(uuid1).when(subdivisionUuidGenerator).generateUuid();
+
+customPostScenarioFromResource("/v1/subdivision",
+subdivisionCreateRequest, subdivisionCreateResponse, true, 200);
+}
+
+}
+
+

@@ -1,0 +1,383 @@
+﻿import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderReserveRenewalCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderShipPermissionItemsCmdDataHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderShipPermissionItemsCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderSignPipelineCmdRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.OrderSignPipelineCmdResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ShippingRequestShipPermissionItemsCmdDataHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ShippingRequestShipPermissionItemsCmdResponseHttp;
+import ru.liga.evraz.aggregation.application.cmd.CommandStatusCmd;
+import ru.liga.evraz.aggregation.application.cmd.OrderReserveRenewalCmd;
+import ru.liga.evraz.aggregation.application.cmd.OrderShipPermissionItemsCmd;
+import ru.liga.evraz.aggregation.application.cmd.OrderSignPipelineCmd;
+import ru.liga.evraz.aggregation.application.cmd.ShippingRequestShipPermissionItemsCmd;
+import ru.liga.evraz.aggregation.application.cmd.dto.OrderReserveRenewalCmdDto;
+import ru.liga.evraz.aggregation.application.cmd.dto.OrderShipPermissionItemsCmdDto;
+import ru.liga.evraz.aggregation.application.cmd.dto.ShippingRequestShipPermissionItemsCmdDto;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.command.ErpCommandDto;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpCommandHttpMapper {
+String DATE_TIME_BY_DOT_WITH_OFFSET_FORMAT = "dd.MM.yyyy HH:mm:ss xxx";
+
+OrderShipPermissionItemsCmd map(OrderShipPermissionItemsCmdDataHttp source);
+
+@Mappings({
+@Mapping(target = "payload.commandGuid", source = "commandGuid"),
+@Mapping(target = "payload.commandName", source = "commandName"),
+@Mapping(target = "payload.commandTopic", source = "commandTopic"),
+@Mapping(target = "payload.commandDateTime", source = "commandDateTime", dateFormat = DATE_TIME_BY_DOT_WITH_OFFSET_FORMAT)
+})
+OrderShipPermissionItemsCmdResponseHttp mapToOrderShipPermissionResponse(OrderShipPermissionItemsCmdDto commandDto);
+
+ShippingRequestShipPermissionItemsCmd map(ShippingRequestShipPermissionItemsCmdDataHttp source);
+
+@Mappings({
+@Mapping(target = "payload.commandGuid", source = "commandGuid"),
+@Mapping(target = "payload.commandName", source = "commandName"),
+@Mapping(target = "payload.commandTopic", source = "commandTopic"),
+@Mapping(target = "payload.commandDateTime", source = "commandDateTime", dateFormat = DATE_TIME_BY_DOT_WITH_OFFSET_FORMAT)
+})
+ShippingRequestShipPermissionItemsCmdResponseHttp mapToShippingRequestShipPermissionResponse(ShippingRequestShipPermissionItemsCmdDto commandDto);
+
+@Mapping(target = ".", source = "source.payload")
+OrderSignPipelineCmd map(OrderSignPipelineCmdRequestHttp source);
+
+@Mapping(target = "payload.commandGuid", source = ".")
+OrderSignPipelineCmdResponseHttp mapToOrderSignPipelineResponse(String commandGuid);
+
+OrderReserveRenewalCmd map(OrderReserveRenewalCmdDataHttp source);
+
+@Mappings({
+@Mapping(target = "payload.commandGuid", source = "commandGuid"),
+@Mapping(target = "payload.commandName", source = "commandName"),
+@Mapping(target = "payload.commandTopic", source = "commandTopic"),
+@Mapping(target = "payload.commandDateTime", source = "commandDateTime", dateFormat = DATE_TIME_BY_DOT_WITH_OFFSET_FORMAT)
+})
+OrderReserveRenewalCmdResponseHttp mapToOrderReserveRenewalResponse(OrderReserveRenewalCmdDto commandDto);
+
+@Mapping(target = ".", source = "source.payload")
+CommandStatusCmd map(CreateCmdStatusRequestHttp source);
+
+@Mapping(target = ".", source = "source.payload")
+CloseErpOrderCmd map(CloseErpOrderCmdRequestHttp source);
+
+@Mapping(target = "payload.commandGuid", source = ".")
+CloseErpOrderCmdResponseHttp mapToCloseErpOrderCmdResponse(String commandGuid);
+
+@Mapping(target = "payload", source = ".")
+GetErpCommandResponseHttp mapToErpCommandResponse(ErpCommandDto erpCommand);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/ErpDeliveryController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.ErpDeliveryApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateDeliveryAttributeRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateDeliveryAttributeResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateErpDeliveryRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateErpDeliveryResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ErpDeliveryItemHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ErpOrderDeliveryHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.FindErpDeliveryResponseHttp;
+import ru.liga.evraz.aggregation.application.CreateUpdateDeliveryAttributeUseCase;
+import ru.liga.evraz.aggregation.application.CreateUpdateErpDeliveryUseCase;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.application.usecase.FindErpDeliveryUseCase;
+
+import javax.validation.ValidationException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Api(tags = "ErpDelivery")
+@RestController
+@Validated
+@RequiredArgsConstructor
+class ErpDeliveryController implements ErpDeliveryApi {
+
+private final ErpDeliveryMapper erpDeliveryMapper;
+
+private final CreateUpdateErpDeliveryUseCase ucDelivery;
+private final CreateUpdateDeliveryAttributeUseCase ucAttributeDelivery;
+private final FindErpDeliveryUseCase findErpDeliveryUseCase;
+
+@Override
+public ResponseEntity<CreateUpdateErpDeliveryResponseHttp> createOrUpdateErpDelivery(CreateUpdateErpDeliveryRequestHttp body) {
+validate(body);
+final var cmd = erpDeliveryMapper.mapToCmd(body);
+final var erpDelivery = ucDelivery.update(cmd);
+return ResponseEntity.ok(CreateUpdateErpDeliveryResponseHttp.builder()
+.payload(erpDeliveryMapper.mapToPayload(erpDelivery))
+.build());
+}
+
+@Override
+public ResponseEntity<CreateUpdateDeliveryAttributeResponseHttp> createOrUpdateDeliveryAttribute(
+CreateUpdateDeliveryAttributeRequestHttp body) {
+final var cmd = erpDeliveryMapper.map(body.getPayload());
+final var attribute = ucAttributeDelivery.createUpdateDeliveryAttribute(cmd);
+return ResponseEntity.ok(
+CreateUpdateDeliveryAttributeResponseHttp.builder()
+.payload(erpDeliveryMapper.map(attribute))
+.build()
+);
+}
+
+@Override
+public ResponseEntity<FindErpDeliveryResponseHttp> findDelivery(String deliveryGuid) {
+return findErpDeliveryUseCase.find(deliveryGuid)
+.map(delivery -> ResponseEntity.ok(erpDeliveryMapper.mapToFindResponse(delivery)))
+.orElseThrow(() -> new NotFoundException(
+String.format("ErpDelivery not found by deliveryGuid %s", deliveryGuid)));
+}
+
+private void validate(CreateUpdateErpDeliveryRequestHttp requestHttp) {
+checkUniqOrder(requestHttp);
+checkUniqPositionCode(requestHttp);
+}
+
+private void checkUniqOrder(CreateUpdateErpDeliveryRequestHttp requestHttp) {
+Set<String> o = new HashSet<>(requestHttp.getPayload().getOrders()
+.stream()
+.map(ErpOrderDeliveryHttp::getErpOrderGuid).toList());
+if (o.size() != requestHttp.getPayload().getOrders().size()) {
+throw new ValidationException(String.format("Duplicate orders in delivery(guid) %s", requestHttp
+.getPayload().getErpGuid()));
+}
+}
+
+private void checkUniqPositionCode(CreateUpdateErpDeliveryRequestHttp requestHttp) {
+for (ErpOrderDeliveryHttp order : requestHttp.getPayload().getOrders()) {
+final var deliveryItems = order.getDeliveryItems();
+final var uniqueElementsSet = deliveryItems.stream()
+.map(ErpDeliveryItemHttp::getPositionCode)
+.collect(Collectors.toSet());
+if (deliveryItems.size() != uniqueElementsSet.size()) {
+throw new ValidationException(
+String.format("Duplicate position code in delivery(guid) %s", requestHttp
+.getPayload().getErpGuid()));
+}
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/ErpDeliveryMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateErpDeliveryRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.DeliveryAttributeHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ErpDeliveryHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.FindErpDeliveryResponseHttp;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateDeliveryAttributeCmd;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateErpDeliveryCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+interface ErpDeliveryMapper {
+
+@Mapping(source = "payload", target = ".")
+CreateUpdateErpDeliveryCmd mapToCmd(CreateUpdateErpDeliveryRequestHttp source);
+
+ErpDeliveryHttp mapToPayload(ErpDelivery source);
+
+CreateUpdateDeliveryAttributeCmd map(DeliveryAttributeHttp payload);
+
+DeliveryAttributeHttp map(DeliveryAttribute attribute);
+
+@Mapping(source = ".", target = "payload")
+FindErpDeliveryResponseHttp mapToFindResponse(ErpDelivery source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/ErpTaskController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.ErpTaskApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CancelErpTaskRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CancelErpTaskResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateErpTaskRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateErpTaskResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateErpTaskStatusRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateErpTaskStatusResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.ErpTaskHttp;
+import ru.liga.evraz.aggregation.application.CreateErpTaskCmdResult;
+import ru.liga.evraz.aggregation.application.cmd.CancelErpTaskCmd;
+import ru.liga.evraz.aggregation.application.cmd.CreateErpTaskCmd;
+import ru.liga.evraz.aggregation.application.cmd.ErpTaskStatusCmd;
+import ru.liga.evraz.aggregation.application.usecase.CancelErpTaskUseCase;
+import ru.liga.evraz.aggregation.application.usecase.CreateErpTaskUseCase;
+import ru.liga.evraz.aggregation.application.usecase.CreateUpdateErpTaskStatusUseCase;
+
+import javax.validation.ValidationException;
+import java.util.List;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Api(tags = "ErpTask")
+@RestController
+@Validated
+@RequiredArgsConstructor
+class ErpTaskController implements ErpTaskApi {
+
+private final CreateErpTaskUseCase createUpdateErpTaskUseCase;
+private final CancelErpTaskUseCase cancelErpTaskUseCase;
+private final CreateUpdateErpTaskStatusUseCase createUpdateErpTaskStatusUseCase;
+
+private final ErpTaskMapper erpTaskMapper;
+
+@Override
+public ResponseEntity<CreateErpTaskResponseHttp> createErpTask(CreateErpTaskRequestHttp body) {
+validateRequest(body.getPayload());
+CreateErpTaskCmd cmd = erpTaskMapper.mapToCmd(body);
+
+CreateErpTaskCmdResult result = createUpdateErpTaskUseCase.create(cmd);
+CreateErpTaskResponseHttp response = erpTaskMapper.mapToResponse(result);
+return ResponseEntity.ok(response);
+}
+
+@Override
+public ResponseEntity<CancelErpTaskResponseHttp> cancelErpTask(CancelErpTaskRequestHttp body) {
+CancelErpTaskCmd cmd = erpTaskMapper.mapToCmd(body);
+
+List<String> commandGuids = cancelErpTaskUseCase.cancelTask(cmd);
+CancelErpTaskResponseHttp response = erpTaskMapper.mapToCancelResponse(commandGuids);
+return ResponseEntity.ok(response);
+}
+
+@Override
+public ResponseEntity<CreateUpdateErpTaskStatusResponseHttp> createOrUpdateErpTaskStatus(CreateUpdateErpTaskStatusRequestHttp body) {
+ErpTaskStatusCmd cmd = erpTaskMapper.mapToCmd(body);
+
+createUpdateErpTaskStatusUseCase.process(cmd);
+return ResponseEntity.ok(CreateUpdateErpTaskStatusResponseHttp.builder().build());
+}
+
+private void validateRequest(ErpTaskHttp payload) {
+boolean isValid = (StringUtils.isNotBlank(payload.getResponsibleId()) && payload.getRoleId() == null && payload.getSubdivisionId() == null)
+|| (payload.getResponsibleId() == null && StringUtils.isNotBlank(payload.getRoleId()) && StringUtils.isNotBlank(payload.getSubdivisionId()));
+if (!isValid) {
+throw new ValidationException("responsibleId or (roleId and subdivisionId) should not be blank");
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/ErpTaskMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CancelErpTaskRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CancelErpTaskResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CancelErpTaskResponsePayloadHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateErpTaskRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateErpTaskResponseHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.CreateUpdateErpTaskStatusRequestHttp;
+import ru.liga.evraz.aggregation.application.CreateErpTaskCmdResult;
+import ru.liga.evraz.aggregation.application.cmd.CancelErpTaskCmd;
+import ru.liga.evraz.aggregation.application.cmd.CreateErpTaskCmd;
+import ru.liga.evraz.aggregation.application.cmd.ErpTaskStatusCmd;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+interface ErpTaskMapper {
+
+@Mapping(source = "payload", target = ".")
+CreateErpTaskCmd mapToCmd(CreateErpTaskRequestHttp source);
+
+@Mapping(source = ".", target = "payload")
+CreateErpTaskResponseHttp mapToResponse(CreateErpTaskCmdResult result);
+
+@Mapping(source = "payload", target = ".")
+CancelErpTaskCmd mapToCmd(CancelErpTaskRequestHttp source);
+
+default CancelErpTaskResponseHttp mapToCancelResponse(List<String> commandGuids) {
+return CancelErpTaskResponseHttp.builder()
+.payload(CancelErpTaskResponsePayloadHttp.builder()
+.success(true)
+.commandGuids(commandGuids)
+.build())
+.build();
+}
+
+@Mapping(target = ".", source = "source.payload")
+ErpTaskStatusCmd mapToCmd(CreateUpdateErpTaskStatusRequestHttp source);
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/EventHandlerController.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+import ru.liga.evraz.aggregation.api.adapter.in.http.EventHandlerApi;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.EnrichCamundaVariablesRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.EnrichCamundaVariablesResponseHttp;
+import ru.liga.evraz.aggregation.application.EventHandlerUseCase;
+
+@Api(tags = "EventHandler")
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+class EventHandlerController implements EventHandlerApi {
+
+private static final String UPDATE_VARIABLES_EVENT = "update-variables";
+
+private final EventHandlerUseCase ucUpdateVariables;
+private final EventHandlerMapper mapper;
+
+@Override
+public ResponseEntity<EnrichCamundaVariablesResponseHttp> enrichProcessVariables(
+EnrichCamundaVariablesRequestHttp body) {
+log.info("Process update-variables event started for starfish24 orderId: {}", body.getOrderId());
+final var result = ucUpdateVariables.updateProcessVariables(mapper.map(UPDATE_VARIABLES_EVENT, body));
+return ResponseEntity.ok(mapper.map(result));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/in/EventHandlerMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.in;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.EnrichCamundaVariablesRequestHttp;
+import ru.liga.evraz.aggregation.api.adapter.in.http.model.EnrichCamundaVariablesResponseHttp;
+import ru.liga.evraz.aggregation.application.cmd.CamundaProcessVariablesCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+interface EventHandlerMapper {

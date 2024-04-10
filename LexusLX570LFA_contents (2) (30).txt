@@ -1,0 +1,347 @@
+﻿TRUNCATE order_reserve CASCADE;
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/fill_duplicate_attribute.sql
+Content:
+insert into order_attribute (id, erp_order_guid, position_code, name, "value", created_at, modified_at)
+values ('1', 'test_erp_guid', 5, 'metalProcessingStartTime', '2022-11-10T20:27:51.704+00:00', '2022-11-10T20:25:51.704+00:00', '2023-11-10T20:25:51.704+00:00'),
+('2', 'test_erp_guid', 6, 'metalProcessingStartTime', '2022-11-15T20:27:51.704+00:00', '2022-11-12T20:25:51.704+00:00', '2023-11-12T20:25:51.704+00:00'),
+('3', 'test_erp_guid', 6, 'metalProcessingCompleted', 'false', '2022-11-12T20:25:51.704+00:00', '2023-11-12T20:25:51.704+00:00');
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/fill_order_attributes.sql
+Content:
+insert into order_attribute (id, erp_order_guid, position_code, "name", "value", created_at,
+modified_at)
+VALUES ('qwqwqw', 'update_test_guid', 2, 'inserted', 'test_value',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('212', '333', 2, 'approvalProcessStatus', 'test_value',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('121212', 'delete_test_guid', 1, 'for_delete', 'test_value',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into subdivision(subdivision_id, subdivision_name, time_zone, "deleted")
+values ('test_subdivision_id', 'test_subdivision_name', 'UTC+3', false);
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/order_created.sql
+Content:
+insert into partner(id, type, inn, name, created_at, modified_at)
+values ('test-client_guid', 'ENTITY', 'test-client_inn', 'test-client_name',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('test-client_guid_1', 'ENTITY', 'test-client_inn_1', 'test-client_name_1',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into order_entity (id, document_type, base_erp_guid, document_id, document_date_time, document_source,
+order_type, document_link, contract_type, sale_manager_responsible_id,
+sale_manager_responsible_email, document_status, document_cancellation_reason, payment_method,
+agreement, delivery_method, recipient_full_name, recipient_phone, recipient_email,
+customer_full_name, customer_phone, customer_email, subdivision_id, erp_guid, deleted, deleted_mark, active,
+sf_order_id, partner_guid, created_at, modified_at, total_cost,
+contract_number, sale_manager_responsible_name, customer_comment, erp_pipeline, in_pieces,
+customer_guid, document_status_modified_at, order_paid)
+values ('test_id', 'CLIENT_ORDER', null, 'test_order', '2022-08-10 07:56:46.000000', 'ERP',
+false, 'e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test', 'INVOICE_OFFER',
+'test_sale_manager_responsible_id', null, 'TO_BE_AGREED', null, 'PAYMENT_ON_ACCOUNT', 'PREPAYMENT',
+'PICKUP_FROM_OUR_WAREHOUSE', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€', '+7 (928) 111-11-11', 'test@test.com', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€',
+'+7 (111) 111-11-11',
+'test@test.com', 'test_subdivision_id', 'test_erp_guid',
+false, false, true, 'test_starfish24_erp_guid', 'test-client_guid',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655', 0.0,
+'Ð’Ð -32-18-Ð¾Ð´', 'ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡', 'ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚', true, false, 'test-customer_guid',
+'2023-10-12 10:58:40.280', false);
+
+insert into product_sku (id, name, type_name, type)
+values ('37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ',
+'LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•',
+'ITEM_GP');
+
+insert into order_entity_item (id, position_code, linked_sku_position_code, sku_id, sku_status, quantity, measure_unit,
+price, currency, position_cancellation_reason, warehouse_id, provide_from_other_orders,
+order_id, position_cost)
+values ('b0a6be1e-f5a0-4e99-b082-126cda07c0ec', 5, 4,
+'37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c', 'SHIP', 0.23400, 'Ñ‚', 4.27, 'RUB',
+null, null, false, 'test_id', 0.0);
+
+insert into subdivision(subdivision_id, subdivision_name, time_zone, "deleted")
+values ('test_subdivision_id', 'test_subdivision_name', 'UTC+3', false);
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/order_created_for_metalProcessingAttribute.sql
+Content:
+insert into partner(id, type, inn, name, created_at, modified_at)
+values ('test-client_guid', 'ENTITY', 'test-client_inn', 'test-client_name',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('test-client_guid_1', 'ENTITY', 'test-client_inn_1', 'test-client_name_1',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into order_entity (id, document_type, base_erp_guid, document_id, document_date_time, document_source,
+order_type, document_link, contract_type, sale_manager_responsible_id,
+sale_manager_responsible_email, document_status, document_cancellation_reason, payment_method,
+agreement, delivery_method, recipient_full_name, recipient_phone, recipient_email,
+customer_full_name, customer_phone, customer_email, subdivision_id, erp_guid, deleted, deleted_mark, active,
+sf_order_id, partner_guid, created_at, modified_at, total_cost,
+contract_number, sale_manager_responsible_name, customer_comment, erp_pipeline, in_pieces, customer_guid,
+document_status_modified_at, order_paid, oms_pipeline)
+values ('test_id', 'CLIENT_ORDER', null, 'test_order', '2022-08-10 07:56:46.000000', 'ERP',
+false, 'e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test', 'INVOICE_OFFER',
+'test_sale_manager_responsible_id', null, 'TO_BE_AGREED', null, 'PAYMENT_ON_ACCOUNT', 'PREPAYMENT',
+'PICKUP_FROM_OUR_WAREHOUSE', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€', '+7 (928) 111-11-11', 'test@test.com', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€',
+'+7 (111) 111-11-11',
+'test@test.com', 'test_subdivision_id', 'test_erp_guid',
+false, false, true, 'test_starfish24_erp_guid', 'test-client_guid',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655', 0.0,
+'Ð’Ð -32-18-Ð¾Ð´', 'ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡', 'ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚', true, false, 'test-customer_guid',
+'2023-10-12 10:58:40.280', false, true);
+
+insert into product_sku (id, name, type_name, type)
+values ('37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'Ð£ÑÐ»ÑƒÐ³Ð°_ÐœÐŸ_name',
+'Ð£ÑÐ»ÑƒÐ³Ð° ÐœÐŸ',
+'MP_SERVICE');
+
+insert into order_entity_item (id, position_code, linked_sku_position_code, sku_id, sku_status, quantity, measure_unit,
+price, currency, position_cancellation_reason, warehouse_id, provide_from_other_orders,
+order_id, position_cost)
+values ('b0a6be1e-f5a0-4e99-b082-126cda07c0ec', 5, null,
+'37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c', 'SHIP', 0.23400, 'Ñ‚', 4.27, 'RUB',
+null, null, false, 'test_id', 0.0);
+
+insert into subdivision(subdivision_id, subdivision_name, time_zone, "deleted")
+values ('test_subdivision_id', 'test_subdivision_name', 'UTC+3', false);
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order_attribute/truncate_order_attributes.sql
+Content:
+TRUNCATE partner CASCADE;
+TRUNCATE order_attribute CASCADE;
+TRUNCATE order_entity CASCADE;
+TRUNCATE product_sku CASCADE;
+TRUNCATE order_transaction CASCADE;
+TRUNCATE delivery_transaction CASCADE;
+TRUNCATE subdivision CASCADE;
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/empty_db_with_order_fulfilment_cmd.sql
+Content:
+TRUNCATE partner CASCADE;
+TRUNCATE order_entity CASCADE;
+TRUNCATE product_sku CASCADE;
+TRUNCATE order_attribute CASCADE;
+TRUNCATE erp_delivery_order_item CASCADE;
+TRUNCATE delivery_order CASCADE;
+TRUNCATE erp_delivery CASCADE;
+TRUNCATE order_transaction CASCADE;
+TRUNCATE delivery_transaction CASCADE;
+TRUNCATE erp_command CASCADE;
+TRUNCATE subdivision CASCADE;
+TRUNCATE order_reserve CASCADE;
+
+-- SELECT setval('erp_task_id-seq', 1, FALSE);
+
+insert into erp_command (command_guid, command_type, instance_id, order_id, order_erp_guid,
+created_at, modified_at, shipping_erp_guid, erp_status, erp_details, oms_pipeline, send_status)
+VALUES ('111-commandGuid', 'ORDER_SHIP_PERMISSION', 'instance-id', '111-orderId', 'order_erp_guid',
+now(), now(), 'sdsds', null, null, null, false),
+('222-commandGuid', 'ORDER_FULFILMENT_PIPELINE', 'instance-id', 'orderId', 'erpGuid',
+now(), now(), null, 'OK', 'its ok', true, true);
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/fill_erp_command.sql
+Content:
+insert into erp_command (command_guid, command_type, instance_id, order_id, order_erp_guid,
+created_at, modified_at, shipping_erp_guid, oms_pipeline, send_status)
+VALUES ('111-commandGuid', 'ORDER_SHIP_PERMISSION', 'instance-id', '111-orderId', 'order_erp_guid',
+now(), now(), 'sdsds', null, false),
+('222-commandGuid', 'ORDER_FULFILMENT_PIPELINE', 'instance-id', '111-orderId', 'order_erp_guid',
+now(), now(), null, true, true);
+
+insert into partner(id, type, inn, name, created_at, modified_at)
+values ('test-client_guid', 'ENTITY', 'test-client_inn', 'test-client_name',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('test-client_guid_1', 'ENTITY', 'test-client_inn_1', 'test-client_name_1',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into order_entity (id, document_type, base_erp_guid, document_id, document_date_time, document_source,
+order_type, document_link, contract_type, sale_manager_responsible_id,
+sale_manager_responsible_email, document_status, document_cancellation_reason, payment_method,
+agreement, delivery_method, recipient_full_name, recipient_phone, recipient_email,
+customer_full_name, customer_phone, customer_email, subdivision_id, erp_guid, deleted, deleted_mark, active,
+sf_order_id, partner_guid, created_at, modified_at, total_cost,
+contract_number, sale_manager_responsible_name, customer_comment, erp_pipeline, in_pieces,
+document_status_modified_at)
+values ('test_id', 'CLIENT_ORDER', null, 'test_order', '2022-08-10 07:56:46.000000', 'ERP',
+false, 'e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test', 'INVOICE_OFFER',
+'test_sale_manager_responsible_id', null, 'TO_BE_AGREED', null, 'PAYMENT_ON_ACCOUNT', 'PREPAYMENT',
+'PICKUP_FROM_OUR_WAREHOUSE', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€', '+7 (928) 111-11-11', 'test@test.com', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€',
+'+7 (111) 111-11-11',
+'test@test.com', 'test_subdivision_id', 'order_erp_guid',
+false, false, true, '111-orderId', 'test-client_guid',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655', 0.0,
+'Ð’Ð -32-18-Ð¾Ð´', 'ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡', 'ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚', true, false, '2023-10-12 10:58:40.280');
+
+insert into product_sku (id, name, type_name, type)
+values ('37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ', 'LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•', 'ITEM'),
+('280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9',
+'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)', 'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼',
+'DELIVERY_AUTO_SERVICE'),
+('3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9',
+'ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°', 'Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹',
+'SIMPLE_CUTTING_SERVICE'),
+('2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9',
+'Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_Ð£Ð“ÐžÐ›ÐžÐš', 'ITEM'),
+('62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9',
+'ÐÑ€Ð¼Ð°Ñ‚ÑƒÑ€Ð° 16 (2Ñ„) Ð500Ð¡ Ð“ÐžÐ¡Ð¢ 34028-2016_11700 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_ÐÐ Ðœ_ÐŸÐ Ð£Ð¢ÐšÐ˜', 'ITEM');
+
+insert into order_entity_item (id, position_code, linked_sku_position_code, sku_id, sku_status, quantity, measure_unit,
+price, currency, position_cancellation_reason, warehouse_id, provide_from_other_orders,
+order_id, position_cost)
+values ('9a55dbf3-b993-498c-8360-03a9d896093d', 4, null,
+'2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9', 'RESERVE_IN_WAREHOUSE', 0.23400,
+'Ñ‚', 78730.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('b0a6be1e-f5a0-4e99-b082-126cda07c0ec', 5, 4,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP', 0.23400, 'Ñ‚', 4.27, 'RUB',
+null, null, false, 'test_id', 0.0),
+('cc150dc6-a9a0-4d3c-87a0-dae01e45949c', 3, 2,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP', 0.19000, 'Ñ‚', 5.26, 'RUB',
+null, null, false, 'test_id', 0.0),
+('d5beb8a2-24a1-467f-a3b4-89bcbda246a0', 1, null,
+'37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c', 'RESERVE_IN_WAREHOUSE', 0.31500,
+'Ñ‚', 67980.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('aaa0d71a-4e7b-41c9-83cb-850ac8834239', 6, null,
+'280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9', 'SHIP', 1.00000, 'ÐµÐ´', 2000.00,
+'RUB', null, null, false, 'test_id', 0.0),
+('33fbc7ce-4875-4137-a712-78dc9810aabe', 2, null,
+'62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9', 'RESERVE_IN_WAREHOUSE', 0.19000,
+'Ñ‚', 57200.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false, 'test_id', 0.0);
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created.sql
+Content:
+insert into partner(id, type, inn, name, created_at, modified_at)
+values ('test-client_guid', 'ENTITY', 'test-client_inn', 'test-client_name',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('test-client_guid_1', 'ENTITY', 'test-client_inn_1', 'test-client_name_1',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into order_entity (id, document_type, base_erp_guid, document_id, document_date_time, document_source,
+order_type, document_link, contract_type, sale_manager_responsible_id,
+sale_manager_responsible_email, document_status, document_cancellation_reason, payment_method,
+agreement, delivery_method, recipient_full_name, recipient_phone, recipient_email,
+customer_full_name, customer_phone, customer_email, subdivision_id, erp_guid, deleted, deleted_mark, active,
+sf_order_id, partner_guid, created_at, modified_at, total_cost,
+contract_number, sale_manager_responsible_name, customer_comment, erp_pipeline, in_pieces,
+document_status_modified_at)
+values ('test_id', 'CLIENT_ORDER', null, 'test_order', '2022-08-10 07:56:46.000000', 'ERP',
+false, 'e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test', 'INVOICE_OFFER',
+'test_sale_manager_responsible_id', null, 'TO_BE_AGREED', null, 'PAYMENT_ON_ACCOUNT', 'PREPAYMENT',
+'PICKUP_FROM_OUR_WAREHOUSE', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€', '+7 (928) 111-11-11', 'test@test.com', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€',
+'+7 (111) 111-11-11',
+'test@test.com', 'test_subdivision_id', 'test_erp_guid',
+false, false, true, 'test_starfish24_erp_guid', 'test-client_guid',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655', 0.0,
+'Ð’Ð -32-18-Ð¾Ð´', 'ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡', 'ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚', true, false, '2023-10-12 10:58:40.280');
+
+insert into product_sku (id, name, type_name, type)
+values ('37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ', 'LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•', 'ITEM'),
+('280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9',
+'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)', 'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼',
+'DELIVERY_AUTO_SERVICE'),
+('3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9',
+'ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°', 'Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹',
+'SIMPLE_CUTTING_SERVICE'),
+('2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9',
+'Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_Ð£Ð“ÐžÐ›ÐžÐš', 'ITEM'),
+('62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9',
+'ÐÑ€Ð¼Ð°Ñ‚ÑƒÑ€Ð° 16 (2Ñ„) Ð500Ð¡ Ð“ÐžÐ¡Ð¢ 34028-2016_11700 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_ÐÐ Ðœ_ÐŸÐ Ð£Ð¢ÐšÐ˜', 'ITEM');
+
+insert into order_entity_item (id, position_code, linked_sku_position_code, sku_id, sku_status, quantity, measure_unit,
+price, currency, position_cancellation_reason, warehouse_id, provide_from_other_orders,
+order_id, position_cost)
+values ('9a55dbf3-b993-498c-8360-03a9d896093d', 4, null,
+'2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9', 'RESERVE_IN_WAREHOUSE', 0.23400,
+'Ñ‚', 78730.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('b0a6be1e-f5a0-4e99-b082-126cda07c0ec', 5, 4,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP', 0.23400, 'Ñ‚', 4.27, 'RUB',
+null, null, false, 'test_id', 0.0),
+('cc150dc6-a9a0-4d3c-87a0-dae01e45949c', 3, 2,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP', 0.19000, 'Ñ‚', 5.26, 'RUB',
+null, null, false, 'test_id', 0.0),
+('d5beb8a2-24a1-467f-a3b4-89bcbda246a0', 1, null,
+'37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c', 'RESERVE_IN_WAREHOUSE', 0.31500,
+'Ñ‚', 67980.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('aaa0d71a-4e7b-41c9-83cb-850ac8834239', 6, null,
+'280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9', 'SHIP', 1.00000, 'ÐµÐ´', 2000.00,
+'RUB', null, null, false, 'test_id', 0.0),
+('33fbc7ce-4875-4137-a712-78dc9810aabe', 2, null,
+'62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9', 'RESERVE_IN_WAREHOUSE', 0.19000,
+'Ñ‚', 57200.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false, 'test_id', 0.0);
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/order/order_created_for_deleted_oa.sql
+Content:
+insert into partner(id, type, inn, name, created_at, modified_at)
+values ('test-client_guid', 'ENTITY', 'test-client_inn', 'test-client_name',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('test-client_guid_1', 'ENTITY', 'test-client_inn_1', 'test-client_name_1',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into order_entity (id, document_type, base_erp_guid, document_id, document_date_time, document_source,
+order_type, document_link, contract_type, sale_manager_responsible_id,
+sale_manager_responsible_email, document_status, document_cancellation_reason, payment_method,
+agreement, delivery_method, recipient_full_name, recipient_phone, recipient_email,
+customer_full_name, customer_phone, customer_email, subdivision_id, erp_guid, deleted, deleted_mark, active,
+sf_order_id, partner_guid, created_at, modified_at, total_cost,
+contract_number, sale_manager_responsible_name, customer_comment, erp_pipeline, in_pieces,
+customer_guid, document_status_modified_at, order_paid)
+values ('test_id', 'CLIENT_ORDER', null, 'documentId', '2022-12-27 10:24:50.000000', 'ERP',
+false, 'documentLink', 'FRAME_NON_STANDARD',
+'test_saleManagerResponsibleId', 'saleManagerResponsibleEmail@test.test', 'TO_BE_AGREED', null, 'PAYMENT_ON_ACCOUNT', 'PREPAYMENT',
+'PICKUP_FROM_OUR_WAREHOUSE', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€', null, null, 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€',
+'+7 (111) 111-11-11',
+'test@test.com', 'test_subdivision_id', 'test_erp_guid',
+false, false, true, null, 'test-client_guid',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655', 0.0,
+'Ð’Ð -32-18-Ð¾Ð´', 'ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡', 'ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚', true, false, 'test-customer_guid',
+'2023-10-12 10:58:40.280', true);
+
+insert into product_sku (id, name, type_name, type)
+values ('37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ', 'LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•', 'ITEM'),
+('280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9',
+'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)', 'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼',
+'DELIVERY_AUTO_SERVICE'),
+('3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9',
+'ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°', 'Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹',
+'SIMPLE_CUTTING_SERVICE'),
+('2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9',
+'Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_Ð£Ð“ÐžÐ›ÐžÐš', 'ITEM'),
+('62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9',
+'ÐÑ€Ð¼Ð°Ñ‚ÑƒÑ€Ð° 16 (2Ñ„) Ð500Ð¡ Ð“ÐžÐ¡Ð¢ 34028-2016_11700 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_ÐÐ Ðœ_ÐŸÐ Ð£Ð¢ÐšÐ˜', 'ITEM');
+
+insert into order_entity_item (id, position_code, linked_sku_position_code, sku_id, sku_status, quantity, measure_unit,
+price, currency, position_cancellation_reason, warehouse_id, provide_from_other_orders,
+order_id, position_cost)
+values ('9a55dbf3-b993-498c-8360-03a9d896093d', 4, null,
+'2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9', 'RESERVE_IN_WAREHOUSE', 0.23400,
+'Ñ‚', 78730.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('b0a6be1e-f5a0-4e99-b082-126cda07c0ec', 5, 4,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP', 0.23400, 'Ñ‚', 4.27, 'RUB',
+null, null, false, 'test_id', 0.0),
+('cc150dc6-a9a0-4d3c-87a0-dae01e45949c', 3, 2,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP', 0.19000, 'Ñ‚', 5.26, 'RUB',
+null, null, false, 'test_id', 0.0),
+('d5beb8a2-24a1-467f-a3b4-89bcbda246a0', 1, null,
+'37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c', 'RESERVE_IN_WAREHOUSE', 0.31500,
+'Ñ‚', 67980.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('aaa0d71a-4e7b-41c9-83cb-850ac8834239', 6, null,
+'280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9', 'SHIP', 1.00000, 'ÐµÐ´', 2000.00,
+'RUB', null, null, false, 'test_id', 0.0),
+('33fbc7ce-4875-4137-a712-78dc9810aabe', 2, null,

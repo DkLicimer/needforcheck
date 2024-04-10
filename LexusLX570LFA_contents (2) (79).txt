@@ -1,0 +1,478 @@
+﻿@NotEmpty(message = "end must not be null nor empty")
+@Pattern(regexp = "([01]\\d|2[0-3]):[0-5]\\d", message = "start must be in 'hh:mm' format")
+private String end;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/transaction/DeliveryTransaction.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.transaction;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class DeliveryTransaction {
+
+private String id;
+private String deliveryDocumentId;
+private Boolean shouldSend;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/product/MeasureUnit.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.product;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+@Getter
+@Slf4j
+public enum MeasureUnit {
+GRAMM("Ð³", ProductType.WEIGHT, "GRM") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+DOZ("Ð´Ð¾Ð·", ProductType.PIECE, null) {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+UNIT("ÐµÐ´", ProductType.PIECE, null) {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+KAR("ÐºÐ°Ñ€", ProductType.WEIGHT, "CTM") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ°Ñ€");
+}
+},
+KILOVATT_PER_HOUR("ÐºÐ’Ñ‚.Ñ‡", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "KWH") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ’Ñ‚.Ñ‡");
+}
+},
+KG("ÐºÐ³", ProductType.WEIGHT, "KGM") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(q -> q * 1000)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+KM("ÐºÐ¼", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "KMT") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+KOMPL("ÐºÐ¾Ð¼Ð¿Ð»", ProductType.PIECE, null) {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+LITER("Ð»", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "LTR") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+LEAF("Ð»Ð¸ÑÑ‚", ProductType.PIECE, "LEF") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+METER("Ð¼", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "MTR") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+METER_SQUARE("Ð¼2", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "MTK") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+METER_QUBE("Ð¼3", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "MTQ") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+MINUTE("Ð¼Ð¸Ð½", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "min") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+MILLIMETER("Ð¼Ð¼", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "MMT") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+PAR("Ð¿Ð°Ñ€", ProductType.PIECE, "NPR") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+RUB("Ñ€ÑƒÐ±", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "Ð Ð£Ð‘") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÐºÐ¼");
+}
+},
+RUL("Ñ€ÑƒÐ»", ProductType.PIECE, "NPL") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+CM("ÑÐ¼", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, "CMT") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÑÐ¼");
+}
+},
+TONS("Ñ‚", ProductType.WEIGHT, "TNE") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(q -> q * 1_000_000)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+THOUSAND_PIECES("Ñ‚Ñ‹Ñ. ÑˆÑ‚/1000 ÑˆÑ‚", ProductType.PIECE, "MIL") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+THOUSAND_M("Ñ‚Ñ‹Ñ.Ð¼", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, null) {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÑÐ¼");
+}
+},
+UPAK("ÑƒÐ¿Ð°Ðº", ProductType.PIECE, "NMP") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+},
+USL_T("ÑƒÑÐ».Ñ‚", ProductType.WEIGHT/*Ð½Ðµ Ð·Ð°Ð¼Ð°Ð¿Ð»ÐµÐ½Ð¾*/, null) {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+throw new NotImplementedException("Mapping rule does not exists for ÑÐ¼");
+}
+},
+PIECE("ÑˆÑ‚", ProductType.PIECE, "PCE") {
+@Override
+public Long reCalculateQuantity(Double quantity) {
+return Optional.ofNullable(quantity)
+.map(Double::longValue)
+.orElse(null);
+}
+};
+
+private final String measureUnitValue;
+private final ProductType sfProductType;
+private final String internationalValue;
+
+MeasureUnit(final String measureUnitValue, final ProductType sfProductType, final String internationalValue) {
+this.measureUnitValue = measureUnitValue;
+this.sfProductType = sfProductType;
+this.internationalValue = internationalValue;
+}
+
+public abstract Long reCalculateQuantity(Double quantity);
+
+@Getter
+public enum ProductType {
+PIECE("piece"),
+WEIGHT("weight"),
+PIECE_WEIGHT("piece_weight");
+
+private final String value;
+
+ProductType(String value) {
+this.value = value;
+}
+}
+
+public boolean isWeight() {
+return ProductType.WEIGHT.equals(this.getSfProductType());
+}
+
+public boolean isPiece() {
+return ProductType.PIECE.equals(this.getSfProductType());
+}
+
+public static MeasureUnit getByValue(final String measureUnitValue) {
+return Arrays.stream(values())
+.filter(unit -> unit.getMeasureUnitValue().equals(measureUnitValue))
+.findFirst()
+.orElseThrow(() -> {
+log.error("Unknown measureUnit value: {}", measureUnitValue);
+return new RuntimeException("Unknown measureUnitValue");
+});
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/product/ProductSku.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.product;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+@SuperBuilder
+@Slf4j
+@Validated
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductSku {
+private String id;
+private String name;
+private String type;
+private String typeName;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/product/ProductSkuService.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.product;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+@SuperBuilder
+@Slf4j
+@Validated
+@Getter
+public class ProductSkuService extends ProductSku {
+@Setter
+private String linkedProductSkuId;
+
+public ProductSkuService(ProductSku source) {
+super(source.getId(), source.getName(), source.getType(), source.getTypeName());
+this.linkedProductSkuId = null;
+}
+
+public ProductSkuService(ProductSku source, String linkedProductSkuId) {
+super(source.getId(), source.getName(), source.getType(), source.getTypeName());
+this.linkedProductSkuId = linkedProductSkuId;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/product/SkuStatus.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.product;
+
+import lombok.Getter;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+/**
+* Ð”Ð»Ñ documentType=CLIENT_REQUEST Ð½ÐµÑ‚ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² ÑÑ‚Ñ€Ð¾Ðº Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°.
+* <p>
+* Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ 1Ð¡.
+* Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð²Ð°Ñ€Ð¸Ð°Ð½Ñ‚Ñ‹ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ documentType=CLIENT_ORDER:
+* â€¢  DO_NOT_PROVIDE = ÐÐµ Ð¾Ð±ÐµÑÐ¿ÐµÑ‡Ð¸Ð²Ð°Ñ‚ÑŒ;
+* â€¢  TO_PROVIDE = Ðš Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸ÑŽ;
+* â€¢  PROVIDE = ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ;
+* â€¢  PROVIDE_APART = ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾;
+* â€¢  RESERVE_IN_WAREHOUSE = Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ;
+* â€¢  RESERVE_IN_WAREHOUSE_APART = Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾;
+* â€¢  SHIP = ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ;
+* â€¢  SHIP_APART = ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾.
+* â€¢  CANCELED = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð°
+*/
+@Getter
+public enum SkuStatus {
+DO_NOT_PROVIDE("ÐÐµ Ð¾Ð±ÐµÑÐ¿ÐµÑ‡Ð¸Ð²Ð°Ñ‚ÑŒ"),
+TO_PROVIDE("Ðš Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸ÑŽ"),
+PROVIDE("ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ"),
+PROVIDE_APART("ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾"),
+RESERVE_IN_WAREHOUSE("Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ"),
+RESERVE_ON_DATE("Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ðº Ð´Ð°Ñ‚Ðµ"),
+SHIP("ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"),
+SHIP_APART("ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾"),
+CANCELED("ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð°");
+
+
+public static final Set<SkuStatus> CLIENT_REQUEST_SET = Set.of();
+
+public static final Set<SkuStatus> CLIENT_ORDER_SET = EnumSet.of(
+DO_NOT_PROVIDE,
+TO_PROVIDE,
+PROVIDE,
+PROVIDE_APART,
+RESERVE_IN_WAREHOUSE,
+RESERVE_ON_DATE,
+SHIP,
+SHIP_APART,
+CANCELED
+);
+
+private final String description;
+
+SkuStatus(String description) {
+this.description = description;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/product/SkuType.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.product;
+
+import lombok.Getter;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+/**
+* Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* â€¢  ITEM = Ð¢Ð¾Ð²Ð°Ñ€;
+* â€¢  ITEM_GP = Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ;
+* â€¢  MP_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° ÐœÐŸ;
+* â€¢  SIMPLE_CUTTING_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð¿Ñ€Ð¾ÑÑ‚Ð¾Ð¹ Ñ€ÐµÐ·ÐºÐ¸ (Ð·Ð° 15 Ð¼Ð¸Ð½ Ð´Ð¾ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸);
+* â€¢  DELIVERY_AUTO_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð°Ð²Ñ‚Ð¾;
+* â€¢  DELIVERY_RAILWAY_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¶/Ð´;
+* â€¢  DELIVERY_SEA_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¼Ð¾Ñ€ÑÐºÐ°Ñ;
+* â€¢  OTHER_SERVICE = ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸.
+* Ð•ÑÑ‚ÑŒ ÑƒÑÐ»ÑƒÐ³Ð° ÐŸÐµÑ€ÐµÐ²Ð°Ð»ÐºÐ°, ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð² OMS Ð½Ðµ Ð¾Ð±Ñ€Ð°Ð±Ð°Ñ‚Ñ‹Ð²Ð°ÐµÐ¼ (ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸)
+* ÐÐ° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1Ð¡:
+* 1.  Ð ÐµÐ³Ð¸ÑÑ‚Ñ€ ÑÐ²ÐµÐ´ÐµÐ½Ð¸Ð¹ (Ð²Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€, Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð°, Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Ñ‚Ð¸Ð¿Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸), ÐµÑÐ»Ð¸ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¾Ð´Ð½Ð¾Ð·Ð½Ð°Ñ‡Ð½Ð¾ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÑŒ Ð¿Ð¾ Ð²Ð¸Ð´Ñƒ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð²Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, ÐµÑÐ»Ð¸ Ð½ÐµÑ‚, Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñƒ.
+* 2.  Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Ñ‚Ð¸Ð¿Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸
+* Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÑ‚ÑÑ Ð² ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ð¸ Ñ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð¼ Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ (https://cfl.evraz.com/pages/viewpage.action?pageId=69173742)
+*/
+@Getter
+public enum SkuType {
+ITEM("Ð¢Ð¾Ð²Ð°Ñ€"),
+ITEM_GP("Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ"),
+MP_SERVICE("Ð£ÑÐ»ÑƒÐ³Ð° ÐœÐŸ"),
+SIMPLE_CUTTING_SERVICE("Ð£ÑÐ»ÑƒÐ³Ð° Ð¿Ñ€Ð¾ÑÑ‚Ð¾Ð¹ Ñ€ÐµÐ·ÐºÐ¸"),
+DELIVERY_AUTO_SERVICE("Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð°Ð²Ñ‚Ð¾"),
+DELIVERY_RAILWAY_SERVICE("Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¶/Ð´"),
+DELIVERY_SEA_SERVICE("Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¼Ð¾Ñ€ÑÐºÐ°Ñ"),
+OTHER_SERVICE("ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸");
+
+public static final Set<SkuType> ITEM_SKU = EnumSet.of(
+ITEM,
+ITEM_GP
+);
+
+public static final Set<SkuType> SERVICE_SKU = EnumSet.of(
+MP_SERVICE,
+SIMPLE_CUTTING_SERVICE,
+DELIVERY_AUTO_SERVICE,
+DELIVERY_RAILWAY_SERVICE,
+DELIVERY_SEA_SERVICE,
+OTHER_SERVICE
+);
+
+public static final Set<SkuType> DELIVERY_SERVICE_SKU = EnumSet.of(
+DELIVERY_AUTO_SERVICE,
+DELIVERY_RAILWAY_SERVICE,
+DELIVERY_SEA_SERVICE
+);
+
+public static final Set<SkuType> SERVICES_WITH_REQUIRED_LINKED_POSITION = EnumSet.of(
+MP_SERVICE/*,
+SIMPLE_CUTTING_SERVICE*/ // Ð¯ÐºÐ¾Ð±Ñ‹ Ð½ÐµÐ¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾, ÐµÑÐ»Ð¸ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð½ÐµÐ¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ - ÑƒÐ±Ñ€Ð°Ñ‚ÑŒ
+);
+
+private final String description;
+
+SkuType(String description) {
+this.description = description;
+}
+
+public boolean isSkuServiceNeedLinkedPosition() {
+return SERVICES_WITH_REQUIRED_LINKED_POSITION.contains(this);
+}
+
+public boolean isDeliverySkuService() {
+return DELIVERY_SERVICE_SKU.contains(this);
+}
+
+public static boolean isSkuItem(SkuType skuType) {
+return ITEM_SKU.contains(skuType);
+}
+
+public boolean isSkuItem() {
+return isSkuItem(this);
+}
+
+public static boolean isSkuService(SkuType skuType) {
+return SERVICE_SKU.contains(skuType);
+}
+
+public boolean isSkuService() {
+return isSkuService(this);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/order/Order.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.order;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;

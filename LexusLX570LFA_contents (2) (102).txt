@@ -1,0 +1,444 @@
+﻿import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.LegalEntityDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer.CustomerDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDetails;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderUpdateDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping.ShippingDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.config.FeignClientConfig;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@FeignClient(name = "${feign.starfish.order.name}", configuration = {FeignClientConfig.class})
+public interface OrderFeignClient {
+
+@PostMapping("/order/create")
+ResponseEntity<OrderCreateExtendedDto> createOrder(@RequestBody OrderCreateExtendedDto body);
+
+@PostMapping("/order/{orderId}")
+ResponseEntity<OrderDto> updateOrder(@PathVariable("orderId") String orderId, @RequestBody OrderDetails orderDetails);
+
+@Deprecated
+@PostMapping("/order/{orderId}/cancelationreason/{cancelationReasonId}/set")
+ResponseEntity<ControllerResult> setCancellationReason(@PathVariable("orderId") String orderId,
+@PathVariable("cancelationReasonId") String cancellationReasonId,
+@RequestParam(value = "cancelationReasonId", required = false)
+String customCancellationReason);
+
+@GetMapping("/order/{orderId}")
+ResponseEntity<OrderSearchDto> getOrderByStarfishOrderId(@PathVariable("orderId") String orderId);
+
+@GetMapping("/client/order/{clientOrderId}")
+ResponseEntity<OrderSearchDto> getOrderByClientOrderId(@PathVariable("clientOrderId") String clientOrderId);
+
+@PostMapping("/shipping/{orderId}/create")
+ResponseEntity<ControllerResult> createShipping(@PathVariable("orderId") String orderId,
+@RequestBody @Valid ShippingDto shippingDto);
+
+@Deprecated
+@PostMapping("/shipping/{orderId}/update")
+ResponseEntity<ControllerResult> updateShipping(@PathVariable("orderId") String orderId,
+@RequestBody @Valid ShippingDto shippingDto,
+@RequestParam(value = "tenantId", required = false) String tenantId);
+
+@GetMapping("/shipping/{orderId}")
+ResponseEntity<ShippingDto> getShipping(@PathVariable("orderId") String orderId,
+@RequestParam(value = "tenantId", required = false) String tenantId);
+
+@GetMapping("/shipping/clientorder/{clientOrderId}")
+ResponseEntity<ShippingDto> findShippingByClientOrderId(@PathVariable("clientOrderId") String clientOrderId,
+@RequestParam(value = "tenantId", required = false) String tenantId);
+
+@Deprecated
+@PostMapping("/order/{orderId}")
+ResponseEntity<OrderDto> updateOrderDetails(@PathVariable(value = "orderId") String orderId, @RequestBody OrderDetails orderDetails);
+
+@PostMapping("/order/{orderId}/customattributes")
+ResponseEntity<OrderDto> updateCustomAttributes(@PathVariable(value = "orderId") String orderId, @RequestBody List<CustomAttributesDto> attributesDtos);
+
+@PostMapping("/customer/{customerId}")
+ResponseEntity<ControllerResult> updateCustomer(@PathVariable(value = "customerId") String customerId,
+/*@RequestParam(required = false, defaultValue = "true") Boolean sendEvent,*/
+@RequestBody @Valid CustomerDto customerDto);
+
+@DeleteMapping("/orders/{orderId}")
+ResponseEntity<String> deleteOrder(@PathVariable("orderId") String orderId);
+
+@PostMapping("/item/{orderId}/extendedlist")
+ResponseEntity<List<ItemDto>> updateItems(@PathVariable(value = "orderId") String orderId, @RequestBody @Valid List<ItemDto> items,
+@RequestParam(value = "tenantId", required = false) String tenantId);
+
+@PostMapping("/itemservice/{orderId}/extendedlist")
+ResponseEntity<List<ItemServiceDto>> updateItemServices(@PathVariable(value = "orderId") String orderId, @RequestBody @Valid List<ItemServiceDto> itemServices);
+
+@GetMapping("/order/{orderId}/customattributes")
+ResponseEntity<List<CustomAttributesDto>> getOrderCustomAttributes(@PathVariable(value = "orderId") String orderId);
+
+@PostMapping("/customers/legalEntities")
+ResponseEntity<LegalEntityDto> createLegalEntity(@RequestBody LegalEntityDto dto);
+
+@PutMapping("/customers/legalEntities/{legalEntityId}")
+ResponseEntity<LegalEntityDto> updateLegalEntity(@PathVariable(value = "legalEntityId") String legalEntityId, @RequestBody LegalEntityDto dto);
+
+@PostMapping("/customers/legalEntities/create-or-update")
+ResponseEntity<LegalEntityDto> createOrUpdateLegalEntity(LegalEntityDto legalEntityDto);
+
+@PutMapping("/orders/{orderId}/shipping")
+ResponseEntity<ShippingDto> createOrUpdateShipping(@PathVariable(value = "orderId") String orderId, @RequestBody ShippingDto shippingDto);
+
+@PutMapping("/orders/{orderId}/details")
+ResponseEntity<OrderUpdateDto> updateOrderDetails(@RequestBody OrderUpdateDto orderUpdateDto, @PathVariable(value = "orderId") String orderId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/ProductFeignClient.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerService.CustomerServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.product.ProductDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.config.FeignClientConfig;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+
+import java.util.Collection;
+
+@FeignClient(name = "${feign.starfish.product.name}", configuration = {FeignClientConfig.class})
+public interface ProductFeignClient {
+
+@PostMapping("/product/update")
+ResponseEntity<ControllerResult> updateProduct(@RequestBody Collection<ProductDto> body);
+
+@GetMapping("/product/list")
+ResponseEntity<Collection<ProductDto>> getProductsByIds(@RequestBody Collection<String> productIds);
+
+@PostMapping("/customerservice/list")
+ResponseEntity<ControllerResult> updateCustomerService(@RequestBody Collection<CustomerServiceDto> body);
+
+@GetMapping("/customerservice/list")
+ResponseEntity<Collection<CustomerServiceDto>> getCustomerService();
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/config/FeignClientConfig.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign.config;
+
+import feign.Logger;
+import feign.codec.ErrorDecoder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import ru.liga.evraz.aggregation.security.IntegrationTokenConfig;
+import ru.liga.evraz.aggregation.security.service.JwtTokenService;
+
+@RequiredArgsConstructor
+@Configuration
+public class FeignClientConfig {
+
+private final IntegrationTokenConfig integrationTokenConfig;
+
+@Bean
+public FeignClientInterceptor feignAccessTokenAuthInterceptor(JwtTokenService jwtTokenService) {
+return new FeignClientInterceptor(integrationTokenConfig.getIntegrationToken(), jwtTokenService);
+}
+
+@Bean
+Logger.Level feignLoggerLevel() {
+return Logger.Level.FULL;
+}
+
+@Bean
+public ErrorDecoder errorDecoder() {
+return new ErrorDecoder.Default();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/config/FeignClientInterceptor.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign.config;
+
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import ru.liga.evraz.aggregation.security.authentication.JwtTokenAuthentication;
+import ru.liga.evraz.aggregation.security.service.JwtTokenService;
+
+import java.util.Map;
+
+import static java.util.Objects.nonNull;
+
+@Slf4j
+public class FeignClientInterceptor implements RequestInterceptor {
+
+private static final String AUTHORIZATION_HEADER = "Authorization";
+private static final String TOKEN_TYPE = "Bearer";
+private static final String TOKEN_KEY = "evraz_oms_dev";
+
+private final JwtTokenService jwtTokenService;
+private final Map<String, String> integrationTokens;
+
+@Value("${cloud.token}")
+public String token;
+
+public FeignClientInterceptor(Map<String, String> integrationTokens, JwtTokenService jwtTokenService) {
+this.integrationTokens = integrationTokens;
+this.jwtTokenService = jwtTokenService;
+}
+
+@Override
+public void apply(RequestTemplate requestTemplate) {
+/*var token = integrationTokens.get(TOKEN_KEY);
+requestTemplate.header(AUTHORIZATION_HEADER, String.format("%s %s", TOKEN_TYPE, token));*/
+
+if (!requestTemplate.headers().containsKey(AUTHORIZATION_HEADER)) {
+Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+if (nonNull(authentication) && nonNull(authentication.getName()) && !authentication.getName().isEmpty()) {
+JwtTokenAuthentication jwtTokenAuthentication = (JwtTokenAuthentication) authentication;
+String token = jwtTokenAuthentication.getName();
+if (requestTemplate.queries().containsKey("tenant")) {
+if (!"SUPER".equals(jwtTokenService.getUserDtoFromToken(token).getRole())) {
+requestTemplate.queries().remove("tenant");
+}
+}
+requestTemplate.header(AUTHORIZATION_HEADER, String.format("%s %s", TOKEN_TYPE, token));
+} else {
+requestTemplate.header(AUTHORIZATION_HEADER, token);
+}
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/OrderDeliveryInfo.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+@Getter
+@Builder
+public class OrderDeliveryInfo {
+private boolean isFirstDelivery;
+private ErpDelivery firstErpDelivery;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/ProcessVariableDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProcessVariableDto {
+private String name;
+private String value;
+private String type;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/AppliedPromo.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+
+import java.util.List;
+
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+//@Document(collection = "appliedpromo")
+public class AppliedPromo {
+@Id
+private String promoId;
+private Double discountValue;
+@Deprecated
+private List<String> productIds;
+private String promoDescription;
+private String discountLevel;
+private String discountType;
+private Integer discountAmount;
+private Boolean withDeliveryCost;
+private Boolean withAnotherPromo;
+private String couponId;
+private List<AppliedPromoItem> items;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/AppliedPromoItem.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+//@Document(collection = "appliedpromoitem")
+public class AppliedPromoItem {
+private String itemId;
+private String productId;
+private Double discountAmount;
+private Double discountPercentage;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/CalculationInputFieldDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CalculationInputFieldDto {
+
+private String fieldId;
+private String inputType;
+private String fieldName;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/CategoryListDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import java.util.List;
+
+public abstract class CategoryListDto {
+public abstract List<String> getCategory();
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/CustomAttributeDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CustomAttributeDto {
+@NotBlank
+private String name;
+@NotBlank
+private String value;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/CustomAttributesDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CustomAttributesDto {
+private String name;
+private String value;
+@JsonIgnore
+private CustomAttributeSource customAttributeSource;
+
+public CustomAttributesDto updCustomAttributeSource(CustomAttributeSource customAttributeSource) {
+this.customAttributeSource = customAttributeSource;
+return this;
+}
+
+public enum CustomAttributeSource {
+ORDER,
+DELIVERY
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/LegalEntityDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.Set;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+public class LegalEntityDto {
+private String id;
+@JsonProperty("INN")
+private String inn;
+private String name;
+private String legalAddress;
+private Set<String> actualAddresses;
+}

@@ -1,0 +1,499 @@
+﻿
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/OrderMarketingDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+public class OrderMarketingDto {
+private Double loyaltyPointsAvailable;
+private Double loyaltyPointsEarn;
+private Double loyaltyPointsBurn;
+private Boolean loyaltyPointsReturned;
+private String loyaltyId;
+private String loyalityOrderId;
+private List<AppliedPromo> promoApplied;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/PackageDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class PackageDto {
+private String id;
+private String direction;
+private Double weight;
+private Double height;
+private Double length;
+private Double width;
+private List<PackageItemDto> items;
+private List<CustomAttributesDto> customAttributes;
+private StickerDto sticker;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/PackageItemDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class PackageItemDto {
+private String itemId;
+private String productId;
+private Long quantity;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/StickerDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class StickerDto {
+private String id;
+private String stickerEncoded;
+private String svg;
+private String fileId;
+private String zplHorizontal;
+private String zplVertical;
+private Map<String, String> idParts;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/shipping/ShippingDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.adapter.http.out.TimeFormat;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address.AddressDto;
+
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+@EqualsAndHashCode
+public class ShippingDto {
+
+private String orderId;
+private String trackingId;
+private String returnCarrierOrderId;
+private String returnTrackingId;
+private String recipientFirstName;
+private String recipientMiddleName;
+private String recipientLastName;
+private Double deliveryCost;
+private BigDecimal discount;
+private String deliveryTypeId;
+private String fulfillmentTypeId;
+private String carrierId;
+private String carrierTariffId;
+private String carrierOrderId;
+@JsonFormat(pattern = "yyyy-MM-dd")
+private LocalDate promissedDeliveryDate;
+@JsonFormat(pattern = "yyyy-MM-dd")
+private LocalDate estimatedDeliveryDate;
+@Deprecated
+private LocalDate realDeliveryDate;
+private LocalDateTime realDeliveryDateTime;
+private String delayReasonId;
+private String deliveryIntervalId;
+@JsonFormat(pattern = "HH:mm")
+private LocalTime deliveryIntervalFrom;
+@JsonFormat(pattern = "HH:mm")
+private LocalTime deliveryIntervalTo;
+@NotNull(message = "address can not be null")
+private AddressDto address;
+private String pickupPointId;
+private String carrierPickupPointId;
+private String targetDispatchWarehouseId;
+private String pickupStoreId;
+@JsonFormat(pattern = TimeFormat.DATE_TIME_ISO_FORMAT)
+private LocalDateTime expirationDateTime;
+private List<String> carrierServices;
+private String dispatchWarehouseId;
+private String actualDeliveryCost;
+@JsonFormat(pattern = "yyyy-MM-dd")
+private LocalDate dispatchDate;
+@JsonFormat(pattern = "HH:mm")
+private LocalTime dispatchTime;
+private String logisticGroupId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/product/ProductDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.product;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CategoryListDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ProductDto extends CategoryListDto {
+
+@NonNull
+private String id;
+private String name;
+private String vendorCode;
+private List<String> barcode;
+private String brandId;
+private String picture;
+private String sizeId;
+private String colorId;
+private String parentId;
+private Boolean markable;
+private Double weight;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+private List<SkuDto> sku;
+private List<String> category;
+private List<CustomAttributesDto> customAttributes;
+private List<String> tags;
+private Double vat;
+private Double length;
+private Double width;
+private Double height;
+private List<String> optionalPictures;
+private String shortDescription;
+private String description;
+private String link;
+private Boolean active;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/product/SkuDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.product;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+@Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class SkuDto {
+@NonNull
+private String id;
+private String name;
+private String sizeId;
+private String colorId;
+private List<String> barcode;
+private Integer stockValue;
+private BigDecimal price;
+private String dispatchWarehouse;
+private List<String> tags;
+private Double vat;
+private Double weight;
+private Double length;
+private Double width;
+private Double height;
+private String picture;
+private String link;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/payment/PaymentDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.payment;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributeDto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class PaymentDto {
+private String paymentId;
+private String orderId;
+private String clientOrderId;
+private String transactionType;
+private String claimId;
+private Double sumPaid;
+@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+private LocalDateTime timePaid;
+private String paymentMethod;
+private String acquierId;
+private String acquierTransactionId;
+private String acquierTransactionStatusId;
+private List<String> productIds;
+private String userId;
+private String accountingType;
+private String receiptId;
+private String receiptLink;
+private String posId;
+private Double receiptAmount;
+private String acquierRRN;
+private String itemStatus;
+private String cardNumber;
+private String fiscalStorageId;
+private String posShiftId;
+private String shiftReceiptId;
+private String paymentSystem;
+private List<ReceiptItemDto> receiptItems;
+private List<CustomAttributeDto> customAttributes;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/payment/ReceiptItemDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.payment;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ReceiptItemDto {
+
+private String id;
+private String name;
+private Double quantity;
+private Double price;
+private Double vatValue;
+private Double vatRate;
+private String merchantTaxId;
+private Double sum;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/orderCalculation/CalculationInputDataDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.orderCalculation;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CalculationInputDataDto {
+
+private String name;
+private String value;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/CancellationReasonIdDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class CancellationReasonIdDto {
+@NotNull
+@JsonProperty("cancelationReasonId")
+private String cancellationReasonId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/LinkDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class LinkDto {
+private String orderId;
+private String clientOrderId;
+private String type;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/OrderCreateExtendedDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.PackageDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.domain.model.DeliveryItem;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Slf4j
+public class OrderCreateExtendedDto extends OrderDto {
+private static final String SHIPPING_ERP_GUID = "shippingErpGuid";
+private static final String POSITION_CODE = "positionCode";
+
+private static final String ORDER_ERP_GUID = "erpGuid";
+
+public OrderCreateExtendedDto(OrderDto orderDto) {
+super(orderDto);
+}
+
+private Boolean sendCustomerUpdate;
+private List<PackageDto> packages;
+
+// Ð’ÑÐ¿Ð¾Ð¼Ð¾Ð³Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ð¿Ð¾Ð»Ðµ.
+@JsonIgnore
+private String orderErpGuid;
+
+public void enrichOrderItemsAndServicesWithShippingErpGuid(ErpDelivery delivery) {
+if (delivery == null) {
+log.info("ErpDelivery is null for clientOrderId: {}", this.getOrderDetails().getClientOrderId());
+for (ItemDto item : this.getItems()) {
+final var itemCustomAttributes = item.getCustomAttributes();
+setEmptyShippingErpGuid(itemCustomAttributes);
+}
+
+for (ItemServiceDto service : this.getItemServices()) {
+final var serviceCustomAttributes = service.getCustomAttributes();
+setEmptyShippingErpGuid(serviceCustomAttributes);
+}
+return;
+}
+
+final var orderErpGuid = this.getCustomAttributes().stream()
+.filter(ca -> ORDER_ERP_GUID.equals(ca.getName()))
+.findFirst();
+
+// ÐŸÐ¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ð²ÑÐµ Ñ‚Ð¾Ð²Ð°Ñ€Ñ‹ Ð¸Ð· Ð¿ÐµÑ€ÐµÐ´Ð°Ð½Ð½Ð¾Ð¹ Ð—ÐÐŸ ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð¸Ðµ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ¼Ñƒ Ð·Ð°ÐºÐ°Ð·Ñƒ
+final var orderDeliveryItems = orderErpGuid
+.map(CustomAttributesDto::getValue)
+.flatMap(erpGuid -> {
+final var optDeliveryOrder = Optional.ofNullable(delivery.getOrders())
+.flatMap(deliveryOrders -> deliveryOrders.stream()
+.filter(deliveryOrder -> erpGuid.equals(deliveryOrder.getErpOrderGuid()))

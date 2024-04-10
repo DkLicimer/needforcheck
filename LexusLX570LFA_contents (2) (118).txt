@@ -1,0 +1,493 @@
+﻿
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Repository
+@Validated
+public interface ErpDeliveryOrderItemJpaRepository extends JpaRepository<ErpDeliveryOrderItemEntity, String> {
+
+void deleteAllByDeliveryOrderIn(@NotNull List<DeliveryOrderEntity> orders);
+
+List<ErpDeliveryOrderItemEntity> findAllByDeliveryOrder(@NotNull DeliveryOrderEntity order);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/command/ErpCommandEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.command;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import ru.liga.evraz.aggregation.domain.model.ReservationExtensionReason;
+import ru.liga.evraz.aggregation.domain.model.command.CommandStatusData;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Builder
+@Getter
+@Setter
+@Table(name = "erp_command")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@NamedNativeQuery(name = "erpCommandFindLatestWithStatusForOrder",
+query = """
+select c1.command_guid, c1.command_type, c1.erp_status
+from erp_command as c1
+join (
+select c2.command_type, max(c2.created_at) as m_c
+from erp_command as c2
+where c2.order_id = :orderId
+group by c2.command_type
+) as q
+on c1.command_type = q.command_type and c1.created_at = q.m_c
+where c1.order_id = :orderId and c1.erp_status is not null
+""",
+resultSetMapping = "erpCommandFindLatestWithStatusForOrderMapping")
+@SqlResultSetMapping(name = "erpCommandFindLatestWithStatusForOrderMapping",
+classes = {
+@ConstructorResult(targetClass = CommandStatusData.class,
+columns = {
+@ColumnResult(name = "command_guid", type = String.class),
+@ColumnResult(name = "command_type", type = String.class),
+@ColumnResult(name = "erp_status", type = String.class)
+})
+}
+)
+public class ErpCommandEntity implements Persistable<String> {
+
+@Id
+@Column(name = "command_guid", nullable = false)
+private String commandGuid;
+
+@Column(name = "command_type", nullable = false)
+private String commandType;
+
+@Column(name = "instance_id", nullable = false)
+private String instanceId;
+
+@Column(name = "order_id", nullable = false)
+private String orderId;
+
+@Column(name = "order_erp_guid")
+private String erpGuid;
+
+@Column(name = "shipping_erp_guid")
+private String shippingErpGuid;
+
+@Column(name = "oms_pipeline")
+private Boolean omsPipeline;
+
+@Column(name = "send_status")
+private boolean sendStatus;
+
+@Enumerated(EnumType.STRING)
+@Column(name = "erp_status")
+private CmdStatus erpStatus;
+
+@Column(name = "erp_details")
+private String erpDetails;
+
+@Column(name = "reservation_removal_date")
+private LocalDate reservationRemovalDate;
+
+@Enumerated(EnumType.STRING)
+@Column(name = "reservation_extension_reason")
+private ReservationExtensionReason reservationExtensionReason;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@Column(name = "document_cancellation_reason")
+private String documentCancellationReason;
+
+@Column(name = "position_cancellation_reason")
+private String positionCancellationReason;
+
+@Column(name = "document_status")
+private String documentStatus;
+
+@Column(name = "task_guid")
+private String taskGuid;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+
+public String getId() {
+return commandGuid;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/command/MetricConfigEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.command;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "metrics")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Slf4j
+@Validated
+public class MetricConfigEntity implements Persistable<String> {
+@Id
+private String id;
+@Column(name = "selection_delta")
+private String selectionDelta;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public String getId() {
+return this.id;
+}
+
+@Override
+@Transient
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/OrederAttribute/OrderAttributeEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.OrederAttribute;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Table(name = "order_attribute")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderAttributeEntity implements Persistable<String> {
+
+@Id
+private String id;
+
+@Column(name = "erp_order_guid")
+private String erpOrderGuid;
+
+@Column(name = "position_code")
+private Long positionCode;
+
+@Column(name = "name")
+private String name;
+
+@Column(name = "value")
+private String value;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/OrderReserve/OrderReserveEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.OrderReserve;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import ru.liga.evraz.aggregation.domain.enums.ReservationReason;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.time.LocalDateTime;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Table(name = "order_reserve")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderReserveEntity implements Persistable<String> {
+
+@Id
+private String id;
+
+@Column(name = "erp_order_guid")
+private String erpOrderGuid;
+
+@Column(name = "active")
+private Boolean active;
+
+@Column(name = "reservation_removal_date")
+private String reservationRemovalDate;
+
+@Enumerated(EnumType.STRING)
+@Column(name = "reservation_extension_reason")
+private ReservationReason reservationExtensionReason;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/ErpCommandEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.command.ErpCommandEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.command.*;
+import ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission.ShippingRequestShipPermissionItemsCommand;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpCommandEntityMapper {
+
+ErpCommandEntity map(OrderShipPermissionItemsCommand source);
+
+OrderShipPermissionItemsCommand map(ErpCommandEntity source);
+
+ErpCommandEntity map(ShippingRequestShipPermissionItemsCommand source);
+
+ShippingRequestShipPermissionItemsCommand mapShippingRequestShipPermission(ErpCommandEntity source);
+
+ErpCommandEntity map(OrderSignPipelineCommand source);
+
+ErpCommandEntity map(OrderReserveRenewalCommand source);
+
+ErpCommandEntity map(CloseErpOrderCommand source);
+
+ErpCommandEntity map(ErpTaskCommand source);
+
+OrderSignPipelineCommand mapOrderSignPipeline(ErpCommandEntity source);
+
+CloseErpOrderCommand mapCloseErpOrder(ErpCommandEntity source);
+
+ErpTaskCommand mapErpTask(ErpCommandEntity source);
+
+OrderReserveRenewalCommand mapOrderReserveRenewal(ErpCommandEntity resultEntity);
+
+ErpCommandDto mapErpCommand(ErpCommandEntity source);
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/ErpDeliveryEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryAttributeEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.DeliveryOrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.delivery.ErpDeliveryOrderItemEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.DeliveryTransactionEntity;
+import ru.liga.evraz.aggregation.application.event.DeliveryEvent;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.DeliveryItem;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+import java.util.List;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpDeliveryEntityMapper {
+
+ErpDeliveryEntity toDeliveryEntity(ErpDelivery source);
+
+@Mapping(target = "deliveryOrderItems", source = "deliveryItems")
+DeliveryOrderEntity toDeliveryOrderEntity(DeliveryOrder deliveryOrder);
+
+@Mapping(target = "deliveryItems", source = "deliveryOrderItems")
+@Mapping(target = "deliveryId", source = "delivery.id")
+DeliveryOrder toDeliveryOrder(DeliveryOrderEntity source);
+
+List<ErpDeliveryOrderItemEntity> toDeliveryItemEntities(List<DeliveryItem> source);
+
+ErpDeliveryOrderItemEntity toDeliveryItemEntity(DeliveryItem source);
+
+ErpDelivery toModel(ErpDeliveryEntity deliveryEntity, List<DeliveryOrderEntity> orders);
+
+@Mapping(target = "deliveryErpGuid", source = "source.erpGuid")
+DeliveryEvent toEvent(DeliveryTransactionEntity source, ErpDelivery erpDelivery);
+
+DeliveryAttributeEntity map(DeliveryAttribute source);
+
+DeliveryAttribute map(DeliveryAttributeEntity source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/ErpTaskEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.ErpTaskEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpTaskEntityMapper {
+
+ErpTaskEntity toEntity(ErpTask source);
+
+ErpTask toModel(ErpTaskEntity source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/OrderAttributeEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.OrederAttribute.OrderAttributeEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderAttributeEntityMapper {
+
+OrderAttributeEntity map(OrderAttribute source);
+
+OrderAttribute map(OrderAttributeEntity source);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/converter/OrderEntityMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderItemEntity;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface OrderEntityMapper {
+OrderEntity map(Order source);
+
+@Mappings({
+@Mapping(target = "product.id", source = "skuId"),
+@Mapping(target = "product.name", source = "skuName"),
+@Mapping(target = "product.type", source = "skuType"),
+@Mapping(target = "product.typeName", source = "skuTypeName"),
+})
+OrderItemEntity orderItemToOrderEntityItem(OrderItem source);
+
+Order map(OrderEntity source);
+
+@Mappings({
+@Mapping(target = "order", ignore = true),
+@Mapping(target = "skuId", source = "product.id"),
+@Mapping(target = "skuName", source = "product.name"),
+@Mapping(target = "skuType", source = "product.type"),
+@Mapping(target = "skuTypeName", source = "product.typeName"),
+})
+OrderItem orderItemEntityMapToOrderItem(OrderItemEntity source);

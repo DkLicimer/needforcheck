@@ -1,0 +1,422 @@
+﻿('8-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 4, 4, 'test_sku_id_4', 10, now(), now()),
+('9-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 4, 5, 'test_sku_id_4', 10, now(), now()),
+('1-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 1, 1, 'test_sku_id', 10, now(), now()),
+('2-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 2, 2, 'test_sku_id', 10, now(), now()),
+('3-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 3, 3, 'test_sku_id', 10, now(), now()),
+('4-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 4, 4, 'test_sku_id', 10, now(), now());
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/db/cmd/order_ship_permission/fill-for-order-ship-permission.sql
+Content:
+insert into partner(id, type, inn, name, created_at, modified_at)
+values ('test-client_guid', 'ENTITY', 'test-client_inn', 'test-client_name',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655'),
+('test-client_guid_1', 'ENTITY', 'test-client_inn_1', 'test-client_name_1',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655');
+
+insert into order_entity (id, document_type, base_erp_guid, document_id, document_date_time,
+document_source,
+order_type, document_link, contract_type, sale_manager_responsible_id,
+sale_manager_responsible_email, document_status,
+document_cancellation_reason, payment_method,
+agreement, delivery_method, recipient_full_name, recipient_phone,
+recipient_email,
+customer_full_name, customer_phone, customer_email, subdivision_id,
+erp_guid, deleted, deleted_mark, active,
+sf_order_id, partner_guid, created_at, modified_at, total_cost,
+contract_number, sale_manager_responsible_name, customer_comment, erp_pipeline, in_pieces,
+document_status_modified_at)
+values ('test_id', 'CLIENT_ORDER', null, 'documentId', '2022-12-27 10:24:50.000000', 'ERP',
+false, 'e1cib/data/Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚.Ð—Ð°ÐºÐ°Ð·ÐšÐ»Ð¸ÐµÐ½Ñ‚Ð°?ref=test', 'INVOICE_OFFER',
+'test_saleManagerResponsibleId', null, 'TO_BE_AGREED', null, 'PAYMENT_ON_ACCOUNT',
+'PREPAYMENT',
+'PICKUP_FROM_OUR_WAREHOUSE', 'Ð¡Ð°Ñ„Ð¸Ð½ Ð˜Ð»ÑŒÐ´Ð°Ñ€', '+7 (928) 111-11-11', 'test@test.com',
+'Ð”Ð°Ð½Ð¸Ð» 41',
+null,
+null, 'test_subdivision_id', 'test_order_erp_guid',
+false, false, true, 'test_starfish24_erp_guid', 'test-client_guid',
+'2023-01-27 17:00:02.930213', '2023-01-27 17:00:03.186655', 0.0,
+'Ð’Ð -32-18-Ð¾Ð´', 'ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡', 'ÐšÐ°ÐºÐ¾Ð¹-Ñ‚Ð¾ Ñ‚ÐµÐºÑÑ‚', true, false, '2023-10-12 10:58:40.280');
+
+insert into product_sku (id, name, type_name, type)
+values ('37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'Ð¢Ñ€ÑƒÐ±Ð° Ð¿Ñ€Ð¾Ñ„. 40Ñ…20Ñ…2 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 13663-86_6000 / ÐœÐµÑ‚Ð°Ð»Ð»Ð¡ÐµÑ€Ð²Ð¸Ñ', 'LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•',
+'ITEM'),
+('280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9',
+'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)',
+'Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼',
+'DELIVERY_AUTO_SERVICE'),
+('3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9',
+'ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°',
+'Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹',
+'SIMPLE_CUTTING_SERVICE'),
+('2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9',
+'Ð£Ð³Ð¾Ð»Ð¾Ðº 50Ñ…5 Ð¡Ñ‚3Ð¿Ñ Ð“ÐžÐ¡Ð¢ 535-2005_12000 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_Ð£Ð“ÐžÐ›ÐžÐš', 'ITEM'),
+('62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9',
+'ÐÑ€Ð¼Ð°Ñ‚ÑƒÑ€Ð° 16 (2Ñ„) Ð500Ð¡ Ð“ÐžÐ¡Ð¢ 34028-2016_11700 / Ð‘Ð°Ð»Ð°ÐºÐ¾Ð²Ð¾', 'ES_ÐÐ Ðœ_ÐŸÐ Ð£Ð¢ÐšÐ˜', 'ITEM');
+
+insert into order_entity_item (id, position_code, linked_sku_position_code, sku_id, sku_status,
+quantity, measure_unit,
+price, currency, position_cancellation_reason, warehouse_id,
+provide_from_other_orders,
+order_id, position_cost)
+values ('9a55dbf3-b993-498c-8360-03a9d896093d', 4, null,
+'2949349b-3646-11e7-812a-9cb6547c258c_0099c794-d2e5-11e9-a850-48df371528b9',
+'RESERVE_IN_WAREHOUSE', 0.23400,
+'Ñ‚', 78730.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('b0a6be1e-f5a0-4e99-b082-126cda07c0ec', 5, 4,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP',
+0.23400, 'Ñ‚', 4.27, 'RUB',
+null, null, false, 'test_id', 0.0),
+('cc150dc6-a9a0-4d3c-87a0-dae01e45949c', 3, 2,
+'3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9', 'SHIP',
+0.19000, 'Ñ‚', 5.26, 'RUB',
+null, null, false, 'test_id', 0.0),
+('d5beb8a2-24a1-467f-a3b4-89bcbda246a0', 1, null,
+'37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c',
+'RESERVE_IN_WAREHOUSE', 0.31500,
+'Ñ‚', 67980.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false,
+'test_id', 0.0),
+('aaa0d71a-4e7b-41c9-83cb-850ac8834239', 6, null,
+'280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9', 'SHIP',
+1. 00000, 'ÐµÐ´', 2000.00,
+'RUB', null, null, false, 'test_id', 0.0),
+('33fbc7ce-4875-4137-a712-78dc9810aabe', 2, null,
+'62b6cfde-2e85-11e9-a846-48df371528b9_f0bef0fd-d2e3-11e9-a850-48df371528b9',
+'RESERVE_IN_WAREHOUSE', 0.19000,
+'Ñ‚', 57200.00, 'RUB', null, '3269a17a-1957-11e4-80bf-f0921c005714', false, 'test_id', 0.0);
+
+insert into erp_delivery(id, delivery_document_id, delivery_document_date_time,
+delivery_document_link, car_delivery_date_time_from,
+car_delivery_date_time_to, car_delivery_date_time_from_description,
+car_delivery_date_time_to_description, delivery_method, erp_guid, deleted, active,
+created_at, modified_at, recipient_full_name, recipient_phone,
+recipient_email, recipient_guid, delivery_time_zone)
+values ('1-erp_delivery-uuid-test', 'dd_id_1', '2023-02-21T12:00:00', 'dd_link_1', '2023-02-21T16:00:00',
+'2023-02-21T18:00:00', '21.02.2023 19:00:00 +03:00', '21.02.2023 21:30:00 +03:00',
+'DETERMINED_IN_THE_DIRECTION', 'shippingErpGuid', false, true, '2023-01-27 17:00:02.930213', now(), 'Testov Test',
+'test-phone', 'test-email', 'a99db9b3-27d6-4c85-a6e6-c15b7df73306', '+03:00'),
+('2-erp_delivery-uuid-test', 'dd_id_2', '2023-02-21T12:00:00', 'dd_link_2', '2023-02-21T16:00:00',
+'2023-02-21T18:00:00', '21.02.2023 19:00:00 +03:00', '21.02.2023 21:30:00 +03:00',
+'DETERMINED_IN_THE_DIRECTION', '2-test-erp_guid', false, true, '2023-01-28 17:00:02.930213', now(), 'Testov Test',
+'test-phone', 'test-email', 'a99db9b3-27d6-4c85-a6e6-c15b7df73306', '+03:00'),
+('3-erp_delivery-uuid-test', 'dd_id_3', '2023-02-21T12:00:00', 'dd_link_3', '2023-02-21T16:00:00',
+'2023-02-21T18:00:00', '21.02.2023 19:00:00 +03:00', '21.02.2023 21:30:00 +03:00',
+'DETERMINED_IN_THE_DIRECTION', '3-test-erp_guid', false, true, '2023-01-29 17:00:02.930213', now(), 'Testov Test',
+'test-phone', 'test-email', 'a99db9b3-27d6-4c85-a6e6-c15b7df73306', '+03:00');
+
+insert into delivery_order(id, delivery_id, order_id, erp_order_guid, created_at, modified_at)
+values ('1-delivery_order-uuid-test', '1-erp_delivery-uuid-test', null, 'test_order_erp_guid', now(), now()),
+('2-delivery_order-uuid-test', '2-erp_delivery-uuid-test', null, 'test_order_erp_guid', now(), now()),
+('3-delivery_order-uuid-test', '3-erp_delivery-uuid-test', null, 'test_order_erp_guid', now(), now());
+
+insert into erp_delivery_order_item(id, delivery_order_id, position_code, order_position_code,
+sku_id, quantity, created_at, modified_at)
+values ('5-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 1, 1, 'test_sku_id_1', 10, now(), now()),
+('6-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 2, null, 'test_sku_id_2', 10, now(), now()),
+('7-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 3, 3, 'test_sku_id_3', 10, now(), now()),
+('8-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 4, 4, 'test_sku_id_4', 10, now(), now()),
+('9-erp_delivery_order_item-uuid-test', '1-delivery_order-uuid-test', 4, 5, 'test_sku_id_4', 10, now(), now()),
+('1-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 1, 1, 'test_sku_id', 10, now(), now()),
+('2-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 2, 2, 'test_sku_id', 10, now(), now()),
+('3-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 3, 3, 'test_sku_id', 10, now(), now()),
+('4-erp_delivery_order_item-uuid-test', '2-delivery_order-uuid-test', 4, 4, 'test_sku_id', 10, now(), now());
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/usergroup/usergroup_seccess_request.json
+Content:
+{
+"userGroupId": "M-1232_N-2222",
+"userGroupName": "Ñ€ÑƒÐºÐ¾Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ ÑÐ½Ð°Ð±Ð¶ÐµÐ½Ñ†ÐµÐ²_ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"userGroupParticipants": [
+{
+"personId": "K-1111",
+"personFullName": "Ð˜Ð²Ð°Ð½ Ð˜Ð²Ð°Ð½Ð¾Ð²Ð¸Ñ‡ Ð˜Ð²Ð°Ð½Ð¾Ð²",
+"email": "ivanov@mail.ru",
+"unitId": "M-1232",
+"unitName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"roleId": "N-2222",
+"roleName": "Ñ€ÑƒÐºÐ¾Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ ÑÐ½Ð°Ð±Ð¶ÐµÐ½Ñ†ÐµÐ²"
+},
+{
+"personId": "K-2222",
+"personFullName": "ÐŸÐµÑ‚Ñ€ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡ ÐŸÐµÑ‚Ñ€Ð¾Ð²",
+"email": "petrov@mail.ru",
+"unitId": "M-1232",
+"unitName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"roleId": "N-2222",
+"roleName": "Ñ€ÑƒÐºÐ¾Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ ÑÐ½Ð°Ð±Ð¶ÐµÐ½Ñ†ÐµÐ²"
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/usergroup/usergroup_seccess_response.json
+Content:
+{
+"userGroupId": "M-1232_N-2222"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision.json
+Content:
+{
+"subdivisionId": "GX-8",
+"subdivisionName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"timeZone": "UTC+3",
+"deleted" : false,
+"workDays": [
+{
+"name": "monday",
+"workSchedule": [
+{
+"start": "9:00",
+"end": "18:00"
+}
+]
+},
+{
+"name": "tuesday",
+"workSchedule": [
+{
+"start": "9:00",
+"end": "18:00"
+}
+]
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_create_request_1.json
+Content:
+{
+"subdivisionId": "GX-8",
+"subdivisionName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"timeZone": "UTC+3",
+"deleted": false,
+"workDays": [
+{
+"name": "MONDAY",
+"workSchedule": [
+{
+"start": "09:00",
+"end": "18:00"
+}
+]
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_create_response_1.json
+Content:
+{
+"subdivisionId": "GX-8",
+"subdivisionName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"timeZone": "UTC+3",
+"deleted": "false",
+"workDays": [
+{
+"name": "MONDAY",
+"workSchedule": [
+{
+"start": "09:00",
+"end": "18:00"
+}
+]
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_not_found_response.json
+Content:
+{
+"fault": {
+"code": "NOT_FOUND",
+"details": "Subdivision not_found not found"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_success_get_response.json
+Content:
+{
+"payload": {
+"subdivisionId": "GX-8",
+"subdivisionName": "ÐÑÑ‚Ñ€Ð°Ñ…Ð°Ð½ÑŒ",
+"timeZone": "UTC+3",
+"workDays": [
+{
+"name": "WEDNESDAY",
+"workSchedule": [
+{
+"start": "08:00",
+"end": "17:00"
+}
+]
+},
+{
+"name": "TUESDAY",
+"workSchedule": [
+{
+"start": "08:00",
+"end": "17:00"
+}
+]
+},
+{
+"name": "MONDAY",
+"workSchedule": [
+{
+"start": "08:00",
+"end": "17:00"
+}
+]
+},
+{
+"name": "FRIDAY",
+"workSchedule": [
+{
+"start": "08:00",
+"end": "17:00"
+}
+]
+},
+{
+"name": "THURSDAY",
+"workSchedule": [
+{
+"start": "08:00",
+"end": "17:00"
+}
+]
+}
+],
+"deleted": "false"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_update_request_1.json
+Content:
+{
+"subdivisionId": "GX-8",
+"subdivisionName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"timeZone": "UTC+3",
+"deleted": false,
+"workDays": [
+{
+"name": "MONDAY",
+"workSchedule": [
+{
+"start": "10:00",
+"end": "20:00"
+}
+]
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/subdivision/subdivision_update_response_1.json
+Content:
+{
+"subdivisionId": "GX-8",
+"subdivisionName": "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1",
+"timeZone": "UTC+3",
+"deleted": "false",
+"workDays": [
+{
+"name": "MONDAY",
+"workSchedule": [
+{
+"start": "10:00",
+"end": "20:00"
+}
+]
+}
+]
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_create_request_1.json
+Content:
+{
+"payload": {
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"active": true,
+"reservationRemovalDate": "2023-08-10",
+"reservationExtensionReason": "TENDER_WON"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_create_response_1.json
+Content:
+{
+"payload": {
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"active": true,
+"reservationRemovalDate": "2023-08-10",
+"reservationExtensionReason": "TENDER_WON"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_update_request_1.json
+Content:
+{
+"payload": {
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"active": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_reserve/order_reserve_update_response_1.json
+Content:
+{
+"payload": {
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"active": false,
+"reservationRemovalDate": null,
+"reservationExtensionReason": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/update/response/update_order_attribute_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "update_test_guid",
+"positionCode": 2,
+"name": "inserted",
+"value": "updated_true",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/update/request/update_order_attribute_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "update_test_guid",
+"positionCode": 2,
+"name": "inserted",
+"value": "updated_true",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/delete/response/delete_metalProcessingStartTime_order_attribute_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": null,
+"name": "metalProcessingStartTime",
+"value": null,
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/delete/response/delete_olurTaskSent_order_attribute_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": null,

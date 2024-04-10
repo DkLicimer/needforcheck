@@ -1,0 +1,453 @@
+﻿</addColumn>
+</changeSet>
+
+<changeSet id="add_column_delivery_interval_from_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="delivery_interval_from"/>
+</not>
+</preConditions>
+<comment>Add delivery_interval_from to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="delivery_interval_from" type="time"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_column_delivery_interval_to_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="delivery_interval_to"/>
+</not>
+</preConditions>
+<comment>Add delivery_interval_to to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="delivery_interval_to" type="time"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_column_address_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="address"/>
+</not>
+</preConditions>
+<comment>Add address to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="address" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_column_warehouse_id_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="warehouse_id"/>
+</not>
+</preConditions>
+<comment>Add warehouse_id to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="warehouse_id" type="text"/>
+</addColumn>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-030-302936.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_dispatch_warehouse_slot_booked_to_erp_delivery" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="dispatch_warehouse_slot_booked"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_delivery">
+<column name="dispatch_warehouse_slot_booked" type="boolean"/>
+</addColumn>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-031-173713.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_erp_task_responsible_full_name" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="responsible_full_name"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="responsible_full_name" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_responsible_email" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="responsible_email"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="responsible_email" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_erp_status" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="erp_status"/>
+</not>
+</preConditions>
+
+<addColumn tableName="erp_task">
+<column name="erp_status" type="text"/>
+</addColumn>
+
+</changeSet>
+
+<changeSet id="add_erp_task_decision" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="decision"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="decision" type="text"/>
+</addColumn>
+</changeSet>
+
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-032-309060.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_column_client_document_authority_for_receive_goods_note_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="client_document_authority_for_receive_goods_note"/>
+</not>
+</preConditions>
+<comment>Add client_document_authority_for_receive_goods_note to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="client_document_authority_for_receive_goods_note" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_column_client_document_authority_for_receive_goods_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="client_document_authority_for_receive_goods"/>
+</not>
+</preConditions>
+<comment>Add client_document_authority_for_receive_goods to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="client_document_authority_for_receive_goods" type="boolean"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_column_sole_executive_government_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="sole_executive_government"/>
+</not>
+</preConditions>
+<comment>Add sole_executive_government to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="sole_executive_government" type="text"/>
+</addColumn>
+</changeSet>
+
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-033-309740.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_oms_pipeline_flag_for_order" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_delivery" columnName="oms_pipeline"/>
+</not>
+</preConditions>
+<comment>Add oms_pipeline flag to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="oms_pipeline" type="boolean"/>
+</addColumn>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-034-319449.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_columns_for_319449_required_quotation" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="required_quotation"/>
+</not>
+</preConditions>
+<comment>Add required_quotation flag to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="required_quotation" type="boolean"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_columns_for_319449_required_call" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="required_call"/>
+</not>
+</preConditions>
+<comment>Add required_call flag to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="required_call" type="boolean"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_columns_for_319449_branching" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="branching"/>
+</not>
+</preConditions>
+<comment>Add required_call flag to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="branching" type="boolean"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_columns_for_319449_address" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="address"/>
+</not>
+</preConditions>
+<comment>Add order address to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="address" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_columns_for_319449_invoice_without" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="invoice_without"/>
+</not>
+</preConditions>
+<comment>Add invoice_without to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="invoice_without" type="boolean"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_columns_for_319449_payment_link" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="payment_link"/>
+</not>
+</preConditions>
+<comment>Add payment_link to order_entity table</comment>
+<addColumn tableName="order_entity">
+<column name="payment_link" type="text"/>
+</addColumn>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-035-337651-metrics.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_metrics_table_and_initialize" author="evraz">
+<preConditions onFail="MARK_RAN">
+<not>
+<tableExists tableName="metrics"/>
+</not>
+</preConditions>
+
+<createTable tableName="metrics">
+<column name="id" type="text" remarks="ID/GUID Ð½Ð°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸">
+<constraints primaryKey="true" primaryKeyName="metrics_id_pk" nullable="false"/>
+</column>
+<column name="selection_delta" type="text" defaultValue="PT1M"
+remarks="Ð”ÐµÐ»ÑŒÑ‚Ð° Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸ Ð¾Ñ‚ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð´Ð»Ñ ÑÐ±Ð¾Ñ€Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð² Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ðµ java.time.Duration.
+ÐŸÐ¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ: PT1M (Ð·Ð° Ð¿Ð¾ÑÐ»ÐµÐ´Ð½ÑŽÑŽ Ð¼Ð¸Ð½ÑƒÑ‚Ñƒ).
+ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ Ð¿Ñ€Ð¸Ð¼ÐµÑ€Ñ‹:
+- PT1H (Ð·Ð° Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ 1 Ñ‡Ð°Ñ);
+- PT30M (Ð·Ð° Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ðµ 30 Ð¼Ð¸Ð½ÑƒÑ‚);
+- PT3S (Ð·Ð° Ð¿Ð¾ÑÐ»ÐµÐ´Ð½Ð¸Ðµ 3 ÑÐµÐºÑƒÐ½Ð´Ñ‹)"/>
+</createTable>
+
+<insert tableName="metrics">
+<column name="id" value="1"/>
+</insert>
+</changeSet>
+
+</databaseChangeLog>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-shedlock-create.xml
+Content:
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+<changeSet author="akovalevskii@fil-it.ru" id="create_shedlock_table_for_scheduler_locks">
+<preConditions onFail="MARK_RAN">
+<not>
+<tableExists tableName="shedlock"/>
+</not>
+</preConditions>
+<createTable tableName="shedlock">
+<column name="name" type="text">
+<constraints nullable="false" primaryKey="true"/>
+</column>
+<column name="lock_until" type="TIMESTAMP">
+<constraints nullable="false"/>
+</column>
+<column name="locked_at" type="TIMESTAMP">
+<constraints nullable="false"/>
+</column>
+<column name="locked_by" type="text">
+<constraints nullable="false"/>
+</column>
+</createTable>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/AggregationServiceApplication.java
+Content:
+package ru.liga.evraz.aggregation;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import ru.liga.evraz.aggregation.application.config.CommandProperties;
+import ru.liga.evraz.aggregation.application.config.ValidationProperties;
+
+@EnableAsync
+@EnableFeignClients
+@EnableDiscoveryClient
+@EnableScheduling
+@EnableTransactionManagement
+@EnableJpaRepositories
+@SpringBootApplication(scanBasePackages = {"com.starfish24.kubeConfig", "ru.liga.evraz.aggregation"})
+@EnableConfigurationProperties({ValidationProperties.class, CommandProperties.class})
+public class AggregationServiceApplication {
+public static void main(String[] args) {
+SpringApplication.run(AggregationServiceApplication.class, args);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/util/DateTimeUtils.java
+Content:
+package ru.liga.evraz.aggregation.util;
+
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+public class DateTimeUtils {
+/** ÐŸÐµÑ€ÐµÐ²Ð¾Ð´Ð¸Ð¼ timeStamp Ð¸Ð· ÐšÐ°Ñ„ÐºÐ¸ Ð² ZonedDateTime.
+* @param timestamp Ð’Ñ€ÐµÐ¼Ñ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐ¸ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² ÐšÐ°Ñ„ÐºÑƒ
+* @return ZonedDateTime
+*/
+public static ZonedDateTime timeStampToZonedDateTime(@NotNull Long timestamp) {
+LocalDateTime localDateTime =  new Timestamp(timestamp).toLocalDateTime();
+ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+return zonedDateTime;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/util/ListUtils.java
+Content:
+package ru.liga.evraz.aggregation.util;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public class ListUtils {
+public static <T> Stream<Collection<T>> batches(List<T> source, int length) {
+if (length <= 0) {
+throw new IllegalArgumentException("Couldn't split list to batch by length = " + length);
+}
+int size = source.size();
+if (size <= 0) {
+return Stream.empty();
+}
+int fullChunks = (size - 1) / length;
+return IntStream.range(0, fullChunks + 1).mapToObj(
+n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
+}
+}
+
+

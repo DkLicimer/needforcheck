@@ -1,0 +1,463 @@
+﻿ZonedDateTime documentDateTime = source.getDocumentDateTime();
+return OrderDetails.builder()
+.isPaid(source.getOrderPaid())
+.sourceId(source.getDocumentSource().name())
+.clientOrderId(clientOrderId)
+.customerId(getCustomerId(source))
+.responsibleManager(source.getSaleManagerResponsibleId())
+.paymentTypeId(source.getPaymentMethod().getStarfishValue())
+.dateTimeCreated(documentDateTime) // TODO:: need check timezone
+.createdDateTime(documentDateTime)
+.contactEmail(source.getRecipientEmail())
+.contactPhone(source.getRecipientPhone())
+.totalCost(source.getTotalCost())
+.payableCost(source.getTotalCost())
+.currencyId(Optional.ofNullable(source.getOrderItems())
+.flatMap(items -> items.stream()
+.filter(i -> StringUtils.isNotBlank(i.getCurrency()))
+.findFirst())
+.map(OrderItem::getCurrency)
+.orElseThrow(() -> {
+log.error("Invalid currency found in items");
+return new IllegalArgumentException("Unknown currency found in items");
+}))
+.customerComment(source.getCustomerComment())
+.legalEntityId(Optional.ofNullable(source.getPartner()).map(Partner::getClientGuid).orElse(null))
+.customerType(buildCustomerType(source.getPartner()))
+.cancellationReasonId(cancellationReason)
+//.deleted(source.isDeleted())
+.itemsQuantity(buildItemQuantity(source))
+.itemsPrice(source.getItemsPrice())
+.itemsDiscountPrice(source.getItemsDiscountPrice())
+.itemsServiceDiscountPrice(source.getItemsServiceDiscountPrice())
+.itemsAndServicesDiscountValue(source.getDiscountValue())
+.build();
+}
+
+private static Integer buildItemQuantity(Order source) {
+return (int) source.getOrderItems().stream()
+.filter(item -> item.getSkuType().isSkuItem() && !SkuStatus.CANCELED.equals(item.getSkuStatus()))
+.count();
+}
+
+private String getCustomerId(Order source) {
+return Optional.ofNullable(source.getCustomerGuid())
+.orElseGet(() -> {
+log.warn(String.format("Customer guid was not found in order with erpGuid %s", source.getErpGuid()));
+return null;
+});
+}
+
+public String buildClientOrderId(Order source) {
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_BY_DOT);
+return source.getDocumentId() + "___" + source.getDocumentDateTime().format(formatter);
+}
+
+public List<ItemServiceDto> mapOrderItemServices(Collection<OrderItem> orderItems) {
+
+final var productItems = orderItems.stream()
+.filter(item -> isSkuItem(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+final var serviceItems = orderItems.stream()
+.filter(item -> isSkuService(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+if (CollectionUtils.isNotEmpty(serviceItems)) {
+return serviceItems.stream()
+.filter(itemService -> itemService.getSkuType().isSkuService())
+.map(itemService -> {
+final OrderItem linkedOrderItem = getLinkedOrderItem(productItems, itemService);
+LocalDateTime itemDateTime = itemService.getItemDateTime();
+
+return ItemServiceDto.builder()
+// id Ð½Ðµ ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÐ¼. Ð§Ñ‚Ð¾Ð±Ñ‹ Ð½Ðµ "Ð¿Ð»Ð¾Ð´Ð¸Ñ‚ÑŒ" ÑƒÑÐ»ÑƒÐ³Ð¸ Ð¿Ð¾Ð¼ÐµÑ‡ÐµÐ½Ð½Ñ‹Ðµ Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ
+.products(linkedOrderItem == null
+? List.of()
+: List.of(ServiceProductDto.builder()
+.id(linkedOrderItem.getSkuId())
+.quantity(1) // TODO:: Ð¼Ð¾Ð³ÑƒÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ñ‹
+.build()))
+.title(itemService.getSkuName())
+.customerServiceId(itemService.getSkuId())
+.customAttributes(buildItemServicesCustomAttributes(itemService))
+.quantity(1/*itemService.getQuantity().intValue()*/) // TODO:: Ð½ÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚ Ð¿Ñ€Ð¸ Ð´Ñ€Ð¾Ð±Ð½Ð¾Ð¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¸, Ð½ÑƒÐ¶ÐµÐ½ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¼Ð°Ð¿Ð¿Ð¸Ð½Ð³
+.price(itemService.getPrice()) // TODO:: Ñ€Ð°ÑÑ‡ÐµÑ‚ Ñ†ÐµÐ½Ñ‹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸-ÑƒÑÐ»ÑƒÐ³Ð¸
+.deleted(itemService.getPositionCancellationReason() != null)
+.calculationInputData(buildCalculationInputData(itemService))
+.createdDateTime(itemDateTime != null ? itemDateTime.atZone(ZoneOffset.UTC) : null)
+.discount(itemService.getDiscount() != null ? itemService.getDiscount() : 0.0)
+.discountPrice(itemService.getPositionCost() != null ? BigDecimal.valueOf(itemService.getPositionCost()) : null)
+.build();
+})
+.collect(Collectors.toList());
+}
+return List.of();
+}
+
+private List<CalculationInputDataDto> buildCalculationInputData(OrderItem itemService) {
+if (itemService != null && SERVICE_SKU.contains(itemService.getSkuType())) {
+final var calculationInputData = new ArrayList<CalculationInputDataDto>();
+calculationInputData.add(CalculationInputDataDto.builder()
+.name("skuTypeName")
+.value(Optional.ofNullable(itemService.getSkuTypeName()).orElse(EMPTY))
+.build());
+calculationInputData.add(CalculationInputDataDto.builder()
+.name("skuTypeDescription")
+.value(Optional.ofNullable(itemService.getSkuType())
+.map(SkuType::getDescription).orElse(EMPTY))
+.build());
+calculationInputData.add(CalculationInputDataDto.builder()
+.name("skuStatusDescription")
+.value(Optional.ofNullable(itemService.getSkuStatus())
+.map(SkuStatus::getDescription).orElse(EMPTY))
+.build());
+calculationInputData.add(CalculationInputDataDto.builder()
+.name("measureUnit")
+.value(MeasureUnit.getByValue(itemService.getMeasureUnit()).getMeasureUnitValue())
+.build());
+calculationInputData.add(CalculationInputDataDto.builder()
+.name("skuComment")
+.value(Optional.ofNullable(itemService.getSkuComment())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+calculationInputData.add(CalculationInputDataDto.builder()
+.name("positionCancellationReason")
+.value(Optional.ofNullable(itemService.getPositionCancellationReason())
+.map(Enum::name).orElse(EMPTY))
+.build());
+// metalProcessingStartTimeDescription Ð”Ð¾Ð±Ð°Ð²Ð»ÑÐµÑ‚ÑÑ Ð¿Ñ€Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐµ Ð² Ð¡Ð¤
+return calculationInputData;
+}
+return List.of();
+}
+
+public List<ItemDto> mapOrderItems(Collection<OrderItem> orderItems) {
+if (CollectionUtils.isEmpty(orderItems)) {
+log.warn("Empty order item list");
+return List.of();
+}
+
+final var productItems = orderItems.stream()
+.filter(item -> isSkuItem(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+// TODO:: Ð·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ ÑÐ²ÑÐ·Ð°Ð½Ð½Ñ‹Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸ Ñ
+final var serviceItems = orderItems.stream()
+.filter(item -> isSkuService(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+if (!CollectionUtils.isEmpty(productItems)) {
+return productItems.stream()
+.map(item -> {
+final var measureUnit = MeasureUnit.getByValue(item.getMeasureUnit());
+final var sfProductType = measureUnit.getSfProductType();
+LocalDateTime itemDateTime = item.getItemDateTime();
+return ItemDto.builder()
+.title(item.getSkuName())
+.type(sfProductType.getValue())
+.customAttributes(buildItemsCustomAttributes(item, serviceItems))
+.quantity(resolveItemQuantityByMeasureUnit(item, measureUnit)) // conflict with product quantity - convert with described rules
+.weight(measureUnit.isWeight() ? item.getQuantity() : null)
+.price(item.getPrice()) // TODO:: Ñ€Ð°ÑÑ‡ÐµÑ‚ Ñ†ÐµÐ½Ñ‹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸-Ñ‚Ð¾Ð²Ð°Ñ€Ð°
+.productId(item.getSkuId())
+.deleted(item.getPositionCancellationReason() != null)
+.positionCode(item.getPositionCode())
+.dateTimeCreated(itemDateTime)
+.createdDateTime(itemDateTime != null ? itemDateTime.atZone(ZoneOffset.UTC) : null)
+.discount(item.getDiscount() != null ? item.getDiscount() : 0.0)
+.discountPrice(item.getPositionCost() != null ? BigDecimal.valueOf(item.getPositionCost()) : null)
+.build();
+})
+.collect(Collectors.toList());
+}
+return List.of();
+}
+
+private static long resolveItemQuantityByMeasureUnit(OrderItem item, MeasureUnit measureUnit) {
+return measureUnit.isWeight() ? 1L : measureUnit.reCalculateQuantity(item.getQuantity());
+}
+
+private static OrderItem getLinkedOrderItem(Set<OrderItem> productItems, OrderItem serviceItem) {
+final var linkedOrderItem = serviceItem.getLinkedSkuPositionCode() == null
+? null
+: productItems.stream()
+.filter(i -> serviceItem.getLinkedSkuPositionCode().equals(i.getPositionCode()))
+.findFirst()
+.orElseThrow(() ->
+new ValidationException(
+String.format("ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶Ð¸Ñ‚ÑŒ ÑÐ²ÑÐ·Ð°Ð½Ð½ÑƒÑŽ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñƒ %s Ð¿Ð¾ positionCode",
+serviceItem.getLinkedSkuPositionCode())));
+return linkedOrderItem;
+}
+
+private static List<CustomAttributesDto> buildItemServicesCustomAttributes(OrderItem item) {
+if (item != null) {
+final var customAttributes = new ArrayList<CustomAttributesDto>();
+
+final var measureUnit = MeasureUnit.getByValue(item.getMeasureUnit());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("positionCode")
+.value(item.getPositionCode().toString())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("linkedSkuPositionCode")
+.value(Optional.ofNullable(item.getLinkedSkuPositionCode())
+.map(Object::toString).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name(ItemCA.SKU_STATUS.getCode())
+.value(item.getSkuStatus().name())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuStatusDescription")
+.value(item.getSkuStatus().getDescription())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuType")
+.value(item.getSkuType().name())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuTypeDescription")
+.value(item.getSkuType().getDescription())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("positionCancellationReason")
+.value(Optional.ofNullable(item.getPositionCancellationReason())
+.map(Enum::name).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("measureUnit")
+.value(measureUnit.getMeasureUnitValue())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("warehouseId")
+.value(Optional.ofNullable(item.getWarehouseId())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("provideFromOtherOrders")
+.value(Optional.ofNullable(item.getProvideFromOtherOrders()).map(Object::toString).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuComment")
+.value(Optional.ofNullable(item.getSkuComment())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+
+return customAttributes;
+}
+return List.of();
+}
+
+private static List<CustomAttributesDto> buildItemsCustomAttributes(OrderItem item,
+Collection<OrderItem> itemServices) {
+if (item != null) {
+final var customAttributes = new ArrayList<CustomAttributesDto>();
+final var measureUnit = MeasureUnit.getByValue(item.getMeasureUnit());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("positionCode")
+.value(item.getPositionCode().toString())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("linkedSkuPositionCode")
+.value(Optional.ofNullable(item.getLinkedSkuPositionCode())
+.map(Object::toString).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name(ItemCA.SKU_STATUS.getCode())
+.value(item.getSkuStatus().name())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuStatusDescription")
+.value(item.getSkuStatus().getDescription())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuType")
+.value(item.getSkuType().name())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuTypeDescription")
+.value(item.getSkuType().getDescription())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("positionCancellationReason")
+.value(Optional.ofNullable(item.getPositionCancellationReason())
+.map(Enum::name).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("measureUnit")
+.value(measureUnit.getMeasureUnitValue())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("warehouseId")
+.value(Optional.ofNullable(item.getWarehouseId())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("provideFromOtherOrders")
+.value(Optional.ofNullable(item.getProvideFromOtherOrders())
+.map(Object::toString).orElse(EMPTY))
+.build());
+
+if (CollectionUtils.isNotEmpty(itemServices)) {
+final var linkedServicesForProductItem = itemServices.stream()
+.filter(service -> service.getPositionCancellationReason() == null // Ð•ÑÐ»Ð¸ ÑƒÑÐ»ÑƒÐ³Ð° Ð½Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½Ð°
+&& item.getPositionCode().equals(service.getLinkedSkuPositionCode()))
+.sorted(Comparator.comparing(OrderItem::getPositionCode))
+.map(OrderItem::getSkuId)
+.collect(Collectors.joining(";"));
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("linkedItemServiceIds")
+.value(linkedServicesForProductItem)
+.build());
+} else {
+customAttributes.add(CustomAttributesDto.builder()
+.name("linkedItemServiceIds")
+.value(EMPTY)
+.build());
+}
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("skuComment")
+.value(Optional.ofNullable(item.getSkuComment())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("productVariantAttribute")
+.value(Optional.ofNullable(item.getProductVariantAttribute())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+
+return customAttributes;
+}
+return List.of();
+}
+
+public List<CustomAttributesDto> mapOrderCustomAttributes(Order source) {
+if (source != null) {
+final List<CustomAttributesDto> customAttributes = new ArrayList<>();
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("documentType")
+.value(source.getDocumentType().name())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("documentId")
+.value(source.getDocumentId())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("orderType")
+.value(source.getOrderType().toString())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("orderTypeDescription")
+.value(Boolean.TRUE.equals(source.getOrderType())
+? "Ð¦ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·" : "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·")
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("documentLink")
+.value(source.getDocumentLink())
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("contractType")
+.value(Optional.ofNullable(source.getContractType())
+.map(Enum::name).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("contractTypeDescription")
+.value(Optional.ofNullable(source.getContractType())
+.map(OrderContractType::getDescription).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("saleManagerResponsibleEmail")
+.value(Optional.ofNullable(source.getSaleManagerResponsibleEmail())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+
+customAttributes.add(CustomAttributesDto.builder()
+.name("documentStatus")
+.value(source.getDocumentStatus().name())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("documentStatusDescription")
+.value(source.getDocumentStatus().getDescription())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("deliveryMethod")
+.value(source.getDeliveryMethod().name())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("subdivisionId")
+.value(source.getSubdivisionId())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("erpGuid")
+.value(source.getErpGuid())
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("deletedMark")
+.value(String.valueOf(source.isDeletedMark()))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("active")
+.value(String.valueOf(source.isActive()))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("contractNumber")
+.value(String.valueOf(source.getContractNumber()))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("saleManagerResponsibleName")
+.value(Optional.ofNullable(source.getSaleManagerResponsibleName())
+.filter(StringUtils::isNotBlank).orElse(EMPTY))
+.build());
+customAttributes.add(buildBooleanOrderCustomAttributeOrDefault(
+"erpPipeline", source.getErpPipeline(), EMPTY));
+customAttributes.add(buildBooleanOrderCustomAttributeOrDefault(
+"omsPipeline", source.getOmsPipeline(), EMPTY));
+customAttributes.add(CustomAttributesDto.builder()
+.name("inPieces")
+.value(String.valueOf(source.isInPieces()))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("agreement")
+.value(Optional.ofNullable(source.getAgreement())
+.map(Enum::toString).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("deliveryPeriod")
+.value(Optional.ofNullable(source.getDeliveryPeriod())
+.map(String::valueOf).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("pricesAgreed")
+.value(Optional.ofNullable(source.getPricesAgreed())
+.map(String::valueOf).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()

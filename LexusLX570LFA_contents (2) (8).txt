@@ -1,0 +1,492 @@
+﻿"name": "test_sku_name",
+"sku": [
+{
+"id": "test_sku_id",
+"name": "test_sku_name"
+}
+],
+"shortDescription": "ITEM",
+"description": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"active": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/product_create_request_for_OA.json
+Content:
+[
+{
+"id": "test_sku_id",
+"name": "test_sku_name",
+"sku": [
+{
+"id": "test_sku_id",
+"name": "test_sku_name"
+}
+],
+"shortDescription": "ITEM_GP",
+"description": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"active": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/product/product_create_response.json
+Content:
+{
+"success": true,
+"message": "mocked message",
+"result": "mocked result"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/createDeliveryAttributeSuccess_Req.json
+Content:
+[
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/createDeliverySuccess_Req.json
+Content:
+[
+{
+"id": "280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9",
+"name": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)",
+"description": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼",
+"productRelated": false,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": false
+},
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+},
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/createMetalProcessingStartTimeWithValidDateShouldSuccess.json
+Content:
+[
+{
+"id": "37da7ae4-3726-11e7-8130-9cb6547cb49c_63ea41e2-3726-11e7-8130-9cb6547cb49c",
+"name": "Ð£ÑÐ»ÑƒÐ³Ð°_ÐœÐŸ_name",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð° ÐœÐŸ",
+"productRelated": false,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "metalProcessingStartTimeDescription",
+"inputType": "string",
+"fieldName": "Ð”Ð°Ñ‚Ð° ÐœÐŸ"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": false
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteDeliverySuccess_Req.json
+Content:
+[
+{
+"id": "280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9",
+"name": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)",
+"description": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteForUpdateWithNextDeliverySuccess_Req.json
+Content:
+[
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+},
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": true
+},
+{
+"id": "280e4d4e-89b9-11e4-80bc-f0921c008944_db893688-c478-11eb-a89a-48df371528b9",
+"name": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð½Ð°ÐµÐ¼Ð½Ñ‹Ð¼ Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼_Ð‘Ñ€ÑÐ½ÑÐº - Ð‘Ñ€ÑÐ½ÑÐº, Ñ€Ð°Ð¹Ð¾Ð½ Ð¡Ð¾Ð²ÐµÑ‚ÑÐºÐ¸Ð¹ (1,5Ñ‚, 6Ð¼)",
+"description": "Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð°/Ð¼ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼",
+"productRelated": false,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",
+"fieldName": "Ð’Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹"
+},
+{
+"fieldId": "skuTypeDescription",
+"inputType": "string",
+"fieldName": "Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸"
+},
+{
+"fieldId": "skuStatusDescription",
+"inputType": "string",
+"fieldName": "Ð¡Ñ‚Ð°Ñ‚ÑƒÑ 1Ð¡"
+},
+{
+"fieldId": "measureUnit",
+"inputType": "string",
+"fieldName": "Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ"
+},
+{
+"fieldId": "skuComment",
+"inputType": "string",
+"fieldName": "ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹"
+},
+{
+"fieldId": "positionCancellationReason",
+"inputType": "string",
+"fieldName": "ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹"
+}
+],
+"anyProductsRelated": false
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/product/customer_service/deleteMetalProcessingStartTimeOrderAttributeFromExistedOrder_Req.json
+Content:
+[
+{
+"id": "3a9e7228-9e5c-11ea-a86c-48df371528b9_48c511f9-9e5c-11ea-a86c-48df371528b9",
+"name": "ÐŸÐ¾Ñ€ÐµÐ·ÐºÐ° Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾ÐºÐ°Ñ‚Ð° (Ð³Ð°Ð·Ð¾Ð²Ð°Ñ) Ð´Ð»Ñ Ð Ð¾Ð·Ð½Ð¸Ñ†Ñ‹_Ð“Ð°Ð·Ð¾Ð²Ð°Ñ Ñ€ÐµÐ·ÐºÐ°",
+"description": "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹",
+"productRelated": true,
+"barcode": null,
+"supplierId": null,
+"picture": null,
+"category": null,
+"logisticGroupId": null,
+"calculatorEngine": null,
+"calculationInputFields": [
+{
+"fieldId": "skuTypeName",
+"inputType": "string",

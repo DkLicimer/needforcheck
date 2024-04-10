@@ -1,0 +1,455 @@
+﻿</column>
+<column name="start" type="varchar(10)">
+<constraints nullable="false"/>
+</column>
+<column name="end" type="varchar(10)">
+<constraints nullable="false"/>
+</column>
+<column name="work_day_id" type="bigint">
+<constraints
+nullable="false"
+foreignKeyName="work_schedule_to_work_day_fk"
+referencedTableName="work_day"
+referencedColumnNames="work_day_id"/>
+</column>
+</createTable>
+</changeSet>
+
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-001.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="create_user_group" author="akovalevskii@fil-it.ru">
+<preConditions onFail="MARK_RAN">
+<not>
+<tableExists tableName="user_group"/>
+<tableExists tableName="user_group_participant"/>
+<tableExists tableName="group_participant"/>
+</not>
+</preConditions>
+<comment>Create subdivisionEntity related tables</comment>
+<createTable tableName="user_group">
+<column name="group_id" type="text">
+<constraints primaryKey="true" primaryKeyName="user_group_id_pk" nullable="false" />
+</column>
+<column name="group_name" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="created_date" type="timestamp with time zone">
+<constraints nullable="false"/>
+</column>
+<column name="modified_date" type="timestamp with time zone">
+<constraints nullable="false"/>
+</column>
+</createTable>
+
+<createTable tableName="user_group_participant">
+<column name="person_id" type="text" remarks="Ð˜Ð” Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ">
+<constraints primaryKey="true" primaryKeyName="user_group_participant_id_pk" nullable="false" />
+</column>
+<column name="person_full_name" type="varchar(512)" remarks="Ð¤Ð˜Ðž ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ°">
+<constraints nullable="false"/>
+</column>
+<column name="email" type="varchar(512)" remarks="Email ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ°">
+<constraints nullable="false"/>
+</column>
+<column name="subdivision_id" type="varchar(512)" remarks="Ð˜Ð” Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ">
+<constraints nullable="false"/>
+</column>
+<column name="subdivision_name" type="text" remarks="ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ"/>
+<column name="role_id" type="varchar(512)" remarks="Ð˜Ð” Ñ€Ð¾Ð»Ð¸/Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹">
+<constraints nullable="false"/>
+</column>
+<column name="role_name" type="text" remarks="ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð Ð¾Ð»Ð¸"/>
+<column name="created_date" type="timestamp with time zone">
+<constraints nullable="false"/>
+</column>
+<column name="modified_date" type="timestamp with time zone">
+<constraints nullable="false"/>
+</column>
+</createTable>
+
+<!-- Many to Many -->
+<createTable tableName="group_participant">
+<column name="user_group_id" type="varchar(100)">
+<constraints nullable="false"
+foreignKeyName="group_participant_to_user_group_id_fk"
+referencedTableName="user_group"
+referencedColumnNames="group_id" />
+</column>
+<column name="user_group_participant_id" type="varchar(100)">
+<constraints nullable="false"
+foreignKeyName="group_participant_to_user_group_participant_id_fk"
+referencedTableName="user_group_participant"
+referencedColumnNames="person_id" />
+</column>
+</createTable>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-002.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="create_warehouse" author="akovalevskii@fil-it.ru">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="subdivision"/>
+<not>
+<tableExists tableName="warehouse"/>
+<tableExists tableName="warehouse_work_day"/>
+<tableExists tableName="warehouse_work_schedule"/>
+</not>
+</preConditions>
+<comment>Create warehouseEntity related tables</comment>
+<createTable tableName="warehouse">
+<column name="id" type="text">
+<constraints primaryKey="true" primaryKeyName="warehouse_id_pk" nullable="false"/>
+</column>
+<column name="name" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="time_zone" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<column name="subdivision_id" type="varchar(512)">
+<constraints nullable="false"
+foreignKeyName="warehouse_subdivision_fk"
+referencedTableName="subdivision"
+referencedColumnNames="subdivision_id"/>
+</column>
+<column name="type" type="text"/>
+<column name="address" type="text"/>
+<column name="city" type="text"/>
+<column name="active" type="boolean"/>
+<column name="deleted" type="boolean"/>
+<column name="created_at" type="timestamp with time zone">
+<constraints nullable="false"/>
+</column>
+<column name="modified_at" type="timestamp with time zone">
+<constraints nullable="false"/>
+</column>
+</createTable>
+<createTable tableName="warehouse_work_day">
+<column name="id" type="bigint" autoIncrement="true">
+<constraints primaryKey="true" primaryKeyName="warehouse_work_day_id_pk" nullable="false" />
+</column>
+<column name="name" type="varchar(10)">
+<constraints nullable="false"/>
+</column>
+<column name="warehouse_id" type="varchar(512)">
+<constraints
+nullable="false"
+foreignKeyName="work_day_to_warehouse_fk"
+referencedTableName="warehouse"
+referencedColumnNames="id"/>
+</column>
+</createTable>
+
+<createTable tableName="warehouse_work_schedule">
+<column name="id" type="bigint" autoIncrement="true">
+<constraints primaryKey="true" primaryKeyName="warehouse_work_schedule_id_pk" nullable="false" />
+</column>
+<column name="start" type="varchar(10)">
+<constraints nullable="false"/>
+</column>
+<column name="end" type="varchar(10)">
+<constraints nullable="false"/>
+</column>
+<column name="warehouse_work_day_id" type="bigint">
+<constraints
+nullable="false"
+foreignKeyName="warehouse_work_schedule_to_warehouse_work_day_fk"
+referencedTableName="warehouse_work_day"
+referencedColumnNames="id"/>
+</column>
+</createTable>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-003.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="create_order" author="akovalevskii@fil-it.ru">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="warehouse"/>
+<tableExists tableName="subdivision"/>
+<not>
+<tableExists tableName="order"/>
+<tableExists tableName="product_sku"/>
+<tableExists tableName="order_entity_item"/>
+</not>
+</preConditions>
+<comment>Create order entity related tables</comment>
+<createTable tableName="order_entity">
+<column name="id" type="text">
+<constraints primaryKey="true" primaryKeyName="order_id_pk" nullable="false"/>
+</column>
+<column name="document_type" type="varchar(100)" remarks="Ð¢Ð¸Ð¿ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡ (CLIENT_REQUEST/CLIENT_ORDER)">
+<constraints nullable="false"/>
+</column>
+<column name="base_erp_guid" type="varchar(100)" remarks="guid"/> <!-- TODO:: ÐÐ°Ð´Ð¾ Ð»Ð¸ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ unique constraint? -->
+<column name="document_id" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="document_date_time" type="timestamp">
+<constraints nullable="false"/>
+</column>
+<column name="document_source" type="varchar(100)" remarks="Ð˜ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð° (SITE_CLIENT/SITE_MANAGER/ERP)">
+<constraints nullable="false"/>
+</column>
+<column name="order_type" type="boolean"/>
+<column name="document_link" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="contract_type" type="varchar(100)" remarks="Ð¢Ð¸Ð¿ Ð´Ð¾Ð³Ð¾Ð²Ð¾Ñ€Ð°"/>
+<column name="sale_manager_responsible_id" type="text"/>
+<column name="sale_manager_responsible_email" type="text"/>
+<column name="document_status" type="text" remarks="Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡">
+<constraints nullable="false"/>
+</column>
+<column name="document_cancellation_reason" type="text" remarks="ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°"/>
+<column name="payment_method" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<column name="agreement" type="varchar(100)"/>
+<column name="delivery_method" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="recipient_full_name" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="recipient_phone" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="recipient_email" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="customer_full_name" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="customer_phone" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="customer_email" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="subdivision_id" type="varchar(512)" remarks="ÑÑÑ‹Ð»ÐºÐ° Ð½Ð° ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Subdivision, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ Ð½Ð° Ð¼Ð¾Ð¼ÐµÐ½Ñ‚ Ð¿Ð¾ÑÑ‚ÑƒÐ¿Ð»ÐµÐ½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð° Ð¼Ð¾Ð¶ÐµÑ‚ Ð¸ Ð½Ðµ Ð¿Ñ€Ð¸Ð´Ñ‚Ð¸">
+<constraints nullable="false"/>
+</column>
+<column name="erp_guid" type="varchar(512)" remarks="guid Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡ (Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð»Ð¸ Ð·Ð°ÐºÐ°Ð· Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°">
+<constraints nullable="false" unique="true" uniqueConstraintName="order_entity_order_erp_guid_uniq"/>
+</column>
+<column name="deleted" type="boolean" remarks="Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ð¾Ð¼ÐµÑ‡ÐµÐ½ Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ">
+<constraints nullable="false"/>
+</column>
+<column name="sf_order_id" type="text" remarks="OrderId Ð² Starfish">
+<constraints unique="true" uniqueConstraintName="order_entity_sf_order_id_uniq"/>
+</column>
+<column name="created_at" type="timestamp" remarks="Ð”Ð°Ñ‚Ð°-Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°">
+<constraints nullable="false"/>
+</column>
+<column name="modified_at" type="timestamp" remarks="Ð”Ð°Ñ‚Ð°-Ð²Ñ€ÐµÐ¼Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°"/>
+</createTable>
+
+<createTable tableName="product_sku">
+<column name="id" type="text" remarks="Ð£Ð½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ ÐºÐ¾Ð´ SKU (Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° + Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ°).GUID Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ GUID Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸.">
+<constraints primaryKey="true" primaryKeyName="product_sku_id_pk" nullable="false"/>
+</column>
+<column name="name" type="text" remarks="ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹.">
+<constraints nullable="false"/>
+</column>
+<column name="type_name" type="text" remarks="ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð²Ð¸Ð´Ð° Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹.">
+<constraints nullable="false"/>
+</column>
+<column name="type" type="text" remarks="Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸">
+<constraints nullable="false"/>
+</column>
+</createTable>
+
+<createTable tableName="order_entity_item">
+<column name="id" type="varchar(100)">
+<constraints primaryKey="true" primaryKeyName="order_entity_item_id_pk" nullable="false"/>
+</column>
+<column name="position_code" type="bigint" remarks="ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡.">
+<constraints nullable="false"/>
+</column>
+<column name="linked_sku_position_code" type="bigint" remarks="ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, Ðº ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð¿Ñ€Ð¸Ð²ÑÐ·Ð°Ð½Ð° ÑƒÑÐ»ÑƒÐ³Ð° ÐœÐŸ"/>
+<column name="sku_id" type="text" remarks="Ð£Ð½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ ÐºÐ¾Ð´ SKU (Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° + Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ°).GUID Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ GUID Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸.">
+<constraints nullable="false"
+foreignKeyName="order_entity_item_to_product_sku_fk"
+referencedTableName="product_sku"
+referencedColumnNames="id"/>
+</column>
+<column name="sku_status" type="text" remarks="Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ 1Ð¡ (Ð°ÐºÑ‚ÑƒÐ°Ð»ÑŒÐ½Ð¾ Ð´Ð»Ñ Ð·Ð°ÐºÐ°Ð·Ð°, !ÐÐ• Ð—ÐÐ¯Ð’ÐšÐ˜)"/>
+<column name="quantity" type="numeric(19, 5)" remarks="ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¸Ð· Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡.">
+<constraints nullable="false"/>
+</column>
+<column name="measure_unit" type="text" remarks="Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ Ð¸Ð· Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡">
+<constraints nullable="false"/>
+</column>
+<column name="price" type="numeric(19, 2)" remarks="Ð¦ÐµÐ½Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°"> <!-- TODO:: Ð² Ñ‡ÐµÐ¼ Ð² Ð¸Ñ‚Ð¾Ð³Ðµ Ñ…Ñ€Ð°Ð½Ð¸Ð¼ Ñ†ÐµÐ½Ñƒ? -->
+<constraints nullable="false"/>
+</column>
+<column name="currency" type="varchar(100)" remarks="Ð’Ð°Ð»ÑŽÑ‚Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°">
+<constraints nullable="false"/>
+</column>
+<column name="position_cancellation_reason" type="text" remarks="Ð’Ð°Ð»ÑŽÑ‚Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°"/>
+<column name="warehouse_id" type="text" remarks="ÐšÐ¾Ð´ ÑÐºÐ»Ð°Ð´Ð° Ð¸Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° 1Ð¡. Ð¡Ð°Ð¼ ÑÐºÐ»Ð°Ð´ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð½Ðµ Ð·Ð°Ð³Ñ€ÑƒÐ¶ÐµÐ½ Ð² ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð¸Ð¹ ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Warehouse"/>
+<column name="provide_from_other_orders" type="boolean" remarks="ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ Ð¸Ð· Ð´Ñ€ÑƒÐ³Ð¸Ñ… Ð·Ð°ÐºÐ°Ð·Ð¾Ð²">
+<constraints nullable="false"/>
+</column>
+<column name="order_id" type="text">
+<constraints nullable="false"
+foreignKeyName="order_entity_item_to_order_fk"
+referencedTableName="order_entity"
+referencedColumnNames="id"/>
+</column>
+</createTable>
+</changeSet>
+
+<changeSet id="order_entity_add_active_column" author="akovalevskii@fil-it.ru">
+<preConditions>
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="active"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="active" type="boolean" remarks="Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ñ€Ð¾Ð²ÐµÐ´ÐµÐ½ Ð² 1Ð¡" defaultValueBoolean="true">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-004.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="create_erp_task" author="aoleynikov@fil-it.ru">
+<preConditions onFail="MARK_RAN">
+<not>
+<tableExists tableName="erp_task"/>
+</not>
+</preConditions>
+<comment>Create erp task related tables</comment>
+<createTable tableName="erp_task">
+<column name="id" type="varchar(100)">
+<constraints primaryKey="true" primaryKeyName="erp_task_id_pk" nullable="false"/>
+</column>
+<column name="order_id" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<!--TODO: ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ erp_order_guid Ð¿Ð¾ÑÐ»Ðµ Ð¿Ð¾ÐºÐ°Ð·Ð°-->
+<column name="erp_order_guid" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<column name="title" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="description" type="text"/>
+<column name="responsible_id" type="varchar(100)"/>
+<column name="responsible_full_name" type="text"/>
+<column name="responsible_email" type="varchar(100)"/>
+<column name="role_id" type="varchar(100)"/>
+<column name="role_name" type="text"/>
+<column name="subdivision_id" type="varchar(100)"/>
+<column name="subdivision_name" type="text"/>
+<column name="deadline" type="timestamp"/>
+<column name="sended" type="boolean">
+<constraints nullable="false"/>
+</column>
+<column name="created_at" type="timestamp">
+<constraints nullable="false"/>
+</column>
+<column name="modified_at" type="timestamp"/>
+</createTable>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-005.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="create_erp_delivery" author="aoleynikov@fil-it.ru">
+<preConditions onFail="MARK_RAN">
+<not>
+<tableExists tableName="erp_delivery"/>
+<tableExists tableName="delivery_order"/>
+<tableExists tableName="erp_delivery_order_item"/>
+</not>
+</preConditions>
+<comment>Create erp delivery related tables</comment>
+<createTable tableName="erp_delivery">
+<column name="id" type="varchar(100)">
+<constraints primaryKey="true" primaryKeyName="erp_delivery_id_pk" nullable="false"/>
+</column>
+<column name="delivery_document_id" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="delivery_document_date_time" type="timestamp">
+<constraints nullable="false"/>
+</column>
+<column name="delivery_document_link" type="text">
+<constraints nullable="false"/>
+</column>
+<column name="car_delivery_date_time_from" type="timestamp">
+<constraints nullable="false"/>
+</column>
+<column name="car_delivery_date_time_to" type="timestamp">
+<constraints nullable="false"/>
+</column>
+<column name="delivery_method" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<column name="erp_guid" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<column name="deleted" type="boolean">
+<constraints nullable="false"/>
+</column>
+<column name="active" type="boolean">
+<constraints nullable="false"/>
+</column>
+<column name="created_at" type="timestamp">
+<constraints nullable="false"/>
+</column>
+<column name="modified_at" type="timestamp"/>
+</createTable>
+
+<createTable tableName="delivery_order">
+<column name="id" type="varchar(100)">
+<constraints primaryKey="true" primaryKeyName="erp_delivery_order_id_pk" nullable="false"/>

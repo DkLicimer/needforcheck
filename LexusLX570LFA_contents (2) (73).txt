@@ -1,0 +1,470 @@
+﻿<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="prices_agreed"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="prices_agreed" type="boolean"/>
+</addColumn>
+</changeSet>
+</databaseChangeLog>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-025-289207.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_order_entity_customer_guid" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="customer_guid"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="customer_guid" type="text"/>
+</addColumn>
+</changeSet>
+</databaseChangeLog>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-025-291068.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_order_entity_order_paid" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="order_paid"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="order_paid" type="boolean"/>
+</addColumn>
+</changeSet>
+<changeSet id="add_order_entity_order_paid_assignment_date" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="order_paid_assignment_date"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="order_paid_assignment_date" type="timestamp"/>
+</addColumn>
+</changeSet>
+</databaseChangeLog>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-026-291978.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_order_entity_specification_approval_required" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="specification_approval_required"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="specification_approval_required" type="boolean"/>
+</addColumn>
+</changeSet>
+</databaseChangeLog>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-027-293592.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_order_entity_document_status_modified_at" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="document_status_modified_at"/>
+</not>
+</preConditions>
+<addColumn tableName="order_entity">
+<column name="document_status_modified_at" type="timestamp" remarks="Ð’Ñ€ÐµÐ¼Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ documentStatus"/>
+</addColumn>
+<sql>UPDATE order_entity SET document_status_modified_at = now() AT TIME ZONE 'utc'</sql>
+<addNotNullConstraint tableName="order_entity" columnName="document_status_modified_at"/>
+</changeSet>
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-028-298665.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_items_price_to_order_table" author="liga">
+
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="items_price"/>
+</not>
+</preConditions>
+
+<comment>Add items_price to order_entity table</comment>
+
+<addColumn tableName="order_entity">
+<column name="items_price" type="numeric(19, 2)" remarks="Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð²ÑÐµÑ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð±ÐµÐ· ÑÐºÐ¸Ð´Ð¾Ðº"/>
+</addColumn>
+
+</changeSet>
+
+<changeSet id="add_items_discount_price_to_order_table" author="liga">
+
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="items_discount_price"/>
+</not>
+</preConditions>
+
+<comment>Add items_discount_price to order_entity table</comment>
+
+<addColumn tableName="order_entity">
+<column name="items_discount_price" type="numeric(19, 2)" remarks="Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð²ÑÐµÑ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ñ ÑƒÑ‡ÐµÑ‚Ð¾Ð¼ ÑÐºÐ¸Ð´Ð¾Ðº"/>
+</addColumn>
+
+</changeSet>
+
+<changeSet id="add_items_service_discount_price_to_order_table" author="liga">
+
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="items_service_discount_price"/>
+</not>
+</preConditions>
+
+<comment>Add items_service_discount_price to order_entity table</comment>
+
+<addColumn tableName="order_entity">
+<column name="items_service_discount_price" type="numeric(19, 2)" remarks="Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð²ÑÐµÑ… ÑƒÑÐ»ÑƒÐ³ Ñ ÑƒÑ‡ÐµÑ‚Ð¾Ð¼ ÑÐºÐ¸Ð´Ð¾Ðº"/>
+</addColumn>
+
+</changeSet>
+
+<changeSet id="add_discount_value_to_order_table" author="liga">
+
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="discount_value"/>
+</not>
+</preConditions>
+
+<comment>Add discount_value to order_entity table</comment>
+
+<addColumn tableName="order_entity">
+<column name="discount_value" type="numeric(19, 2)" remarks="Ð Ð°Ð·Ð¼ÐµÑ€ ÑÐºÐ¸Ð´ÐºÐ¸ (Ð½Ð°Ñ†ÐµÐ½ÐºÐ¸) Ð´Ð»Ñ Ð²ÑÐµÐ³Ð¾ Ð·Ð°ÐºÐ°Ð·Ð°. ÐœÐ¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¾Ñ‚Ñ€Ð¸Ñ†Ð°Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¼ Ð´Ð»Ñ Ð½Ð°Ñ†ÐµÐ½ÐºÐ¸"/>
+</addColumn>
+
+</changeSet>
+
+<changeSet id="add_discount_to_order_items_table" author="liga">
+
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity_item"/>
+<not>
+<columnExists tableName="order_entity_item" columnName="discount"/>
+</not>
+</preConditions>
+
+<comment>Add discount to order_entity_item table</comment>
+
+<addColumn tableName="order_entity_item">
+<column name="discount" type="numeric(19, 2)" remarks="Ð Ð°Ð·Ð¼ÐµÑ€ ÑÐºÐ¸Ð´ÐºÐ¸ Ð´Ð»Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°"/>
+</addColumn>
+
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-029-174553.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_erp_command_task_guid" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_command"/>
+<not>
+<columnExists tableName="erp_command" columnName="task_guid"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_command">
+<column name="task_guid" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_source_code" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="source_code"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="source_code" type="text">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_document_erp_guid" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="document_erp_guid"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="document_erp_guid" type="text">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_sent" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="sent"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="sent" type="boolean">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_active" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="active"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="active" type="boolean">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_canceled" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="canceled"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="canceled" type="boolean">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_type" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="task_type"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="task_type" type="text">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_document_type" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<not>
+<columnExists tableName="erp_task" columnName="document_type"/>
+</not>
+</preConditions>
+<addColumn tableName="erp_task">
+<column name="document_type" type="text">
+<constraints nullable="false"/>
+</column>
+</addColumn>
+</changeSet>
+
+
+<changeSet id="drop_erp_task_responsible_full_name" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="responsible_full_name"/>
+</preConditions>
+<dropColumn tableName="erp_task">
+<column name="responsible_full_name"/>
+</dropColumn>
+</changeSet>
+
+<changeSet id="drop_erp_task_responsible_email" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="responsible_email"/>
+</preConditions>
+<dropColumn tableName="erp_task">
+<column name="responsible_email"/>
+</dropColumn>
+</changeSet>
+
+<changeSet id="drop_erp_task_role_name" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="role_name"/>
+</preConditions>
+<dropColumn tableName="erp_task">
+<column name="role_name"/>
+</dropColumn>
+</changeSet>
+
+<changeSet id="drop_erp_task_subdivision_name" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="subdivision_name"/>
+</preConditions>
+<dropColumn tableName="erp_task">
+<column name="subdivision_name"/>
+</dropColumn>
+</changeSet>
+
+<changeSet id="drop_erp_task_sended" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="sended"/>
+</preConditions>
+<dropColumn tableName="erp_task">
+<column name="sended"/>
+</dropColumn>
+</changeSet>
+
+<changeSet id="drop_erp_task_erp_order_guid" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="erp_order_guid"/>
+</preConditions>
+<dropColumn tableName="erp_task">
+<column name="erp_order_guid"/>
+</dropColumn>
+</changeSet>
+
+<changeSet id="change_erp_task_deadline_type_to_timestamptz" author="liga">
+<preConditions onFail="MARK_RAN">
+<columnExists tableName="erp_task" columnName="deadline"/>
+</preConditions>
+<dropColumn tableName="erp_task" columnName="deadline"/>
+<addColumn tableName="erp_task">
+<column name="deadline" type="timestamptz"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_erp_task_order_id_idx" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_task"/>
+<columnExists tableName="erp_task" columnName="order_id"/>
+</preConditions>
+<createIndex tableName="erp_task" indexName="erp_task_order_id_idx">
+<column name="order_id"/>
+</createIndex>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-029-290099.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_erp_partner_guid_to_order_entity" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="erp_partner_guid"/>
+</not>
+</preConditions>
+
+<addColumn tableName="order_entity">
+<column name="erp_partner_guid" type="text"/>
+</addColumn>
+</changeSet>
+
+<changeSet id="add_document_time_zone_to_order_entity" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="order_entity"/>
+<not>
+<columnExists tableName="order_entity" columnName="document_time_zone"/>
+</not>
+</preConditions>
+
+<addColumn tableName="order_entity">
+<column name="document_time_zone" type="text"/>
+</addColumn>
+</changeSet>
+
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-029-293984.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="add_column_promised_delivery_date_into_erp_delivery_table" author="liga">
+<preConditions onFail="MARK_RAN">
+<tableExists tableName="erp_delivery"/>
+<not>
+<columnExists tableName="erp_delivery" columnName="promised_delivery_date"/>
+</not>
+</preConditions>
+<comment>Add promised_delivery_date to erp_delivery table</comment>
+<addColumn tableName="erp_delivery">
+<column name="promised_delivery_date" type="date"/>

@@ -1,0 +1,432 @@
+﻿public static String format(String template, Map<String, Object> parameters) {
+final var newTemplate = new StringBuilder(template);
+final var valueList = new ArrayList<>();
+
+final var matcher = Pattern.compile("[$][{](\\w+)}").matcher(template);
+
+while (matcher.find()) {
+String key = matcher.group(1);
+
+String paramName = "${" + key + "}";
+int index = newTemplate.indexOf(paramName);
+if (index != -1) {
+newTemplate.replace(index, index + paramName.length(), "%s");
+valueList.add(parameters.get(key));
+}
+}
+
+return String.format(newTemplate.toString(), valueList.toArray());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/path/OrderPath.java
+Content:
+package ru.liga.evraz.aggregation.config.path;
+
+import lombok.Getter;
+
+@Getter
+public enum OrderPath implements BaseEnum {
+ORDER_CREATE("/order/create") {
+// Override if needed
+},
+ORDER_DETAILS_UPDATE("/order/${expected_starfish_order_id}") {
+// Override if needed
+},
+ORDERS_DETAILS_UPDATE("/orders/${expected_starfish_order_id}/details") {
+// Override if needed
+},
+
+ORDER_CUSTOM_ATTRIBUTES_UPDATE("/order/${expected_starfish_order_id}/customattributes") {
+// Override if needed
+},
+
+ORDER_CUSTOMER_UPDATE("/customer/${expected_customer_id}") {
+// Override if needed
+},
+
+ORDER_ITEMS_UPDATE_TEMPLATE("/item/${expected_starfish_order_id}/extendedlist") {
+// Override if needed
+},
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE("/itemservice/${expected_starfish_order_id}/extendedlist") {
+// Override if needed
+},
+
+ORDER_SHIPPING_UPDATE_TEMPLATE("/shipping/${expected_starfish_order_id}/update") {
+// Override if needed
+},
+ORDERS_SHIPPING_UPDATE_TEMPLATE("/orders/${expected_starfish_order_id}/shipping") {
+// Override if needed
+},
+
+ORDER_DELETE("/order/${expected_starfish_order_id}") {
+// Override if needed
+},
+
+ORDER_SET_CANCELLATION_REASON("/order/${expected_starfish_order_id}/cancelationreason/${expected_order_cancellation_reason}/set?cancelationReasonId=${expected_order_cancellation_reason}") {
+// Override if needed
+},
+
+ORDER_GET_BY_CLIENT_ORDER_ID("/client/order/${expected_client_order_id}") {
+// Override if needed
+},
+
+ORDER_GET_CUSTOM_ATTRIBUTES("/order/${orderId}/customattributes") {
+// Override if needed
+},
+
+ORDER_GET_BY_ORDER_ID("/order/${orderId}") {
+// Override if needed
+},
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE("/customers/legalEntities/${legalEntityId}") {
+// Override if needed
+},
+;
+
+private final String pathTemplate;
+
+OrderPath(String pathTemplate) {
+this.pathTemplate = pathTemplate;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/config/path/ProductPath.java
+Content:
+package ru.liga.evraz.aggregation.config.path;
+
+import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+
+import java.util.Map;
+
+@Getter
+public enum ProductPath {
+
+PRODUCT_UPDATE("/product/update") {
+// Override if needed
+},
+
+CUSTOMERSERVICE_UPDATE("/customerservice/list") {
+// Override if needed
+};
+
+private final String pathTemplate;
+
+ProductPath(String pathTemplate) {
+this.pathTemplate = pathTemplate;
+}
+
+public DispatcherData buildDispatcherData(Pair<Resource, Resource> req2resp,
+HttpMethod httpMethod,
+HttpStatus httpStatus) {
+return buildDispatcherData(req2resp, httpMethod, httpStatus, null);
+}
+
+public DispatcherData buildDispatcherData(Pair<Resource, Resource> req2resp,
+HttpMethod httpMethod,
+HttpStatus httpStatus,
+Map<String, Object> templateParameters) {
+return DispatcherData.builder()
+.path(MessageFormatter.format(this.getPathTemplate(), templateParameters))
+.httpMethod(httpMethod.toString())
+.expectedRequest(req2resp.getLeft())
+.expectedResponse(req2resp.getRight())
+.status(httpStatus)
+.build();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/base/BaseIntegrationTest.java
+Content:
+package ru.liga.evraz.aggregation.base;
+
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.mockwebserver.MockWebServer;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.DockerImageName;
+import ru.liga.evraz.aggregation.config.TestConfig;
+import ru.liga.evraz.aggregation.config.path.BpmPath;
+import ru.liga.evraz.aggregation.config.path.OrderPath;
+import ru.liga.evraz.aggregation.dispatcher.BpmDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.util.ResourceUtils;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Map;
+
+import static ru.liga.evraz.aggregation.config.path.BpmPath.BPM_SEND_MESSAGE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDERS_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDERS_SHIPPING_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CREATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOMER_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CUSTOM_ATTRIBUTES_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DELETE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DETAILS_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_GET_BY_CLIENT_ORDER_ID;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEMS_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_ITEM_SERVICES_UPDATE_TEMPLATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SET_CANCELLATION_REASON;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_SHIPPING_UPDATE_TEMPLATE;
+
+/**
+* Ð‘Ð°Ð·Ð¾Ð²Ñ‹Ð¹ Ð¸Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ñ‚ÐµÑÑ‚ Ñ Ð¿Ð¾Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸ÐµÐ¼ ÐºÐ¾Ð½Ñ‚ÐµÐ¹Ð½ÐµÑ€Ð° Kafka.
+*/
+@Slf4j
+@Import(TestConfig.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+public abstract class BaseIntegrationTest {
+
+protected static final Duration TIMEOUT = Duration.ofSeconds(10);
+protected static final String INTEGRATION_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJ0ZW5hbnRJZCI6ImV2cmF6X29tc19kZXYiLCJ1c2VySWQiOiJ0ZXN0Iiwicm9sZSI6IklOVEVHUkFUSU9OIiwibG9naW4iOiJ0ZXN0IiwidmVyc2lvbiI6MCwiYXV0aFR5cGUiOiJvbXNDcmVkZW50aWFscyIsImV4cCI6NDgyOTExOTIxMCwic3ViIjoidGVzdCJ9.2H6DNSLnXZj6NNVQlCZuz-LKJFcnJMpveU-3v-w1i01aU-hO4_8a274MmlIbfPuvunFQIeGsoIh_KnJORvIOmg";
+protected static final PostgreSQLContainer POSTGRES_SQL_CONTAINER;
+protected static final KafkaContainer KAFKA_CONTAINER;
+
+protected MockWebServer sfOrderServer = new MockWebServer();
+protected MockWebServer sfProductServer = new MockWebServer();
+protected MockWebServer bpmServer = new MockWebServer();
+
+@Autowired
+protected TestRestTemplate restTemplate;
+
+static {
+final var psqlImage = DockerImageName.parse("postgres:13.2")
+.asCompatibleSubstituteFor("postgres");
+POSTGRES_SQL_CONTAINER = new PostgreSQLContainer<>(psqlImage)
+//            .withInitScript("db/init-sql/init.sql")
+.waitingFor(Wait.forListeningPort());
+POSTGRES_SQL_CONTAINER.start();
+
+final var kafkaImage = DockerImageName.parse("confluentinc/cp-kafka:latest");
+KAFKA_CONTAINER = new KafkaContainer(kafkaImage);
+KAFKA_CONTAINER.start();
+}
+
+@DynamicPropertySource
+static void initProperties(DynamicPropertyRegistry registry) {
+// jdbc props
+registry.add("spring.datasource.url", POSTGRES_SQL_CONTAINER::getJdbcUrl);
+registry.add("spring.datasource.username", POSTGRES_SQL_CONTAINER::getUsername);
+registry.add("spring.datasource.password", POSTGRES_SQL_CONTAINER::getPassword);
+
+registry.add("spring.liquibase.url", POSTGRES_SQL_CONTAINER::getJdbcUrl);
+registry.add("spring.liquibase.user", POSTGRES_SQL_CONTAINER::getUsername);
+registry.add("spring.liquibase.password", POSTGRES_SQL_CONTAINER::getPassword);
+
+// Kafka props
+registry.add("spring.kafka.consumer.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
+registry.add("spring.kafka.producer.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
+}
+
+@BeforeEach
+@SneakyThrows
+protected void beforeEach() {
+sfOrderServer.start(9208);
+sfProductServer.start(9209);
+bpmServer.start(9207);
+}
+
+@AfterEach
+@SneakyThrows
+protected void afterEach() {
+sfOrderServer.shutdown();
+sfProductServer.shutdown();
+bpmServer.shutdown();
+}
+
+@SneakyThrows
+protected void customGetScenarioFromResource(String url, Resource expectedResponse, int httpCode) {
+customGetScenarioFromResource(url, expectedResponse, true, httpCode);
+}
+
+@SneakyThrows
+protected void customGetScenarioFromResource(
+String url, Resource expectedResponse, boolean withToken, int httpCode) {
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.APPLICATION_JSON);
+if (withToken) {
+headers.setBearerAuth(INTEGRATION_TOKEN);
+}
+
+HttpEntity<String> entity = new HttpEntity<>(null, headers);
+var response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+log.info("Actual| Response:\n{}, \nStatus Code: {}", response.getBody(), response.getStatusCodeValue());
+log.info("Expected| Response:\n {}, \nStatus Code: {}", response.getBody(), response.getStatusCodeValue());
+
+Assertions.assertEquals(httpCode, response.getStatusCodeValue());
+compareResult(response.getBody(), expectedResponse, false);
+}
+
+// POST
+@SneakyThrows
+protected void customPostScenarioFromResource(String url,
+Resource expectedRequest,
+Resource expectedResponse,
+int httpCode) {
+customPostScenarioFromResource(url, expectedRequest, expectedResponse, false, httpCode);
+}
+
+@SneakyThrows
+protected void customPostScenarioFromResource(String url,
+Resource expectedRequest,
+Resource expectedResponse,
+boolean withToken,
+int httpCode) {
+HttpHeaders headers = new HttpHeaders();
+headers.setContentType(MediaType.APPLICATION_JSON);
+if (withToken) {
+headers.setBearerAuth(INTEGRATION_TOKEN);
+}
+
+HttpEntity<String> entity = new HttpEntity<>(ResourceUtils.getResourceAsString(expectedRequest), headers);
+var response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+log.info("Actual| Response:\n{}, \nStatus Code: {}", response.getBody(), response.getStatusCodeValue());
+log.info("Expected| Response:\n {}, \nStatus Code: {}", response.getBody(), response.getStatusCodeValue());
+
+Assertions.assertEquals(httpCode, response.getStatusCodeValue());
+compareResult(response.getBody(), expectedResponse);
+}
+
+// PUT
+@SneakyThrows
+protected void customPutScenarioFromResource(
+String url, Resource expectedRequest, Resource expectedResponse, int httpCode, boolean strictJsonCheck) {
+// TODO:: if necessary
+}
+
+// DELETE
+@SneakyThrows
+protected void customDeleteScenarioFromResource(
+String url, Resource expectedRequest, Resource expectedResponse, int httpCode, boolean strictJsonCheck) {
+// TODO:: if necessary
+}
+
+protected void compareResult(String actual, Resource expectedResponse) throws JSONException {
+compareResult(actual, expectedResponse,true);
+}
+
+protected void compareResult(String actual, Resource expectedResponse, boolean strict) throws JSONException {
+log.info(actual);
+log.info("------------------------------");
+final var expected = expectedResponse != null
+? ResourceUtils.getResourceAsString(expectedResponse)
+: null;
+log.info(expected);
+
+JSONAssert.assertEquals(expected, actual, strict);
+}
+
+// ÐŸÐ¾Ð´ Ð·Ð°Ð³Ð»ÑƒÑˆÐºÐ¸ Ð´Ð»Ñ ÑÐ»ÑƒÑ‡Ð°ÐµÐ², ÐºÐ¾Ð³Ð´Ð° Ð½Ðµ Ð¸Ð¼Ð¸Ñ‚Ð¸Ñ€ÑƒÐµÐ¼ Ð¾ÑˆÐ¸Ð±Ð¾Ñ‡Ð½Ñ‹Ðµ ÐºÐ¾Ð´Ñ‹
+protected void initOrderScenario(Map<OrderPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+initOrderScenario(pathToExpectedResources, Map.of(), pathTemplateParameters);
+}
+
+protected void initBpmScenario(Map<BpmPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+initBpmScenario(pathToExpectedResources, Map.of(), pathTemplateParameters);
+}
+
+/**
+* Ð—Ð°Ð³Ð»ÑƒÑˆÐºÐ¸.
+*
+* @param pathToExpectedResources   - Ð¼Ð°Ð¿Ð° {@link OrderPath} Ð¿ÑƒÑ‚Ð¸ Ðº order-service Ð½Ð° Ð¿Ð°Ñ€Ñƒ Ð¾Ñ‚Ð²ÐµÑ‚-Ð·Ð°Ð¿Ñ€Ð¾Ñ
+* Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ.
+* @param pathsToExpectedHttpStatus - Ð¼Ð°Ð¿Ð° {@link OrderPath} Ð¿ÑƒÑ‚Ð¸ Ð½Ð° ÐºÐ¾Ð´ Ð¾Ñ‚Ð²ÐµÑ‚Ð°, ÐµÑÐ»Ð¸ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÐºÐ»ÑŽÑ‡Ñƒ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾,
+* ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ÑÑ HttpStatus.OK.
+* @param pathTemplateParameters    - Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð² {@link OrderPath} Ð¿ÑƒÑ‚Ð¸.
+*/
+protected void initOrderScenario(Map<OrderPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<OrderPath, HttpStatus> pathsToExpectedHttpStatus,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(ORDER_GET_BY_CLIENT_ORDER_ID)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_GET_BY_CLIENT_ORDER_ID);
+dispatcherDatas.add(
+ORDER_GET_BY_CLIENT_ORDER_ID.buildDispatcherData(
+resourceResourcePair, HttpMethod.GET,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CREATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CREATE);
+dispatcherDatas.add(
+ORDER_CREATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CREATE, HttpStatus.OK)));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_DETAILS_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_DETAILS_UPDATE);
+dispatcherDatas.add(
+ORDER_DETAILS_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DETAILS_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_DETAILS_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_DETAILS_UPDATE);
+dispatcherDatas.add(
+ORDERS_DETAILS_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_DETAILS_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMER_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMER_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMER_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMER_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOM_ATTRIBUTES_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOM_ATTRIBUTES_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOM_ATTRIBUTES_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOM_ATTRIBUTES_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEMS_UPDATE_TEMPLATE)) {

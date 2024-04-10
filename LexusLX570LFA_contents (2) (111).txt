@@ -1,0 +1,436 @@
+﻿
+if (optOldDeliveryEntity.isEmpty()) {
+final var erpDelivery = createDelivery(newDeliveryEntity, newDeliveryModel);
+updateDeliveryEvents(erpDelivery, EventType.CREATE_DELIVERY);
+return erpDelivery;
+} else {
+log.info("Start updating delivery with delivery.erpGuid {}", deliveryErpGuid);
+final var orderDeliveryEntity = optOldDeliveryEntity.get();
+return updateDelivery(newDeliveryEntity, newDeliveryModel, orderDeliveryEntity);
+}
+}
+
+@Override
+public List<ErpDelivery> findAllByIds(List<String> ids) {
+return deliveryRepository.findAllByIdIn(ids).stream()
+.map(erpDelivery -> mapper.toModel(erpDelivery, erpDelivery.getDeliveryOrderEntities()))
+.collect(Collectors.toList());
+}
+
+@Override
+public ErpDelivery findByErpGuid(String erpGuid) {
+Optional<ErpDeliveryEntity> byErpGuid = deliveryRepository.findByErpGuid(erpGuid);
+// TODO:: ÑÐ¾Ð¼Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ orElse
+return mapper.toModel(byErpGuid.orElse(null), List.of());
+}
+
+@Override
+public Optional<ErpDelivery> findByErpGuidWithoutOrders(String erpGuid) {
+return deliveryRepository.findByErpGuid(erpGuid)
+.map(delivery -> mapper.toModel(delivery, null));
+}
+
+@Override
+public ErpDelivery getByErpGuidOrError(String shippingErpGuid) {
+return deliveryRepository.findByErpGuid(shippingErpGuid)
+.map(e -> {
+final var allByDelivery = deliveryOrderJpaRepository.findAllByDelivery(e);
+return mapper.toModel(e, allByDelivery);
+})
+.orElseThrow(() -> new NotFoundException(
+String.format("ErpDelivery not found by shippingErpGuid %s", shippingErpGuid)));
+}
+
+@Override
+public List<DeliveryOrder> findAllByErpOrderGuid(String orderErpGuid) {
+return deliveryOrderJpaRepository.findAllByErpOrderGuid(orderErpGuid).stream()
+.map(mapper::toDeliveryOrder).collect(Collectors.toList());
+}
+
+private ErpDelivery createDelivery(ErpDeliveryEntity entity, ErpDelivery delivery) {
+entity.setId(erpDeliveryUuidGenerator.generateUuid());
+entity.setNewEntity(true);
+var savedDeliveryEntity = deliveryRepository.save(entity);
+var savedDeliverOrders = createDeliveryOrder(delivery, entity);
+return mapper.toModel(savedDeliveryEntity, savedDeliverOrders);
+}
+
+private ErpDelivery updateDelivery(ErpDeliveryEntity newDeliveryEntity,
+ErpDelivery newDeliveryModel,
+ErpDeliveryEntity oldDeliveryEntity) {
+Assert.notNull(oldDeliveryEntity, "order newDeliveryModel newDeliveryEntity is null");
+newDeliveryEntity.setId(oldDeliveryEntity.getId());
+newDeliveryEntity.setCreatedDate(oldDeliveryEntity.getCreatedDate());
+newDeliveryEntity.setNewEntity(false);
+var updatedDeliveryOrders = updateDeliveryOrder(
+newDeliveryModel, newDeliveryEntity, oldDeliveryEntity.getId());
+newDeliveryEntity.setDeliveryOrderEntities(updatedDeliveryOrders.getRight());
+var updatedDeliveryEntity = deliveryRepository.saveAndFlush(newDeliveryEntity);
+updatedDeliveryOrders.getLeft().forEach((eventType, data) -> {
+updateDeliveryEvents(data.getValue(), data.getKey(), eventType);
+});
+return mapper.toModel(updatedDeliveryEntity, updatedDeliveryOrders.getRight());
+}
+
+private List<DeliveryOrderEntity> createDeliveryOrder(ErpDelivery delivery, ErpDeliveryEntity deliveryEntity) {
+List<DeliveryOrderEntity> deliveryOrders = new ArrayList<>();
+
+for (DeliveryOrder deliveryOrder : delivery.getOrders()) {
+
+var toSave = mapper.toDeliveryOrderEntity(deliveryOrder);
+toSave.setId(deliveryOrderUuidGenerator.generateUuid());
+toSave.setDelivery(deliveryEntity);
+
+var items = getDeliveryOrderItems(deliveryOrder, toSave);
+toSave.setDeliveryOrderItems(items);
+var saved = deliveryOrderJpaRepository.save(toSave);
+deliveryOrders.add(saved);
+}
+return deliveryOrders;
+}
+
+private Pair<HashMap<EventType, Pair<String, List<DeliveryOrderEntity>>>, List<DeliveryOrderEntity>> updateDeliveryOrder(
+ErpDelivery delivery, ErpDeliveryEntity deliveryEntity, String deliveryId) {
+
+// Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ ÐºÐ°Ñ€Ñ‚Ñƒ Ñ ÐºÐ»ÑŽÑ‡Ð°Ð¼Ð¸ Ð¿Ð¾ erpOrderGuid Ð¸ Ð°ÐºÑ‚ÑƒÐ°Ð»ÑŒÐ½Ñ‹Ð¼Ð¸ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸ÑÐ¼Ð¸ Ð·Ð°ÐºÐ°Ð·Ð¾Ð²
+final var actualDeliveryOrdersMap = delivery.getOrders().stream()
+.collect(Collectors.toMap(DeliveryOrder::getErpOrderGuid, Function.identity()));
+
+delivery.setId(deliveryId);
+
+// Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ ÐºÐ°Ñ€Ñ‚Ñƒ Ñ ÐºÐ»ÑŽÑ‡Ð°Ð¼Ð¸ Ð¿Ð¾ erpOrderGuid Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°Ð¼Ð¸ Ð¿Ð¾ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ Ð² Ð‘Ð”
+final var oldOrdersByDeliveryInDb = deliveryOrderJpaRepository
+.findAllByDelivery(mapper.toDeliveryEntity(delivery))
+.stream()
+.collect(Collectors.toMap(DeliveryOrderEntity::getErpOrderGuid, Function.identity()));
+
+final var listToAddOrUpdate = new ArrayList<DeliveryOrderEntity>();
+final var listToDelete = new ArrayList<DeliveryOrderEntity>();
+
+// Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ ÑÐ¿Ð¸ÑÐ¾Ðº Ð½Ð° Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¾Ñ€Ð´ÐµÑ€Ð¾Ð² Ð² Ð‘Ð”
+for (DeliveryOrder deliveryOrder : actualDeliveryOrdersMap.values()) {
+final var oldDeliveryOrder = oldOrdersByDeliveryInDb.get(deliveryOrder.getErpOrderGuid());
+final var newDeliveryOrder = mapper.toDeliveryOrderEntity(deliveryOrder);
+if (isNull(oldDeliveryOrder)) {
+newDeliveryOrder.setId(deliveryOrderUuidGenerator.generateUuid());
+newDeliveryOrder.setNewEntity(true);
+newDeliveryOrder.setDelivery(deliveryEntity);
+listToAddOrUpdate.add(newDeliveryOrder);
+}
+// TODO:: check this..
+if (nonNull(oldDeliveryOrder)
+&& (oldDeliveryOrder.getErpOrderGuid().equalsIgnoreCase(newDeliveryOrder.getErpOrderGuid())
+|| !CollectionUtils.isEqualCollection(newDeliveryOrder.getDeliveryOrderItems(),
+oldDeliveryOrder.getDeliveryOrderItems()))) {
+newDeliveryOrder.setId(oldDeliveryOrder.getId());
+newDeliveryOrder.setNewEntity(false);
+newDeliveryOrder.setDelivery(deliveryEntity);
+listToAddOrUpdate.add(newDeliveryOrder);
+}
+}
+
+// Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ ÑÐ¿Ð¸ÑÐ¾Ðº Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¾Ñ€Ð´ÐµÑ€Ð¾Ð² Ð² Ð‘Ð”
+for (DeliveryOrderEntity oldOrderEntity : oldOrdersByDeliveryInDb.values()) {
+if (!actualDeliveryOrdersMap.containsKey(oldOrderEntity.getErpOrderGuid())) {
+listToDelete.add(oldOrderEntity);
+}
+}
+
+//ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¸Ñ‚ÐµÐ¼Ð¾Ð² Ð¸Ð· ÑƒÐ´Ð°Ð»ÑÐµÐ¼Ñ‹Ñ… Ð·Ð°ÐºÐ°Ð·Ð¾Ð²
+itemRepository.deleteAllByDeliveryOrderIn(listToDelete);
+// ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¾Ñ€Ð´ÐµÑ€Ð¾Ð² Ð½Ðµ Ð¿Ñ€Ð¸ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð¸Ñ… Ð² Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ
+deliveryOrderJpaRepository.deleteAllByIdIn(listToDelete.stream()
+.map(DeliveryOrderEntity::getId)
+.toList());
+final var events = new HashMap<EventType, Pair<String, List<DeliveryOrderEntity>>>();
+events.put(EventType.DELETE_DELIVERY, Pair.of(delivery.getErpGuid(), listToDelete));
+/*updateDeliveryEvents(listToDelete, delivery.getErpGuid(), EventType.DELETE);*/
+
+for (DeliveryOrderEntity entity : listToAddOrUpdate) {
+entity.setDeliveryOrderItems(getForUpdateDeliveryOrderItems(entity));
+deliveryOrderJpaRepository.save(entity);
+}
+events.put(EventType.UPDATE_DELIVERY, Pair.of(delivery.getErpGuid(), listToAddOrUpdate));
+/*updateDeliveryEvents(listToAddOrUpdate, delivery.getErpGuid(), EventType.UPDATE);*/
+
+return Pair.of(events, deliveryOrderJpaRepository.findAllByDelivery(deliveryEntity));
+}
+
+private List<ErpDeliveryOrderItemEntity> getDeliveryOrderItems(DeliveryOrder deliveryOrder,
+DeliveryOrderEntity deliveryOrderEntity) {
+List<ErpDeliveryOrderItemEntity> deliveryOrderItems = new ArrayList<>();
+
+for (DeliveryItem orderDeliveryItem : deliveryOrder.getDeliveryItems()) {
+var itemEntity = mapper.toDeliveryItemEntity(orderDeliveryItem);
+itemEntity.setId(deliveryOrderItemUuidGenerator.generateUuid());
+itemEntity.setDeliveryOrder(deliveryOrderEntity);
+itemEntity.setNewEntity(true);
+deliveryOrderItems.add(itemEntity);
+}
+return deliveryOrderItems;
+}
+
+private List<ErpDeliveryOrderItemEntity> getForUpdateDeliveryOrderItems(DeliveryOrderEntity deliveryOrderEntity) {
+final var actualOrderItems = deliveryOrderEntity.getDeliveryOrderItems().stream()
+.collect(Collectors.toMap(ErpDeliveryOrderItemEntity::getPositionCode, Function.identity()));
+
+final var oldOrderItems = itemRepository.findAllByDeliveryOrder(deliveryOrderEntity).stream()
+.collect(Collectors.toMap(ErpDeliveryOrderItemEntity::getPositionCode, Function.identity()));
+
+final var listToAddOrUpdate = new ArrayList<ErpDeliveryOrderItemEntity>();
+final var listToDelete = new ArrayList<DeliveryOrderEntity>();
+
+for (ErpDeliveryOrderItemEntity newItem : actualOrderItems.values()) {
+final var oldItem = oldOrderItems.get(newItem.getPositionCode());
+if (isNull(oldItem)) {
+newItem.setId(deliveryOrderItemUuidGenerator.generateUuid());
+newItem.setNewEntity(true);
+newItem.setDeliveryOrder(deliveryOrderEntity);
+listToAddOrUpdate.add(newItem);
+}
+if (nonNull(oldItem)) {
+newItem.setId(oldItem.getId());
+newItem.setNewEntity(false);
+newItem.setDeliveryOrder(deliveryOrderEntity);
+listToAddOrUpdate.add(newItem);
+}
+}
+for (ErpDeliveryOrderItemEntity item : oldOrderItems.values()) {
+if (!actualOrderItems.containsKey(item.getPositionCode())) {
+listToDelete.add(item.getDeliveryOrder());
+}
+}
+itemRepository.deleteAllByDeliveryOrderIn(listToDelete);
+
+return listToAddOrUpdate;
+}
+
+private void updateDeliveryEvents(ErpDelivery erpDelivery, EventType eventType) {
+var deliveryOrders = erpDelivery.getOrders();
+final var deliveryErpGuid = erpDelivery.getErpGuid();
+List<DeliveryEvent> eventDtos = new ArrayList<>();
+for (DeliveryOrder deliveryOrder : deliveryOrders) {
+final var orderErpOrderGuid = deliveryOrder.getErpOrderGuid();
+saveTransactionInfoAndGenerateEvents(eventType, deliveryErpGuid, eventDtos, orderErpOrderGuid);
+}
+eventGenerator(eventDtos);
+}
+
+private void updateDeliveryEvents(List<DeliveryOrderEntity> entities, String deliveryErpGuid, EventType eventType) {
+List<DeliveryEvent> eventDtos = new ArrayList<>();
+for (DeliveryOrderEntity deliveryOrder : entities) {
+final var orderErpOrderGuid = deliveryOrder.getErpOrderGuid();
+saveTransactionInfoAndGenerateEvents(eventType, deliveryErpGuid, eventDtos, orderErpOrderGuid);
+}
+eventGenerator(eventDtos);
+}
+
+private void saveTransactionInfoAndGenerateEvents(EventType eventType, String deliveryErpGuid,
+List<DeliveryEvent> eventDtos, String orderErpGuid) {
+final var transactionId = erpDeliveryUuidGenerator.generateUuid();
+saveTransactionInfo(deliveryErpGuid, orderErpGuid, transactionId);
+createDeliveryEvents(eventType, deliveryErpGuid, eventDtos, orderErpGuid, transactionId);
+}
+
+private void saveTransactionInfo(String deliveryErpGuid, String orderErpGuid, String transactionId) {
+final var entity = DeliveryTransactionEntity.builder()
+.transactionId(transactionId)
+.erpGuid(deliveryErpGuid)
+.shouldSend(true)
+.newEntity(true)
+.build();
+deliveryTransactionJpaRepository.save(entity);
+
+final var orderTransaction = OrderTransactionEntity.builder()
+.transactionId(transactionId)
+.erpGuid(orderErpGuid)
+.shouldSend(true)
+.newEntity(true)
+.build();
+orderTransactionRepo.save(orderTransaction);
+}
+
+private void createDeliveryEvents(EventType eventType, String deliveryErpGuid,
+List<DeliveryEvent> eventDtos, String orderErpGuid, String transactionId) {
+final var eventDto = DeliveryEvent.builder()
+.transactionId(transactionId)
+.deliveryErpGuid(deliveryErpGuid)
+.orderErpGuid(orderErpGuid)
+.eventType(eventType)
+.build();
+eventDtos.add(eventDto);
+}
+
+private void eventGenerator(List<DeliveryEvent> events) {
+for (DeliveryEvent event : events) {
+applicationEventPublisher.publishEvent(event);
+}
+}
+
+private void deleteDeliveryAndSendUpdateInfoToSf(ErpDelivery delivery) {
+Optional<ErpDeliveryEntity> deliveryDbData = deliveryRepository.findByErpGuid(
+delivery.getErpGuid());
+if (deliveryDbData.isPresent()) {
+delivery.setId(deliveryDbData.get().getId());
+enrichOrderListByDbData(delivery);
+deliveryRepository.deleteByErpGuid(delivery.getErpGuid());
+updateDeliveryEvents(delivery, EventType.DELETE_DELIVERY);
+}
+}
+
+
+private void enrichOrderListByDbData(ErpDelivery erpDelivery) {
+final var entity = ErpDeliveryEntity.builder().id(erpDelivery.getId()).build();
+final var deliveryOrdersFromDb = deliveryOrderJpaRepository
+.findAllByDelivery(entity).stream()
+.map(mapper::toDeliveryOrder)
+.toList();
+erpDelivery.getOrders().addAll(deliveryOrdersFromDb);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/ErpDeliveryUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Component
+public class ErpDeliveryUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/ErpTaskJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.entity.ErpTaskEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Repository
+public interface ErpTaskJpaRepository extends JpaRepository<ErpTaskEntity, String> {
+List<ErpTaskEntity> findByOrderIdAndTaskTypeAndActiveTrue(String orderId, ErpTaskType taskType);
+Optional<ErpTaskEntity> findFirstByOrderIdAndTaskTypeAndActiveTrue(String orderId, ErpTaskType taskType);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/ErpTaskServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.liga.evraz.aggregation.adapter.db.converter.ErpTaskEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.ErpTaskEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskSourceCode;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+import ru.liga.evraz.aggregation.application.cmd.ErpTaskStatusCmd;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+import ru.liga.evraz.aggregation.domain.model.Responsible;
+import ru.liga.evraz.aggregation.domain.repository.ErpTaskService;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Service
+@RequiredArgsConstructor
+@Slf4j
+class ErpTaskServiceImpl implements ErpTaskService {
+
+private final ErpTaskJpaRepository erpTaskJpaRepository;
+
+private final ErpTaskEntityMapper erpTaskEntityMapper;
+
+private final ErpTaskUuidGenerator erpTaskUuidGenerator;
+
+@Override
+@Transactional
+public ErpTask create(ErpTask task) {
+var entity = erpTaskEntityMapper.toEntity(task);
+entity.setId(erpTaskUuidGenerator.generateUuid());
+entity.setNewEntity(true);
+entity.setSourceCode(ErpTaskSourceCode.OMS);
+entity.setSent(false);
+entity.setActive(true);
+entity.setCanceled(false);
+
+log.info("Try to create erp task. Id: {}, taskType: {}", entity.getId(), entity.getTaskType());
+return erpTaskEntityMapper.toModel(erpTaskJpaRepository.saveAndFlush(entity));
+}
+
+@Override
+@Transactional
+public void markSent(String id) {
+ErpTaskEntity task = erpTaskJpaRepository.findById(id)
+.orElseThrow(() -> new NotFoundException("Erp task not found by id: " + id));
+
+task.setSent(true);
+erpTaskJpaRepository.saveAndFlush(task);
+}
+
+@Override
+@Transactional(readOnly = true)
+public List<ErpTask> findActiveByOrderAndType(String orderId, ErpTaskType taskType) {
+return erpTaskJpaRepository.findByOrderIdAndTaskTypeAndActiveTrue(orderId, taskType)
+.stream()
+.map(erpTaskEntityMapper::toModel)
+.collect(Collectors.toList());
+}
+
+@Override
+@Transactional(readOnly = true)
+public ErpTask findFirstActiveByOrderAndType(String orderId, ErpTaskType taskType) {
+return erpTaskJpaRepository.findFirstByOrderIdAndTaskTypeAndActiveTrue(orderId, taskType)
+.map(erpTaskEntityMapper::toModel)
+.orElse(null);
+}
+
+@Override
+@Transactional
+public void deactivate(String id, Boolean canceled) {
+log.info("Try deactivate task. TaskId: {}", id);
+ErpTaskEntity task = erpTaskJpaRepository.findById(id)
+.orElseThrow(() -> new NotFoundException("Erp task not found by id: " + id));
+
+task.setCanceled(canceled);
+task.setActive(false);
+erpTaskJpaRepository.saveAndFlush(task);
+log.info("Erp task deactivated. TaskId: {}", id);
+
+}
+
+@Override
+@Transactional
+public void updateStatus(ErpTaskStatusCmd cmd) {
+String guid = cmd.getGuid();
+log.info("Try update task status. TaskId: {}", guid);
+ErpTaskEntity task = erpTaskJpaRepository.findById(guid)
+.orElseThrow(() -> new NotFoundException("Erp task not found by id: " + guid));
+
+task.setErpStatus(cmd.getStatus());
+task.setDecision(cmd.getDecision());
+task.setResponsibleId(Optional.ofNullable(cmd.getResponsible()).map(Responsible::getResponsibleId).orElse(null));
+task.setResponsibleFullName(Optional.ofNullable(cmd.getResponsible()).map(Responsible::getResponsibleFullName).orElse(null));
+task.setResponsibleEmail(Optional.ofNullable(cmd.getResponsible()).map(Responsible::getResponsibleEmail).orElse(null));
+
+erpTaskJpaRepository.saveAndFlush(task);
+}

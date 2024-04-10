@@ -1,0 +1,431 @@
+﻿- totalCost
+- contractNumber
+- inPieces
+- pricesAgreed
+properties:
+documentType:
+type: string
+description: >
+Ð¢Ð¸Ð¿ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°:
+CLIENT_REQUEST / CLIENT_ORDER
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"CLIENT_REQUEST|CLIENT_ORDER")
+example: "CLIENT_REQUEST"
+baseErpGuid:
+type: string
+description: |
+Ð•ÑÑ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð·Ð°ÐºÐ°Ð·Ð¾Ð² ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° (documentType=CLIENT_ORDER), ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°.
+GUID Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð² 1Ð¡, Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸, ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð±Ñ‹Ð» ÑÐ¾Ð·Ð´Ð°Ð½ Ð·Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°.
+example: "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d5"
+documentId:
+type: string
+description: |
+ÐÐ¾Ð¼ÐµÑ€ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡.
+00239484 - Ð´Ð»Ñ Ð·Ð°ÑÐ²Ð¾Ðº;
+Ð˜Ð00-1102 - Ð´Ð»Ñ Ð·Ð°ÐºÐ°Ð·Ð¾Ð²
+example: "00239484"
+documentDateTime:
+type: string
+format: date-time
+description: |
+Ð”Ð°Ñ‚Ð° Ð¸ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡.
+Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚ Ð² UTC. (Ð’ÐµÑ€Ð¾ÑÑ‚Ð½Ð¾ Ð±ÑƒÐ´ÐµÑ‚ Ð¿ÐµÑ€ÐµÐ´Ð°Ð²Ð°Ñ‚ÑŒÑÑ Ñ Ñ‡Ð°ÑÐ¾Ð²Ñ‹Ð¼ Ð¿Ð¾ÑÑÐ¾Ð¼ +7)
+x-field-extra-annotation: >-
+@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
+example: "2022-11-16T20:27:51.704746+07:00"
+documentSource:
+type: string
+description: |
+Ð˜ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÑÐ²ÐºÐ¸/Ð·Ð°ÐºÐ°Ð·Ð°.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ (Ð—Ð°ÑÐ²ÐºÐ°): SITE_CLIENT, SITE_MANAGER, ERP ->
+â€¢	SITE_CLIENT = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð¾Ð¼ Ð½Ð° ÑÐ°Ð¹Ñ‚Ðµ;
+â€¢	SITE_MANAGER = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶ Ð½Ð° ÑÐ°Ð¹Ñ‚Ðµ;
+â€¢	ERP = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶ Ð² 1C:ERP.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ (Ð—Ð°ÐºÐ°Ð·): SITE_CLIENT, SITE_MANAGER, ERP ->
+â€¢	SITE_CLIENT = Ð—Ð°ÐºÐ°Ð· ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð°Ð²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸ Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ñ ÑÐ°Ð¹Ñ‚Ð°, ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð¾Ð¼;
+â€¢	SITE_MANAGER = Ð—Ð°ÐºÐ°Ð· ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð°Ð²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸ Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ñ ÑÐ°Ð¹Ñ‚Ð°, ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶;
+â€¢	ERP = Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶ Ð² 1C:ERP.
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"SITE_CLIENT|SITE_MANAGER|ERP")
+example: "ERP"
+orderType:
+type: boolean
+description: |
+Ð¢Ð¸Ð¿ Ð·Ð°ÐºÐ°Ð·Ð°*.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢	true = Ð¦ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·
+â€¢	false = ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·
+* ÐžÐ±ÑÐ·Ð°Ñ‚ÐµÐ»ÐµÐ½ Ð´Ð»Ñ documentType=CLIENT_ORDER (Ð—Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°).
+example: null
+documentLink:
+type: string
+description: Ð’Ð½ÑƒÑ‚Ñ€ÐµÐ½Ð½ÑÑ ÑÑÑ‹Ð»ÐºÐ° Ð½Ð° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð² 1Ð¡
+example: "https://1c.evraz.com/in00_1101"
+contractType:
+type: string
+description: |
+Ð¢Ð¸Ð¿ Ð´Ð¾Ð³Ð¾Ð²Ð¾Ñ€Ð°. ÐžÐ±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð»Ñ Ð·Ð°ÐºÐ°Ð·Ð°.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢	INVOICE_OFFER = Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð°
+â€¢	INVOICE_OFFER_CASH = Ð¡Ñ‡ÐµÑ‚-Ð¾Ñ„ÐµÑ€Ñ‚Ð° (Ð½Ð°Ð»Ð¸Ñ‡Ð½Ñ‹Ð¹ Ñ€Ð°ÑÑ‡ÐµÑ‚)
+â€¢	FRAME_STANDARD = Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ñ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹
+â€¢	FRAME_NON_STANDARD = Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"INVOICE_OFFER|INVOICE_OFFER_CASH|FRAME_STANDARD|FRAME_NON_STANDARD")
+example: "INVOICE_OFFER"
+saleManagerResponsibleId:
+type: string
+description: |
+ÐžÑ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€ Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶.
+example: "1234"
+saleManagerResponsibleEmail:
+type: string
+description: |
+Email Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ð³Ð¾ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð° Ð¾Ñ‚Ð´ÐµÐ»Ð° Ð¿Ñ€Ð¾Ð´Ð°Ð¶.
+example: "test@test.test"
+documentStatus:
+type: string
+description: |
+Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ (Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° (documentType=CLIENT_REQUEST)):
+â€¢	ACCEPTED = ÐŸÑ€Ð¸Ð½ÑÑ‚Ð°;
+â€¢	IN_PROCESSING = Ð’ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐµ;
+â€¢	PROCESSED = ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ð½Ð°;
+â€¢	CANCELED_BY_USER = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¼;
+â€¢	CANCELED_BY_MANAGER = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð¾Ð¼;
+â€¢	CANCELED_BY_KC_EMPLOYEE = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð° ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ¾Ð¼ ÐšÐ¦.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ (Ð—Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° (documentType=CLIENT_ORDER)):
+â€¢	TO_BE_AGREED = ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸;
+â€¢	TO_BE_COMPLETED = Ðš Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸ÑŽ;
+â€¢	CLOSED = Ð—Ð°ÐºÑ€Ñ‹Ñ‚;
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"ACCEPTED|IN_PROCESSING|PROCESSED|CANCELED_BY_USER|CANCELED_BY_MANAGER|CANCELED_BY_KC_EMPLOYEE|TO_BE_AGREED|TO_BE_COMPLETED|CLOSED")
+example: "TO_BE_COMPLETED"
+documentCancellationReason:
+description: |
+ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°.
+Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð¾Ñ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð½Ñ‹Ñ… Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²
+Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢	NO_REASON = Ð‘ÐµÐ· ÑƒÐºÐ°Ð·Ð°Ð½Ð¸Ñ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹;
+â€¢	RETURN_TO_DEPOSITOR = Ð’Ð¾Ð·Ð²Ñ€Ð°Ñ‚ Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ÐºÐ»Ð°Ð¶ÐµÐ´Ð°Ñ‚ÐµÐ»ÑŽ;
+â€¢	COMPLETED = Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½;
+â€¢	TASK_HIGH_VOLUME = Ð—Ð°Ð´Ð°Ð½Ð¸Ðµ (Ð±Ð¾Ð»ÑŒÑˆÐ¾Ð¹ Ð¾Ð±ÑŠÐµÐ¼);
+â€¢	INTERESTED_IN_LOADING_KATYUSHAE = Ð˜Ð½Ñ‚ÐµÑ€ÐµÑÐ¾Ð²Ð°Ð»Ð° Ð¿Ð¾Ð³Ñ€ÑƒÐ·ÐºÐ° ÐšÐ°Ñ‚ÑŽÑˆÐµÐ¹;
+â€¢	PRICE_MONITORING = ÐœÐ¾Ð½Ð¸Ñ‚Ð¾Ñ€Ð¸Ð½Ð³ Ñ†ÐµÐ½;
+â€¢	NOT_OUR_RANGE = ÐÐµ Ð½Ð°Ñˆ ÑÐ¾Ñ€Ñ‚Ð°Ð¼ÐµÐ½Ñ‚;
+â€¢	BAD_LENGTH = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ð´Ð»Ð¸Ð½Ð°;
+â€¢	BAD_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð°;
+â€¢	BAD_METAL_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¼ÐµÑ‚Ð°Ð»Ð»;
+â€¢	BAD_PROCESSING_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÑƒ;
+â€¢	NOT_FIT = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð¸ ÑÑ€Ð¾ÐºÐ¸;
+â€¢	NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸;
+â€¢	PART_NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸;
+â€¢	NO_PAYMENT = ÐÐµÑ‚ Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹;
+â€¢	NO_RESPONSE_FROM_CLIENT = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+â€¢	NO_RESPONSE_FROM_MANAGER = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð°;
+â€¢	IMPOSSIBLE_MANUFACTURING = ÐÐµÑ‚ Ñ‚ÐµÑ…. Ð²Ð¾Ð·Ð¼Ð¾Ð¶. Ð¸Ð·Ð³Ð¾Ñ‚Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ;
+â€¢	SHIPPED = ÐžÑ‚Ð³Ñ€ÑƒÐ¶ÐµÐ½;
+â€¢	CLIENT_REJECTION = ÐžÑ‚ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+â€¢	CANCELED = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½;
+â€¢	NO_LONGER_NEEDED = ÐžÑ‚Ð¿Ð°Ð»Ð° Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð½Ð¾ÑÑ‚ÑŒ;
+â€¢	ORDER_RECEATED = ÐŸÐµÑ€ÐµÑÐ¾Ð·Ð´Ð°Ð½ Ð·Ð°ÐºÐ°Ð·;
+â€¢	DIFFERENT_REASONS = Ð Ð°Ð·Ð½Ñ‹Ðµ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹;
+â€¢	TEST_ORDER = Ð¢ÐµÑÑ‚Ð¾Ð²Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·;
+â€¢	GOZ = Ð“ÐžÐ— (Ð“Ð¾ÑÐžÐ±Ð¾Ñ€Ð¾Ð½Ð—Ð°ÐºÐ°Ð·).
+-----
+ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹ Ð·Ð°ÐºÐ°Ð·Ð°.
+Ð¢Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð¾Ñ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð½Ñ‹Ñ… Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²
+Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢	NO_REASON = Ðº Ð£Ð´Ð°Ð»ÐµÐ½Ð¸ÑŽ;
+â€¢	CLOSED_BY_DEADLINE = Ð—Ð°ÐºÑ€Ñ‹Ñ‚ Ð¿Ð¾ ÑÑ€Ð¾ÐºÑƒ;
+â€¢	EXPENSIVE = Ð”Ð¾Ñ€Ð¾Ð³Ð¾;
+â€¢	TECHNICAL_TRANSFER = Ð¢ÐµÑ…Ð½Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ Ð¿ÐµÑ€ÐµÐ½Ð¾Ñ;
+â€¢	NEED_FIXATION = Ð¤Ð¸ÐºÑÐ°Ñ†Ð¸Ñ Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð½Ð¾ÑÑ‚Ð¸;
+â€¢	REJECTION_MEASURED_GOODS = ÐžÑ‚ÐºÐ»Ð¾Ð½ÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¸ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐµ Ð¼ÐµÑ€Ð½Ñ‹Ñ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð²;
+â€¢	NOT_AVAILABLE = ÐÐµÑ‚ Ð² Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸;
+â€¢	CLIENT_REJECTION = ÐžÑ‚ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+â€¢	TRANSFER_TO_ANOTHER_ORDER = ÐŸÐµÑ€ÐµÐ½Ð¾Ñ Ð² Ð´Ñ€ÑƒÐ³Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·;
+â€¢	SHIPPED = ÐžÑ‚Ð³Ñ€ÑƒÐ¶ÐµÐ½;
+â€¢	BAD_METAL_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¼ÐµÑ‚Ð°Ð»Ð»;
+â€¢	BAD_PROCESSING_PRICE = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð° Ñ†ÐµÐ½Ð° Ð·Ð° Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÑƒ;
+â€¢	NOT_FIT = ÐÐµ ÑƒÑÑ‚Ñ€Ð¾Ð¸Ð»Ð¸ ÑÑ€Ð¾ÐºÐ¸;
+â€¢	NO_RESPONSE_FROM_CLIENT = ÐÐµÑ‚ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð¾Ñ‚ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+â€¢	IMPOSSIBLE_MANUFACTURING = ÐÐµÑ‚ Ñ‚ÐµÑ…. Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸ Ð¸Ð·Ð³Ð¾Ñ‚Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ;
+â€¢	NO_LONGER_NEEDED = ÐžÑ‚Ð¿Ð°Ð»Ð° Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð½Ð¾ÑÑ‚ÑŒ;
+â€¢	NO_ITEM_TO_COMPLETE_ORDER = ÐÐµÑ‚ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð´Ð»Ñ Ð¿Ð¾Ð»Ð½Ð¾Ð¹ ÐºÐ¾Ð¼Ð¿Ð»ÐµÐºÑ‚Ð°Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°;
+â€¢	NO_TRANSPORT = ÐÐµÑ‚ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð°;
+â€¢	GOZ = Ð“ÐžÐ— (Ð“Ð¾ÑÐžÐ±Ð¾Ñ€Ð¾Ð½Ð—Ð°ÐºÐ°Ð·).
+$ref: "#/documentCancellationReason"
+paymentMethod:
+type: string
+description: |
+Ð¢Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð»Ð¾Ð³Ð¸ÐºÐ° Ð´Ð»Ñ Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð´Ð°Ð½Ð½Ñ‹Ñ…
+ÐŸÑ€ÐµÐ´Ð²Ð°Ñ€Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð»Ð¾Ð³Ð¸ÐºÐ° Ð±ÑƒÐ´ÐµÑ‚ Ñ€ÐµÐ°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ð° Ð½Ð° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1Ð¡.
+-----
+Ð¡Ð¿Ð¾ÑÐ¾Ð± Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹, Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢   PAYMENT_ON_ACCOUNT = ÐŸÑ€ÐµÐ´Ð¾Ð¿Ð»Ð°Ñ‚Ð° Ð¿Ð¾ ÑÑ‡ÐµÑ‚Ñƒ;
+â€¢   ONLINE = ÐžÐ½Ð»Ð°Ð¹Ð½ Ð½Ð° ÑÐ°Ð¹Ñ‚Ðµ;
+â€¢   PAYMENT_UPON_RECEIPT = Ð¡ Ð¾Ñ‚ÑÑ€Ð¾Ñ‡ÐºÐ¾Ð¹ Ð¿Ð»Ð°Ñ‚ÐµÐ¶Ð°;
+â€¢   POSTPAID = ÐžÐ¿Ð»Ð°Ñ‚Ð° Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŽ Ð¿Ñ€Ð¸ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ;
+â€¢   POINT_OF_SALE_PAYMENT = ÐžÐ¿Ð»Ð°Ñ‚Ð° Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ.
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"PAYMENT_ON_ACCOUNT|ONLINE|PAYMENT_UPON_RECEIPT|POSTPAID|POINT_OF_SALE_PAYMENT")
+example: "PAYMENT_ON_ACCOUNT"
+agreement:
+type: string
+description: |
+Ð¡Ð¾Ð³Ð»Ð°ÑˆÐµÐ½Ð¸Ðµ.
+ÐžÐ±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð»Ñ Ð·Ð°ÐºÐ°Ð·Ð°.
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢	PREPAYMENT = ÐŸÑ€ÐµÐ´Ð¾Ð¿Ð»Ð°Ñ‚Ð°
+â€¢	POSTPAID = ÐžÑ‚ÑÑ€Ð¾Ñ‡ÐºÐ° (Ð¿Ð¾ÑÑ‚Ð¾Ð¿Ð»Ð°Ñ‚Ð°)
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"PREPAYMENT|POSTPAID")
+example: "PREPAYMENT"
+deliveryMethod:
+type: string
+description: |
+Ð¡Ð¿Ð¾ÑÐ¾Ð± Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸.
+ÐŸÐ¾Ð»Ðµ Ð¿ÐµÑ€ÐµÐ´Ð°ÐµÐ¼ ÐºÐ°Ðº ÐµÑÑ‚ÑŒ, Ð»Ð¾Ð³Ð¸ÐºÑƒ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ð³Ð¾ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð½Ð° MVP1 Ð½Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÑ‚ÑÑ
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+â€¢	PICKUP_FROM_OUR_WAREHOUSE = Ð¡Ð°Ð¼Ð¾Ð²Ñ‹Ð²Ð¾Ð· (Ñ Ð½Ð°ÑˆÐµÐ³Ð¾ ÑÐºÐ»Ð°Ð´Ð°);
+â€¢	DELIVERY_BY_RAILWAY_TRANSPORT = Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ° Ð¶/Ð´ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð¾Ð¼;
+â€¢	DESCRIPTION_OF_THE_TRANSPORT_SERVICE = ÐÐ° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹;
+â€¢	OUR_TRANSPORTATION_SERVICE_TO_THE_CLIENT = ÐÐ°ÑˆÐ° Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð°Ñ ÑÐ»ÑƒÐ¶Ð±Ð° Ð´Ð¾ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°;
+â€¢	OUR_TRANSPORT_SERVICE_TO_THE_CARRIER = ÐÐ°ÑˆÐ° Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð°Ñ ÑÐ»ÑƒÐ¶Ð±Ð° Ð´Ð¾ Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·Ñ‡Ð¸ÐºÐ°.
+Ð‘Ñ‹Ð²Ð°ÐµÑ‚ Ð½Ðµ ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ðµ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð¸ Ð¿Ð¾ Ñ„Ð°ÐºÑ‚Ñƒ. Ð’ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ ÑÐ¿Ð¾ÑÐ¾Ð± Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¾Ð´Ð¸Ð½, Ð° Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð° Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° Ñ Ð´Ñ€ÑƒÐ³Ð¸Ð¼ Ñ‚Ð¸Ð¿Ð¾Ð¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ (sÑ€kuType=SERVICE_DELIVERY).
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"PICKUP_FROM_OUR_WAREHOUSE|DELIVERY_BY_RAILWAY_TRANSPORT|DESCRIPTION_OF_THE_TRANSPORT_SERVICE|OUR_TRANSPORTATION_SERVICE_TO_THE_CLIENT|OUR_TRANSPORT_SERVICE_TO_THE_CARRIER")
+example: "PICKUP_FROM_OUR_WAREHOUSE"
+recipientFullName:
+type: string
+deprecated: true
+description: |
+(Ð˜ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾ Ð¸Ð· Ð¸Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ð°Ð¼. ÐŸÐµÑ€ÐµÐ½ÐµÑÐµÐ½Ð¾ Ð² Ð·Ð°ÑÐ²ÐºÑƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ)
+Ð¤Ð˜Ðž Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+Ð’ÐºÐ»Ð°Ð´ÐºÐ° Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾, Ð¿Ð¾Ð»Ðµ ÐŸÐ¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»ÑŒ Ð³Ñ€ÑƒÐ·Ð°.
+example: "Ð˜Ð²Ð°Ð½Ð¾Ð² Ð˜Ð²Ð°Ð½ Ð˜Ð²Ð°Ð½Ð¾Ð²Ð¸Ñ‡"
+recipientPhone:
+type: string
+deprecated: true
+description: |
+(Ð˜ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾ Ð¸Ð· Ð¸Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ð°Ð¼. ÐŸÐµÑ€ÐµÐ½ÐµÑÐµÐ½Ð¾ Ð² Ð·Ð°ÑÐ²ÐºÑƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ)
+Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½ Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+Ð˜Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° ÐšÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ñ‹Ðµ Ð»Ð¸Ñ†Ð° Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð¾Ð².
+example: "89251238495"
+recipientEmail:
+type: string
+deprecated: true
+description: |
+(Ð˜ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾ Ð¸Ð· Ð¸Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ð°Ð¼. ÐŸÐµÑ€ÐµÐ½ÐµÑÐµÐ½Ð¾ Ð² Ð·Ð°ÑÐ²ÐºÑƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ)
+Email Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+Ð˜Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° ÐšÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ñ‹Ðµ Ð»Ð¸Ñ†Ð° Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð¾Ð².
+example: "iivanov@customer.ru"
+clientGuid:
+type: string
+description: GUID ÐºÐ¾Ð½Ñ‚Ñ€Ð°Ð³ÐµÐ½Ñ‚Ð°
+example: "11111111-2222-3333-4444-555555555555"
+clientType:
+type: string
+description: |
+Ð¢Ð¸Ð¿ ÐºÐ¾Ð½Ñ‚Ñ€Ð°Ð³ÐµÐ½Ñ‚Ð°
+INDIVIDUAL = Ñ„Ð¸Ð·. Ð»Ð¸Ñ†Ð¾
+ENTITY  = ÑŽÑ€. Ð»Ð¸Ñ†Ð¾/ Ð˜ÐŸ/ ÑŽÑ€.Ð»Ð¸Ñ†Ð¾ Ð·Ð° Ð¿Ñ€ÐµÐ´ÐµÐ»Ð°Ð¼Ð¸ Ð Ð¤
+example: "ENTITY"
+clientInn:
+type: string
+description: |
+Ð˜ÐÐ ÐºÐ¾Ð½Ñ‚Ñ€Ð°Ð³ÐµÐ½Ñ‚Ð°
+example: "34324324234345"
+clientName:
+type: string
+description: |
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð½Ñ‚Ñ€Ð°Ð³ÐµÐ½Ñ‚Ð°
+example: "ÐžÐžÐž Ð Ð¾Ð¼Ð°ÑˆÐºÐ°"
+customerFullName:
+type: string
+description: |
+Ð¤Ð˜Ðž Ð¿Ð¾ÐºÑƒÐ¿Ð°Ñ‚ÐµÐ»Ñ Ð¸Ð· Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð² 1Ð¡, ÐºÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ð¾Ðµ Ð»Ð¸Ñ†Ð¾ (Ð²ÐºÐ»Ð°Ð´ÐºÐ° Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾).
+example: "ÐŸÐµÑ‚Ñ€Ð¾Ð² ÐŸÑ‘Ñ‚Ñ€ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡"
+customerPhone:
+type: string
+description: |
+Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½ Ð¿Ð¾ÐºÑƒÐ¿Ð°Ñ‚ÐµÐ»Ñ.
+Ð˜Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° ÐšÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ñ‹Ðµ Ð»Ð¸Ñ†Ð° Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð¾Ð².
+example: "89251238495"
+customerEmail:
+type: string
+description: |
+Email Ð¿Ð¾ÐºÑƒÐ¿Ð°Ñ‚ÐµÐ»Ñ.
+Ð˜Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° ÐšÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ñ‹Ðµ Ð»Ð¸Ñ†Ð° Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð¾Ð².
+example: "iivanov@customer.ru"
+subdivisionId:
+type: string
+description: |
+ÐšÐ¾Ð´ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ Ð¸Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° Ð² 1Ð¡*.
+* Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ð¹ Ð¿ÐµÑ€ÐµÐ´Ð°ÐµÑ‚ÑÑ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾Ð¹ Ð¸Ð½Ñ‚ÐµÐ³Ñ€Ð°Ñ†Ð¸ÐµÐ¹
+example: "12345"
+erpGuid:
+type: string
+description: |
+GUID Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡ (Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð»Ð¸ Ð·Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°)
+example: "b34db9b3-27d6-4c85-a6e6-c15b7df73306"
+deleted:
+type: boolean
+description: |
+false - Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ, ÐµÑÐ»Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð½Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½ Ð² 1Ð¡;
+true - ÐµÑÐ»Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ð¾Ð¼ÐµÑ‡ÐµÐ½ Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð² 1Ð¡.
+example: false
+deletedMark:
+type: boolean
+description: |
+false - Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ, ÐµÑÐ»Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð½Ðµ Ð¿Ð¾Ð¼ÐµÑ‡ÐµÐ½ Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð² 1Ð¡;
+true - ÐµÑÐ»Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ð¾Ð¼ÐµÑ‡ÐµÐ½ Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð² 1Ð¡.
+example: false
+active:
+type: boolean
+description: |
+Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ñ€Ð¾Ð²ÐµÐ´ÐµÐ½ Ð² 1Ð¡
+example: false
+documentItems:
+description: |
+ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð° (Ð¢Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð°Ñ Ñ‡Ð°ÑÑ‚ÑŒ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡).
+ÐœÐ¸Ð½Ð¸Ð¼ÑƒÐ¼ 1 Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ.
+type: array
+items:
+$ref: '#/DocumentItem'
+totalCost:
+type: number
+format: double
+description: Ð˜Ñ‚Ð¾Ð³Ð¾Ð²Ð°Ñ ÑÑƒÐ¼Ð¼Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ (ÑÑ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð·Ð°ÐºÐ°Ð·Ð°)
+example: "1000.01"
+contractNumber:
+type: string
+description: ÐÐ¾Ð¼ÐµÑ€ Ð´Ð¾Ð³Ð¾Ð²Ð¾Ñ€Ð° Ð² 1Ð¡
+saleManagerResponsibleName:
+type: string
+description: Ð¤Ð˜Ðž Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð° Ð¸Ð· Ð·Ð°ÐºÐ°Ð·Ð° Ð² 1Ð¡
+orderComment:
+type: string
+description: ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹ Ðº Ð·Ð°ÐºÐ°Ð·Ñƒ Ð¸Ð· 1Ð¡
+erpPipeline:
+type: boolean
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ Ð¸Ð· 1Ð¡
+inPieces:
+type: boolean
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ° Ð² ÑˆÑ‚ÑƒÐºÐ°Ñ…
+deliveryPeriod:
+type: integer
+description: ÐŸÐµÑ€Ð¸Ð¾Ð´ Ð¿Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ (Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÑ‚ÑÑ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð—Ðš ,  Ð² Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¿Ð¾Ð»Ñ Ð½ÐµÑ‚)
+example: 5
+pricesAgreed:
+type: boolean
+description: |
+ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº "Ð¡Ð¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ñ‹ Ñ†ÐµÐ½Ñ‹".
+true - Ð¦ÐµÐ½Ð°/Ð¡ÐºÐ¸Ð´ÐºÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð° (Ð¸Ð»Ð¸ Ð² Ñ€Ð°Ð¼ÐºÐ°Ñ… Ð»Ð¸Ð¼Ð¸Ñ‚Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð°)  Ð¸Ð»Ð¸ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ðµ Ð½Ðµ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ;
+false - ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ñ‚ÑŒ Ñ†ÐµÐ½Ñ‹/ÑÐºÐ¸Ð´ÐºÑƒ (Ð¡ÐºÐ¸Ð´ÐºÐ° Ð½Ðµ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð° Ð¸Ð»Ð¸ Ð¿Ñ€Ð¾Ñ†ÐµÑÑ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ñ Ð½Ðµ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½.
+example: true
+customerGuid:
+type: string
+description: |
+GUID ÐºÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ð¾Ð³Ð¾ Ð»Ð¸Ñ†Ð°.
+example: "d44769a9-ea02-11e3-80c5-f0921c007933"
+orderPaid:
+type: boolean
+description: |
+Ð¤Ð°ÐºÑ‚ Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ.
+example: false
+orderPaidAssignmentDate:
+type: string
+format: date-time
+description: |
+Ð”Ð°Ñ‚Ð° Ð¿Ñ€Ð¸ÑÐ²Ð¾ÐµÐ½Ð¸Ñ Ð¾Ð¿Ð»Ð°Ñ‚Ñ‹ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ.
+Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚ Ð² UTC (Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´Ð¸Ñ‚ÑÑ Ð½Ð° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1C:ERP).
+x-field-extra-annotation: >-
+@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
+example: "2022-11-16T20:27:51.704+00:00"
+specificationApprovalRequired:
+type: boolean
+description: |
+ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº Ñ‚Ð¾Ð³Ð¾ Ñ‡Ñ‚Ð¾ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ðµ ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ.
+example: false
+itemsPrice:
+type: number
+format: double
+description: Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð²ÑÐµÑ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð±ÐµÐ· ÑÐºÐ¸Ð´Ð¾Ðº
+example: "1000.01"
+itemsDiscountPrice:
+type: number
+format: double
+description: Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð²ÑÐµÑ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ñ ÑƒÑ‡ÐµÑ‚Ð¾Ð¼ ÑÐºÐ¸Ð´Ð¾Ðº
+example: "1000.01"
+itemsServiceDiscountPrice:
+type: number
+format: double
+description: Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð²ÑÐµÑ… ÑƒÑÐ»ÑƒÐ³ Ñ ÑƒÑ‡ÐµÑ‚Ð¾Ð¼ ÑÐºÐ¸Ð´Ð¾Ðº
+example: "1000.01"
+discountValue:
+type: number
+format: double
+description: Ð Ð°Ð·Ð¼ÐµÑ€ ÑÐºÐ¸Ð´ÐºÐ¸ (Ð½Ð°Ñ†ÐµÐ½ÐºÐ¸) Ð´Ð»Ñ Ð²ÑÐµÐ³Ð¾ Ð·Ð°ÐºÐ°Ð·Ð°. *ÐœÐ¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¾Ñ‚Ñ€Ð¸Ñ†Ð°Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¼ Ð´Ð»Ñ Ð½Ð°Ñ†ÐµÐ½ÐºÐ¸
+example: "1000.01"
+partnerGuid:
+type: string
+description: |
+GUID Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð°
+example: "d44769a9-ea02-11e3-80c5-f0921c007933"
+documentTimeZone:
+type: string
+description: |
+Ð¢Ð°Ð¹Ð¼Ð·Ð¾Ð½Ð° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°
+example: "UTC +07"
+requiredQuotation:
+type: boolean
+description: |
+ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº Ñ‚Ð¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ ÐºÐ¾Ð¼Ð¼ÐµÑ€Ñ‡ÐµÑÐºÐ¾Ðµ Ð¿Ñ€ÐµÐ´Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ. ÐŸÐµÑ€ÐµÐ´Ð°ÐµÑ‚ÑÑ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð¿Ð¾ ÑÐ²ÑÐ·Ð°Ð½Ð½Ñ‹Ð¼ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ð¼ Ð¸Ð· Ð—Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°.
+Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ - false
+example: false
+requiredCall:
+type: boolean
+description: |
+ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº Ñ‚Ð¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼ Ð·Ð²Ð¾Ð½Ð¾Ðº Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð°. ÐŸÐµÑ€ÐµÐ´Ð°ÐµÑ‚ÑÑ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ Ð¿Ð¾ ÑÐ²ÑÐ·Ð°Ð½Ð½Ñ‹Ð¼ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°Ð¼ Ð¸Ð· Ð—Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°
+Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ - false
+example: false
+branching:
+type: boolean
+description: |
+ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº Ñ‚Ð¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ð·Ð°ÐºÐ°Ð· ÑÐ¾Ð·Ð´Ð°Ð½ Ñ Ð²ÐµÑ‚Ð²Ð»ÐµÐ½Ð¸ÐµÐ¼.
+Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ - false
+example: false
+address:
+type: string
+description: |
+ÐÐ´Ñ€ÐµÑ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² ÑÐ²Ð¾Ð±Ð¾Ð´Ð½Ð¾Ð¹ Ñ„Ð¾Ñ€Ð¼Ðµ.
+ÐžÐ±ÑÐ·Ð°Ñ‚ÐµÐ»ÐµÐ½ Ð´Ð»Ñ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ "ÐÐ° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹"
+Ð”Ð»Ñ Ð´Ñ€ÑƒÐ³Ð¸Ñ… ÑÐ¿Ð¾ÑÐ¾Ð±Ð¾Ð² Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð½Ðµ Ð¿ÐµÑ€ÐµÐ´Ð°ÐµÑ‚ÑÑ
+example: Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ,  Ð´29
+invoiceWithout:
+type: boolean
+description: |
+ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº Ñ‚Ð¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð½Ðµ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÑÑ‚ÑŒ Ð½Ð¾Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸ÑŽ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ñƒ.
+Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ - false
+example: false
+paymentLink:
+type: string
+description: Ð¡ÑÑ‹Ð»ÐºÐ° Ð½Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ñƒ
+example: http://example.com
+
+DocumentItem:
+type: object
+description: ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°
+required:
+- positionCode
+- skuId
+- skuName

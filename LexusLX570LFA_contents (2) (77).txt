@@ -1,0 +1,471 @@
+﻿@Deprecated
+ResponseEntity<OrderDto> updateOrderDetails(@NotEmpty String sfOrderId, @NotNull OrderDetails orderDetails);
+
+ResponseEntity<OrderUpdateDto> updateOrdersDetails(@NotEmpty String sfOrderId, @NotNull OrderDetails orderDetails);
+
+@Deprecated
+ResponseEntity<ControllerResult> updateShipping(@NotEmpty String sfOrderId, @NotNull ShippingDto sfShippingDto);
+
+ResponseEntity<ShippingDto> createOrUpdateShipping(@NotEmpty String sfOrderId, @NotNull ShippingDto sfShippingDto);
+
+List<ItemDto> updateItems(@NotEmpty String starfishOrderId, @NotNull List<ItemDto> starfishOrderItems);
+
+List<ItemServiceDto> updateItemServices(@NotEmpty String starfishOrderId, @NotNull List<ItemServiceDto> starfishOrderItemServices);
+
+ControllerResult updateCustomer(CustomerDto starfishCustomer);
+
+List<CustomAttributesDto> getOrderCustomAttributes(@NotEmpty String sfOrderId);
+
+Optional<OrderSearchDto> getOrderByStarfishOrderId(@NotEmpty String sfOrderId);
+
+String findErpGuidByStarfishOrderId(String sfOrderId);
+
+ResponseEntity<LegalEntityDto> createLegalEntity(@NotNull LegalEntityDto legalEntityDto);
+
+ResponseEntity<LegalEntityDto> updateLegalEntity(@NotNull LegalEntityDto legalEntityDto);
+
+ResponseEntity<LegalEntityDto> createOrUpdateLegalEntity(@NotNull LegalEntityDto legalEntityDto);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/OrderTransactionRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ Ñ‚Ñ€Ð°Ð½Ð·Ð°ÐºÑ†Ð¸Ð¾Ð½Ð½Ð¾Ð¹ Ñ‚Ð°Ð±Ð»Ð¸Ñ†ÐµÐ¹ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ð°Ð¼.
+*/
+@Validated
+public interface OrderTransactionRepository {
+
+@Transactional
+void setShouldSentFalse(@NotEmpty String id);
+
+@Transactional
+void setShouldSentFalse(@NotEmpty Collection<String> transactionIds);
+
+OrderTransactionEntity save(@NotNull OrderTransactionEntity entity);
+
+OrderTransactionEntity findById(@NotEmpty String id);
+
+Map<String, Set<OrderTransactionEntity>> findNotUpdatedOrderErpGuidsWithTransactions(@Valid @NotNull LocalDateTime from, int maxOrders);
+
+Long countActiveOrderTransactions(Boolean byOrder);
+
+Long findOldestActiveOrderTransactionTimeDiff();
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/PartnerRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import ru.liga.evraz.aggregation.domain.model.Partner;
+
+public interface PartnerRepository {
+@Transactional
+Partner save(Partner partner);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/ProductService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import feign.FeignException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSku;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSkuService;
+
+import java.util.Collection;
+import java.util.Set;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ñ Ð¼Ð¾Ð´ÐµÐ»ÑÐ¼Ð¸ "Ð¢Ð¾Ð²Ð°Ñ€".
+*/
+@Validated
+public interface ProductService {
+
+ControllerResult createUpdateProductList(Collection<ProductSku> productSkus);
+
+Collection<ProductSku> getProductByIds(Collection<String> productSkuIds);
+
+ControllerResult createUpdateCustomerServiceList(Collection<ProductSkuService> services);
+
+Collection<ProductSkuService> getCustomerServiceList();
+
+// Ð—Ð°Ð¾Ð¿Ñ‚Ð¸Ð¼Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ (Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÑƒ Ð½Ð° Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ)
+@Transactional(noRollbackFor = {FeignException.class})
+ControllerResult updateCustomerServiceCatalogForOrderErpGuids(Set<String> orderErpGuids);
+
+// Ð—Ð°Ð¾Ð¿Ñ‚Ð¸Ð¼Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ (Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÑƒ Ð½Ð° Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ)
+@Transactional(noRollbackFor = {FeignException.class})
+ControllerResult updateCustomerServiceCatalogForOrderErpGuid(String orderErpGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/ProductSkuRepository.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.product.ProductSku;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð—Ð°ÐºÐ°Ð·/Ð—Ð°ÑÐ²ÐºÐ°".
+*/
+@Validated
+public interface ProductSkuRepository {
+
+List<ProductSku> findAll();
+
+boolean existsById(@NotBlank String skuId);
+
+ProductSku getById(@NotBlank String skuId);
+
+@Transactional
+ProductSku create(@Valid @NotNull ProductSku productSku);
+
+@Transactional
+ProductSku update(@Valid @NotNull ProductSku productSku);
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/SubdivisionService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ".
+*/
+@Validated
+public interface SubdivisionService {
+Subdivision update(@Valid @NotNull Subdivision subdivision);
+
+@Transactional(readOnly = true)
+boolean existsById(@NotEmpty String subdivisionId);
+
+@Transactional(readOnly = true)
+Subdivision getById(@NotEmpty String subdivisionId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/WarehouseService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository;
+
+import ru.liga.evraz.aggregation.domain.model.Warehouse;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð¡ÐºÐ»Ð°Ð´".
+*/
+public interface WarehouseService {
+boolean existsById(String warehouseId);
+
+Warehouse create(Warehouse warehouse);
+
+Warehouse update(Warehouse warehouse);
+
+Warehouse getById(String id);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/usergroup/UserGroupParticipantService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository.usergroup;
+
+import ru.liga.evraz.aggregation.domain.model.UserGroupParticipant;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð“Ñ€ÑƒÐ¿Ð¿Ñ‹ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹".
+*/
+public interface UserGroupParticipantService {
+UserGroupParticipant getByPersonId(String personId);
+
+boolean existsByPersonId(String personId);
+UserGroupParticipant create(UserGroupParticipant userGroupParticipant);
+UserGroupParticipant update(UserGroupParticipant userGroupParticipant);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/repository/usergroup/UserGroupService.java
+Content:
+package ru.liga.evraz.aggregation.domain.repository.usergroup;
+
+import ru.liga.evraz.aggregation.domain.model.UserGroup;
+
+/**
+* Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ, Ð¾Ð¿Ð¸ÑÑ‹Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ñ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚ÑŒÑŽ "Ð“Ñ€ÑƒÐ¿Ð¿Ñ‹ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹".
+*/
+public interface UserGroupService {
+UserGroup getByExtUserGroupId(String userGroupId);
+
+boolean existsByExtUserGroupId(String userGroupId);
+UserGroup create(UserGroup userGroup);
+UserGroup update(UserGroup userGroup);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/CloseErpOrderDto.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
+public class CloseErpOrderDto {
+private String erpGuid;
+private String commandGuid;
+private String documentCancellationReason;
+private String positionCancellationReason;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/DeliveryAttribute.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class DeliveryAttribute {
+
+private String id;
+private String erpDeliveryGuid;
+private Long positionCode;
+private String name;
+private String value;
+private Boolean deleted;
+
+@Override
+public String toString() {
+return "DeliveryAttribute{"
++ "id='" + id + '\''
++ ", erpDeliveryGuid='" + erpDeliveryGuid + '\''
++ ", positionCode=" + positionCode
++ ", name='" + name + '\''
++ ", value='" + value + '\''
++ ", deleted=" + deleted
++ '}';
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/DeliveryItem.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+public class DeliveryItem {
+
+private Integer positionCode;
+private Integer orderPositionCode;
+private String skuId;
+private Double quantity;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/DeliveryOrder.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
+
+@Builder
+@Slf4j
+@Validated
+@Getter
+public class DeliveryOrder {
+
+private String erpOrderGuid;
+private String deliveryId;
+private List<DeliveryItem> deliveryItems;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/ErpDelivery.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.enums.DeliveryMethod;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Builder
+@Slf4j
+@Validated
+@Getter
+@Setter
+public class ErpDelivery {
+
+private String id;
+private String erpGuid;
+private String deliveryDocumentId;
+private ZonedDateTime deliveryDocumentDateTime;
+private String deliveryDocumentLink;
+private ZonedDateTime carDeliveryDateTimeFrom;
+private ZonedDateTime carDeliveryDateTimeTo;
+private String carDeliveryDateTimeFromDescription;
+private String carDeliveryDateTimeToDescription;
+private DeliveryMethod deliveryMethod;
+private String recipientFullName;
+private String recipientPhone;
+private String recipientEmail;
+private String recipientGuid;
+private String deliveryTimeZone;
+private LocalDate promisedDeliveryDate;
+private LocalTime deliveryIntervalFrom;
+private LocalTime deliveryIntervalTo;
+private String address;
+private String warehouseId;
+
+private Boolean deleted;
+private Boolean active;
+private List<DeliveryOrder> orders;
+
+private LocalDateTime createdDate;
+
+private Boolean dispatchWarehouseSlotBooked;
+
+private String clientDocumentAuthorityForReceiveGoodsNote;
+private Boolean clientDocumentAuthorityForReceiveGoods;
+private Boolean soleExecutiveGovernment;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/ErpTask.java
+Content:
+package ru.liga.evraz.aggregation.domain.model;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskDocumentType;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskSourceCode;
+import ru.liga.evraz.aggregation.adapter.db.entity.task.ErpTaskType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpTaskStatus;
+
+import java.time.ZonedDateTime;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Builder
+@Slf4j
+@Validated
+@Getter
+@Setter
+public class ErpTask {
+
+private String id;
+
+private ErpTaskSourceCode sourceCode;
+
+private String title;
+
+private String description;
+
+private String documentErpGuid;
+
+private ErpTaskDocumentType documentType;
+
+private ErpTaskStatus erpStatus;
+
+private String decision;
+
+private String responsibleId;
+
+private String responsibleFullName;
+
+private String responsibleEmail;
+
+private String roleId;
+
+private String subdivisionId;
+
+private ZonedDateTime deadline;
+
+private ErpTaskType taskType;
+
+private String orderId;
+
+private Boolean sent;
+
+private Boolean active;
+
+private Boolean canceled;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/OrderAttribute.java
+Content:

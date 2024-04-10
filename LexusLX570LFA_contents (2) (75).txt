@@ -1,0 +1,472 @@
+﻿File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/sf/ItemCA.java
+Content:
+package ru.liga.evraz.aggregation.sf;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+public enum ItemCA {
+SHIPPING_ERP_GUID("shippingErpGuid"),
+SKU_STATUS("skuStatus"),
+POSITION_CODE("positionCode"),
+MEASURE_UNIT("measureUnit");
+
+private final String code;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/IntegrationTokenConfig.java
+Content:
+package ru.liga.evraz.aggregation.security;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Getter
+@Setter
+@Component
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix = "cloud")
+public class IntegrationTokenConfig {
+private Map<String, String> integrationToken;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/SecurityConfig.java
+Content:
+package ru.liga.evraz.aggregation.security;
+
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.session.ConcurrentSessionFilter;
+import ru.liga.evraz.aggregation.security.filter.JwtTokenAuthFilter;
+import ru.liga.evraz.aggregation.security.providers.JwtTokenAuthenticationProvider;
+
+import javax.servlet.http.HttpServletResponse;
+
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+private final JwtTokenAuthenticationProvider jwtTokenAuthenticationProvider;
+
+// TODO:: ÐŸÐ¾Ñ‚ÐµÐ½Ñ†Ð¸Ð°Ð»ÑŒÐ½Ð¾ Ð² ÐºÐ¾Ð½Ñ„Ð¸Ð³
+private static final String[] WHITE_LIST = {
+"/favicon.ico",
+// -- Swagger UI v2
+"/v2/api-docs",
+"/swagger-resources",
+"/swagger-resources/*",
+"/configuration/ui",
+"/configuration/security",
+"/swagger-ui.html",
+"/webjars/*",
+// -- Swagger UI v3 (OpenAPI)
+"/v3/api-docs/*",
+"/swagger-ui/*",
+// other public endpoints of your API may be appended to this array
+"/actuator/*"
+};
+
+public SecurityConfig(JwtTokenAuthenticationProvider jwtTokenAuthenticationProvider) {
+this.jwtTokenAuthenticationProvider = jwtTokenAuthenticationProvider;
+}
+
+@Override
+protected void configure(HttpSecurity httpSecurity) throws Exception {
+httpSecurity
+.httpBasic().disable()
+.csrf().disable()
+.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+.and()
+.authorizeRequests()
+.regexMatchers(WHITE_LIST)
+.permitAll()
+.and()
+.exceptionHandling().authenticationEntryPoint((req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+.and()
+.addFilterBefore(new JwtTokenAuthFilter(), ConcurrentSessionFilter.class)
+.authorizeRequests()
+.anyRequest().permitAll();
+}
+
+@Override
+protected void configure(AuthenticationManagerBuilder auth) {
+auth.authenticationProvider(jwtTokenAuthenticationProvider);
+}
+
+}
+
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/UserDto.java
+Content:
+package ru.liga.evraz.aggregation.security;
+
+import lombok.Builder;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+
+@Data
+@Builder
+public class UserDto {
+private String tenantId;
+private String userId;
+private String login;
+private String role;
+
+public boolean isFullyFilled() {
+return StringUtils.isNotBlank(tenantId)
+&& StringUtils.isNotBlank(userId)
+&& StringUtils.isNotBlank(login)
+&& StringUtils.isNotBlank(role);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/service/JwtTokenService.java
+Content:
+package ru.liga.evraz.aggregation.security.service;
+
+
+import ru.liga.evraz.aggregation.security.UserDto;
+
+public interface JwtTokenService {
+String replaceToIntegrationToken(String token, String tenant);
+
+UserDto getUserDtoFromToken(String token);
+
+void fillSecurityContextWithIntegrationUser(String tenant);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/service/JwtTokenServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.security.service;
+
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.security.IntegrationTokenConfig;
+import ru.liga.evraz.aggregation.security.UserDto;
+import ru.liga.evraz.aggregation.security.authentication.JwtTokenAuthentication;
+import ru.liga.evraz.aggregation.security.details.UserDetailsImpl;
+
+import java.text.ParseException;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class JwtTokenServiceImpl implements JwtTokenService {
+private final IntegrationTokenConfig tokenConfig;
+
+@Override
+public UserDto getUserDtoFromToken(String token) {
+JWTClaimsSet jwtClaimsSet;
+try {
+jwtClaimsSet = JWTParser.parse(token)
+.getJWTClaimsSet();
+} catch (ParseException e) {
+e.printStackTrace();
+throw new AuthenticationServiceException("Invalid token");
+}
+
+String tenantId = jwtClaimsSet.getClaim("tenantId").toString();
+String userId = jwtClaimsSet.getClaim("userId").toString();
+String login = jwtClaimsSet.getClaim("login").toString();
+String role = jwtClaimsSet.getClaim("role").toString();
+return UserDto.builder()
+.tenantId(tenantId)
+.userId(userId)
+.login(login)
+.role(role)
+.build();
+}
+
+public void fillSecurityContextWithIntegrationUser(String tenant) {
+final var integrationToken = tokenConfig.getIntegrationToken().getOrDefault(tenant, EMPTY);
+if (StringUtils.isNotBlank(integrationToken)) {
+final var emptyContext = SecurityContextHolder.createEmptyContext();
+final var authentication = new JwtTokenAuthentication(integrationToken);
+authentication.setUserDetails(new UserDetailsImpl(getUserDtoFromToken(integrationToken)));
+emptyContext.setAuthentication(authentication);
+SecurityContextHolder.setContext(emptyContext);
+}
+}
+
+@Override
+public String replaceToIntegrationToken(String token, String tenant) {
+if (isNull(token)) {
+throw new IllegalArgumentException("token can't be null");
+}
+
+UserDto userDtoFromToken = getUserDtoFromToken(token);
+if ("SUPER".equals(userDtoFromToken.getRole()) && nonNull(tenant)) {
+String integrationToken = tokenConfig.getIntegrationToken().get(tenant);
+if (nonNull(integrationToken)) {
+token = integrationToken;
+} else {
+log.warn("can't replace to integration token for {} tenant, using super", tenant);
+}
+}
+return token;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/providers/JwtTokenAuthenticationProvider.java
+Content:
+package ru.liga.evraz.aggregation.security.providers;
+
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import ru.liga.evraz.aggregation.security.authentication.JwtTokenAuthentication;
+import ru.liga.evraz.aggregation.security.details.UserDetailsImpl;
+
+import java.text.ParseException;
+
+@Component
+@Slf4j
+public class JwtTokenAuthenticationProvider implements AuthenticationProvider {
+
+private static final String USER_ID = "userId";
+private static final String ROLE = "role";
+private static final String LOGIN = "role";
+private static final String TENANT_ID = "tenantId";
+
+@Override
+public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+JwtTokenAuthentication tokenAuthentication = (JwtTokenAuthentication) authentication;
+
+JWTClaimsSet jwtClaimsSet;
+try {
+jwtClaimsSet = JWTParser.parse(tokenAuthentication.getName())
+.getJWTClaimsSet();
+} catch (ParseException e) {
+log.error(e.getMessage());
+throw new AuthenticationServiceException("Invalid token");
+}
+
+UserDetails userDetails = new UserDetailsImpl(
+jwtClaimsSet.getClaim(USER_ID).toString(),
+jwtClaimsSet.getClaim(ROLE).toString(),
+jwtClaimsSet.getClaim(LOGIN).toString(),
+jwtClaimsSet.getClaim(TENANT_ID).toString()
+);
+MDC.put(LOGIN, jwtClaimsSet.getClaim(LOGIN).toString());
+MDC.put(TENANT_ID, jwtClaimsSet.getClaim(TENANT_ID).toString());
+
+tokenAuthentication.setUserDetails(userDetails);
+tokenAuthentication.setAuthenticated(true);
+return tokenAuthentication;
+}
+
+@Override
+public boolean supports(Class<?> authentication) {
+return JwtTokenAuthentication.class.equals(authentication);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/filter/JwtTokenAuthFilter.java
+Content:
+package ru.liga.evraz.aggregation.security.filter;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.GenericFilterBean;
+import ru.liga.evraz.aggregation.security.authentication.JwtTokenAuthentication;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
+public class JwtTokenAuthFilter extends GenericFilterBean {
+
+
+@Override
+public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+String token = ((HttpServletRequest) servletRequest).getHeader("Authorization");
+
+JwtTokenAuthentication authentication;
+
+if (token == null) {
+authentication = new JwtTokenAuthentication(null);
+authentication.setAuthenticated(false);
+} else {
+authentication = new JwtTokenAuthentication(token.startsWith("Bearer") ? token.substring(7) : token);
+SecurityContextHolder.getContext().setAuthentication(authentication);
+}
+filterChain.doFilter(servletRequest, servletResponse);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/details/UserDetailsImpl.java
+Content:
+package ru.liga.evraz.aggregation.security.details;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import ru.liga.evraz.aggregation.security.UserDto;
+
+import java.util.Collection;
+import java.util.Collections;
+
+public class UserDetailsImpl implements UserDetails {
+
+private final UserDto user;
+
+public UserDetailsImpl(UserDto user) {
+this.user = user;
+}
+
+public UserDetailsImpl(String id, String role, String login, String tenantId) {
+this.user = UserDto.builder()
+.userId(id)
+.role(role)
+.login(login)
+.tenantId(tenantId)
+.build();
+}
+
+@Override
+public Collection<? extends GrantedAuthority> getAuthorities() {
+GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
+return Collections.singletonList(authority);
+}
+
+@Override
+public String getPassword() {
+return null;
+}
+
+@Override
+public String getUsername() {
+return user.getLogin();
+}
+
+@Override
+public boolean isAccountNonExpired() {
+return true;
+}
+
+@Override
+public boolean isAccountNonLocked() {
+return true;
+}
+
+@Override
+public boolean isCredentialsNonExpired() {
+return true;
+}
+
+@Override
+public boolean isEnabled() {
+return true;
+}
+
+public UserDto getUser() {
+return user;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/security/authentication/JwtTokenAuthentication.java
+Content:
+package ru.liga.evraz.aggregation.security.authentication;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+
+public class JwtTokenAuthentication implements Authentication {
+
+private boolean isAuthenticated;
+private UserDetails userDetails;
+private final String token;
+
+public JwtTokenAuthentication(String token) {
+this.token = token;
+}
+
+@Override
+public Collection<? extends GrantedAuthority> getAuthorities() {
+return userDetails.getAuthorities();
+}
+
+@Override
+public Object getCredentials() {
+return null;
+}
+
+@Override
+public Object getDetails() {
+return userDetails;
+}
+
+@Override
+public Object getPrincipal() {
+return null;
+}
+
+@Override
+public boolean isAuthenticated() {
+return isAuthenticated;
+}
+
+@Override
+public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+this.isAuthenticated = isAuthenticated;
+}
+
+@Override
+public String getName() {
+return token;
+}
+
+public void setUserDetails(UserDetails userDetails) {
+this.userDetails = userDetails;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/DayName.java
+Content:
+package ru.liga.evraz.aggregation.domain;
+

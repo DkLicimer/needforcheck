@@ -1,0 +1,469 @@
+﻿.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData2 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid1/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest2)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData3 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid2/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest3)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+//        final var orderDetailsData1 = DispatcherData.builder()
+//            .path("/order/test_Sf_erp_guid4")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(orderDetailsRequest1)
+//            .expectedResponse(orderDetailsResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var orderDetailsData2 = DispatcherData.builder()
+//            .path("/order/test_Sf_erp_guid2")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(orderDetailsRequest2)
+//            .expectedResponse(orderDetailsResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var orderDetailsData3 = DispatcherData.builder()
+//            .path("/order/test_Sf_erp_guid1")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(orderDetailsRequest3)
+//            .expectedResponse(orderDetailsResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+final var orderDetailsDataPut1 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid4/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest1)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut2 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid2/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest2)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut3 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid1/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest3)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData1 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid4/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest1)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData2 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid2/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest2)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData3 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid1/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest3)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData1 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid4/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest1)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData2 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid1/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest2)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData3 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid2/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest3)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var customerData = DispatcherData.builder()
+.path("/customer/test-customer_guid")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customerUpdateRequest)
+.expectedResponse(customerUpdateResponse)
+.status(HttpStatus.OK)
+.build();
+final var legalEntityData = ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse), HttpMethod.PUT, HttpStatus.OK, Map.of("legalEntityId", "test-client_guid"));
+
+var dispatcher = new StarfishOrderDispatcher(List.of(
+shippingDataPut1, customAttributeData1, orderDetailsDataPut1, itemsData1, itemsServiceData1,
+shippingDataPut2, customAttributeData2, orderDetailsDataPut2, itemsData2, itemsServiceData2,
+shippingDataPut3, customAttributeData3, orderDetailsDataPut3, itemsData3, itemsServiceData3,
+customerData, legalEntityData));
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+private void initDeliveryScenario_OneShippingCountEnum() {
+//        final var shippingData1 = DispatcherData.builder()
+//            .path("/shipping/test_Sf_erp_guid4/update")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(shippingRequest1)
+//            .expectedResponse(shippingResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var shippingData2 = DispatcherData.builder()
+//            .path("/shipping/test_Sf_erp_guid2/update")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(shippingRequest2)
+//            .expectedResponse(shippingResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var shippingData3 = DispatcherData.builder()
+//            .path("/shipping/test_Sf_erp_guid1/update")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(shippingRequest3)
+//            .expectedResponse(shippingResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+final var shippingDataPut1 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid4/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest1)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut2 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid2/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest2)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var shippingDataPut3 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid1/shipping")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(shippingRequest3)
+.expectedResponse(shippingResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData1 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid4/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest1)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData2 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid1/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest_forShippingCountEnumOne)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+final var customAttributeData3 = DispatcherData.builder()
+.path("/order/test_Sf_erp_guid2/customattributes")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customAttributeRequest3)
+.expectedResponse(customAttributeResponse)
+.status(HttpStatus.OK)
+.build();
+//        final var orderDetailsData1 = DispatcherData.builder()
+//            .path("/order/test_Sf_erp_guid4")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(orderDetailsRequest1)
+//            .expectedResponse(orderDetailsResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var orderDetailsData2 = DispatcherData.builder()
+//            .path("/order/test_Sf_erp_guid2")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(orderDetailsRequest2)
+//            .expectedResponse(orderDetailsResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+//        final var orderDetailsData3 = DispatcherData.builder()
+//            .path("/order/test_Sf_erp_guid1")
+//            .httpMethod(HttpMethod.POST.toString())
+//            .expectedRequest(orderDetailsRequest3)
+//            .expectedResponse(orderDetailsResponse)
+//            .status(HttpStatus.OK)
+//            .build();
+final var orderDetailsDataPut1 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid4/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest1)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut2 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid2/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest2)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var orderDetailsDataPut3 = DispatcherData.builder()
+.path("/orders/test_Sf_erp_guid1/details")
+.httpMethod(HttpMethod.PUT.toString())
+.expectedRequest(orderDetailsRequest3)
+.expectedResponse(orderDetailsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData1 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid4/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest1)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData2 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid2/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest2)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsData3 = DispatcherData.builder()
+.path("/item/test_Sf_erp_guid1/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsRequest_oneShippingCountEnum)
+.expectedResponse(itemsResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData1 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid4/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest1)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData2 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid1/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest2)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var itemsServiceData3 = DispatcherData.builder()
+.path("/itemservice/test_Sf_erp_guid2/extendedlist")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(itemsServiceRequest3)
+.expectedResponse(itemsServiceResponse)
+.status(HttpStatus.OK)
+.build();
+final var customerData = DispatcherData.builder()
+.path("/customer/test-customer_guid")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(customerUpdateRequest)
+.expectedResponse(customerUpdateResponse)
+.status(HttpStatus.OK)
+.build();
+final var legalEntityData = ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse), HttpMethod.PUT, HttpStatus.OK, Map.of("legalEntityId", "test-client_guid"));
+
+var dispatcher = new StarfishOrderDispatcher(List.of(
+shippingDataPut1, customAttributeData1, orderDetailsDataPut1, itemsData1, itemsServiceData1,
+shippingDataPut2, customAttributeData2, orderDetailsDataPut2, itemsData2, itemsServiceData2,
+shippingDataPut3, customAttributeData3, orderDetailsDataPut3, itemsData3, itemsServiceData3,
+customerData, legalEntityData));
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+// --------------------------------------
+
+protected void initOrderScenario(Map<OrderPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+initOrderScenario(pathToExpectedResources, Map.of(), pathTemplateParameters);
+}
+
+/**
+* Ð—Ð°Ð³Ð»ÑƒÑˆÐºÐ¸.
+*
+* @param pathToExpectedResources   - Ð¼Ð°Ð¿Ð° {@link OrderPath} Ð¿ÑƒÑ‚Ð¸ Ðº order-service Ð½Ð° Ð¿Ð°Ñ€Ñƒ Ð¾Ñ‚Ð²ÐµÑ‚-Ð·Ð°Ð¿Ñ€Ð¾Ñ
+* Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ.
+* @param pathsToExpectedHttpStatus - Ð¼Ð°Ð¿Ð° {@link OrderPath} Ð¿ÑƒÑ‚Ð¸ Ð½Ð° ÐºÐ¾Ð´ Ð¾Ñ‚Ð²ÐµÑ‚Ð°, ÐµÑÐ»Ð¸ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÐºÐ»ÑŽÑ‡Ñƒ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾,
+* ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ÑÑ HttpStatus.OK.
+* @param pathTemplateParameters    - Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð² {@link OrderPath} Ð¿ÑƒÑ‚Ð¸.
+*/
+@SuppressWarnings("PMD.UnusedPrivateMethod")
+protected void initOrderScenario(Map<OrderPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<OrderPath, HttpStatus> pathsToExpectedHttpStatus,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(ORDER_CREATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CREATE);
+dispatcherDatas.add(
+ORDER_CREATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CREATE, HttpStatus.OK)));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_DETAILS_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_DETAILS_UPDATE);
+dispatcherDatas.add(
+ORDER_DETAILS_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DETAILS_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_DETAILS_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_DETAILS_UPDATE);
+dispatcherDatas.add(
+ORDERS_DETAILS_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_DETAILS_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMER_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMER_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMER_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMER_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOM_ATTRIBUTES_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOM_ATTRIBUTES_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOM_ATTRIBUTES_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOM_ATTRIBUTES_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEMS_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEMS_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEMS_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEMS_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDERS_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SET_CANCELLATION_REASON)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SET_CANCELLATION_REASON);
+dispatcherDatas.add(
+ORDER_SET_CANCELLATION_REASON.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SET_CANCELLATION_REASON, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_GET_BY_CLIENT_ORDER_ID)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_GET_BY_CLIENT_ORDER_ID);
+dispatcherDatas.add(
+ORDER_GET_BY_CLIENT_ORDER_ID.buildDispatcherData(
+resourceResourcePair, HttpMethod.GET,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (StringUtils.isNotBlank(pathTemplateParameters.get("expected_starfish_order_id").toString())) {
+final Pair<Resource, Resource> req2resp = Pair.of(
+null,
+new ByteArrayResource("Order is deleted".getBytes(StandardCharsets.UTF_8)));
+dispatcherDatas.add(
+ORDER_DELETE.buildDispatcherData(
+req2resp, HttpMethod.DELETE,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DELETE, HttpStatus.OK),
+pathTemplateParameters));
+}
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+var dispatcher = new StarfishOrderDispatcher(dispatcherDatas);
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+/**
+* Ð—Ð°Ð³Ð»ÑƒÑˆÐºÐ¸.
+*
+* @param pathToExpectedResources - Ð¼Ð°Ð¿Ð° {@link ProductPath} Ð¿ÑƒÑ‚Ð¸ Ðº product-service Ð½Ð° Ð¿Ð°Ñ€Ñƒ Ð¾Ñ‚Ð²ÐµÑ‚-Ð·Ð°Ð¿Ñ€Ð¾Ñ
+* Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ.
+* @param pathTemplateParameters  - Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð² {@link ProductPath} Ð¿ÑƒÑ‚Ð¸.
+*/
+@SuppressWarnings("PMD.UnusedPrivateMethod")
+private void initProductScenario(Map<ProductPath, List<Pair<Resource, Resource>>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(PRODUCT_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(PRODUCT_UPDATE);
+resourceResourcePair.forEach(pair -> dispatcherDatas.add(
+PRODUCT_UPDATE.buildDispatcherData(
+pair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters)));
+}
+
+if (pathToExpectedResources.containsKey(CUSTOMERSERVICE_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(CUSTOMERSERVICE_UPDATE);
+resourceResourcePair.forEach(pair -> dispatcherDatas.add(
+CUSTOMERSERVICE_UPDATE.buildDispatcherData(
+pair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters)));
+}
+
+var dispatcher = new StarfishProductDispatcher(dispatcherDatas);
+sfProductServer.setDispatcher(dispatcher);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/command/CommandStatusSentTest.java
+Content:
+package ru.liga.evraz.aggregation.module.command;
+
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;

@@ -1,0 +1,488 @@
+﻿.findFirst());
+if (optDeliveryOrder.isEmpty()) {
+log.warn("Order {} not found in shipping request with erpGuid {}", erpGuid, delivery.getErpGuid());
+}
+return optDeliveryOrder;
+})
+.map(DeliveryOrder::getDeliveryItems)
+.map(deliveryItems -> deliveryItems.stream()
+.filter(deliveryItem -> deliveryItem.getOrderPositionCode() != null)
+.collect(Collectors.toList()))
+.orElse(List.of());
+
+if (CollectionUtils.isNotEmpty(orderDeliveryItems)) {
+final var shippingErpGuid = delivery.getErpGuid();
+
+for (ItemDto item : this.getItems()) {
+final var isItemFromShippingRequest = item.getCustomAttributes().stream()
+.anyMatch(isPositionFromShippingRequest(orderDeliveryItems));
+
+addOrUpdateShippingErpGuid(
+item.getCustomAttributes(), isItemFromShippingRequest, shippingErpGuid);
+}
+
+for (ItemServiceDto itemService : this.getItemServices()) {
+final var isServiceFromShippingRequest = itemService.getCustomAttributes().stream()
+.anyMatch(isPositionFromShippingRequest(orderDeliveryItems));
+
+addOrUpdateShippingErpGuid(
+itemService.getCustomAttributes(), isServiceFromShippingRequest, shippingErpGuid);
+}
+} else {
+log.info("orderDeliveryItems is empty for clientOrderId: {}", this.getOrderDetails().getClientOrderId());
+}
+}
+
+private static void setEmptyShippingErpGuid(List<CustomAttributesDto> itemCustomAttributes) {
+final var containsShippingErpGuid = itemCustomAttributes.stream()
+.anyMatch(cad -> SHIPPING_ERP_GUID.equals(cad.getName()));
+if (containsShippingErpGuid) {
+for (CustomAttributesDto ca : itemCustomAttributes) {
+if (SHIPPING_ERP_GUID.equals(ca.getName())) {
+ca.setValue(EMPTY);
+break;
+}
+}
+} else {
+itemCustomAttributes.add(CustomAttributesDto.builder()
+.name(SHIPPING_ERP_GUID)
+.value(EMPTY)
+.build());
+}
+}
+
+private static void addOrUpdateShippingErpGuid(List<CustomAttributesDto> positionCustomAttributes,
+boolean isFromShippingRequest,
+String shippingErpGuid) {
+final var containsShippingErpGuid = positionCustomAttributes.stream()
+.anyMatch(cad -> SHIPPING_ERP_GUID.equals(cad.getName())); //Ð£Ð¶Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½ ÐšÐ
+
+if (containsShippingErpGuid) {
+for (CustomAttributesDto ca : positionCustomAttributes) {
+if (SHIPPING_ERP_GUID.equals(ca.getName())) {
+ca.setValue(isFromShippingRequest ? shippingErpGuid : EMPTY); // ÐžÐ±Ð½Ð¾Ð²Ð»ÑÐµÐ¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ ÐšÐ shippingErpGuid
+return;
+}
+}
+} else { // Ð˜ÑÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´ÑƒÐ±Ð»Ð¸ÐºÐ°Ñ‚Ð¾Ð²
+if (isFromShippingRequest) {
+positionCustomAttributes.add(buildShippingErpGuidCustomAttribute(shippingErpGuid, true));
+} else {
+setEmptyShippingErpGuid(positionCustomAttributes);
+}
+}
+}
+
+private static Predicate<CustomAttributesDto> isPositionFromShippingRequest(List<DeliveryItem> orderDeliveryItems) {
+// ÐŸÑ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼, Ñ‡Ñ‚Ð¾ ÑÑ€ÐµÐ´Ð¸ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð¸Ð· Ð—ÐÐŸ ÐµÑÑ‚ÑŒ ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‰Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°
+return ca -> POSITION_CODE.equals(ca.getName())
+&& orderDeliveryItems.stream()
+.map(deliveryItem -> deliveryItem.getOrderPositionCode().toString())
+.toList().contains(ca.getValue());
+}
+
+private static CustomAttributesDto buildShippingErpGuidCustomAttribute(String shippingErpGuid,
+boolean isItemFromShippingRequest) {
+return CustomAttributesDto.builder()
+.name(SHIPPING_ERP_GUID)
+.value(isItemFromShippingRequest ? shippingErpGuid : EMPTY)
+.build();
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/OrderDetails.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import ru.liga.evraz.aggregation.annotations.NullOrNotBlank;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderDetails extends OrderUpdateDto {
+@NullOrNotBlank(message = "sourceId can not be empty")
+private String sourceId;
+private String brandId;
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+private ZonedDateTime dateTimeCreated; // todo:: changed sf type
+private String customerType;
+private List<LinkDto> links;
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+private LocalDateTime deliveredDate;
+private String legalEntityId;
+private String legalEntityActualAddress;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/OrderDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.LegalEntityDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.OrderMarketingDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer.CustomerDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.payment.PaymentDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping.ShippingDto;
+
+import java.util.List;
+import javax.validation.Valid;
+
+@Setter
+@ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class OrderDto {
+// using both annotation at the same time gives us this field will be serialized but not deserialize
+@Valid
+@JsonProperty("order")
+private OrderDetails orderDetails;
+
+private Boolean success;
+private String orderId;
+private String clientOrderId;
+
+@JsonProperty("customer")
+private CustomerDto customer;
+
+@JsonProperty("shipping")
+private ShippingDto shipping;
+
+@JsonProperty("items")
+private List<ItemDto> items;
+
+@JsonProperty("itemServices")
+private List<ItemServiceDto> itemServices;
+
+private OrderMarketingDto marketing;
+private List<CustomAttributesDto> customAttributes;
+@Getter
+private String analyticsClientId;
+@JsonAlias({"payment", "payments"})
+private List<PaymentDto> payment;
+private Boolean deleted;
+@Getter
+private LegalEntityDto legalEntity;
+
+public OrderDto(OrderDto orderDto) {
+this.orderDetails = orderDto.getOrderDetails();
+this.success = orderDto.getSuccess();
+this.orderId = orderDto.getOrderId();
+this.clientOrderId = orderDto.getClientOrderId();
+this.customer = orderDto.getCustomer();
+this.shipping = orderDto.getShipping();
+this.items = orderDto.getItems();
+this.itemServices = orderDto.getItemServices();
+this.marketing = orderDto.getMarketing();
+this.customAttributes = orderDto.getCustomAttributes();
+this.analyticsClientId = orderDto.getAnalyticsClientId();
+this.payment = orderDto.getPayment();
+this.deleted = orderDto.getDeleted();
+this.legalEntity = orderDto.getLegalEntity();
+}
+
+
+public Boolean getSuccess() {
+return success;
+}
+
+//@JsonIgnore
+public OrderDetails getOrderDetails() {
+return orderDetails;
+}
+
+//@JsonIgnore
+public CustomerDto getCustomer() {
+return customer;
+}
+
+//@JsonIgnore
+public ShippingDto getShipping() {
+return shipping;
+}
+
+public List<ItemDto> getItems() {
+return items;
+}
+
+public List<ItemServiceDto> getItemServices() {
+return itemServices;
+}
+
+public String getOrderId() {
+return orderId;
+}
+
+public String getClientOrderId() {
+return clientOrderId;
+}
+
+public OrderMarketingDto getMarketing() {
+return marketing;
+}
+
+public List<CustomAttributesDto> getCustomAttributes() {
+return customAttributes;
+}
+
+public List<PaymentDto> getPayment() {
+return payment;
+}
+
+//@JsonProperty(value = "order")
+public void setOrderDetails(OrderDetails orderDetails) {
+this.orderDetails = orderDetails;
+}
+
+//@JsonProperty(value = "customer")
+public void setCustomer(CustomerDto customer) {
+this.customer = customer;
+}
+
+//@JsonProperty(value = "shipping")
+public void setShipping(ShippingDto shipping) {
+this.shipping = shipping;
+}
+
+public void setPayment(final List<PaymentDto> payment) {
+this.payment = payment;
+}
+
+public Boolean getDeleted() {
+return this.deleted;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/OrderSearchDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static ru.liga.evraz.aggregation.adapter.http.out.TimeFormat.DATE_FORMAT;
+import static ru.liga.evraz.aggregation.adapter.http.out.TimeFormat.DATE_TIME_ISO_FORMAT;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class OrderSearchDto {
+private String id;
+private String clientOrderId;
+private String sourceId;
+private String brandId;
+@JsonFormat(pattern = DATE_TIME_ISO_FORMAT)
+private LocalDateTime dateTimeCreated;
+private String customerId;
+private String paymentTypeId;
+private String deliveryTypeId;
+private String statusId;
+private Boolean isPaid;
+@JsonFormat(pattern = DATE_FORMAT)
+private LocalDate deliveryDate;
+@JsonFormat(pattern = DATE_FORMAT)
+private LocalDate promissedDeliveryDate;
+private String customerComment;
+private Double deliveryCost;
+private String recipientFirstName;
+private String recipientMiddleName;
+private String recipientLastName;
+private String contactEmail;
+private String contactPhone;
+private Boolean callRequested;
+private Double totalCost;
+private Double payableCost;
+private String currencyId;
+private String cancellationReasonId;
+private String customCancelationReason;
+private String fiasId;
+private String notification;
+private String responsibleManager;
+private String pickupStoreId;
+private String dispatchWarehouseId;
+private String analyticsClientId;
+private String priceClusterId;
+private List<LinkDto> links;
+@JsonIgnore
+private LocalDateTime deliveredDate;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/order/OrderUpdateDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.apache.commons.collections4.CollectionUtils;
+import ru.liga.evraz.aggregation.adapter.http.out.TimeFormat;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+/**
+* OrderUpdateDto ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ ÐºÐ»Ð°ÑÑÑƒ OrderEntityDto Ð² SF.
+*/
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderUpdateDto {
+private String orderId;
+private String tenantId;
+private String clientOrderId;
+@JsonFormat(pattern = TimeFormat.ISO_DATE_TIME_UTC_OFFSET, timezone = "GMT")
+private ZonedDateTime createdDateTime;
+private boolean deleted = false;
+private String customerId;
+private String paymentTypeId;
+private String statusId;
+private Boolean isPaid;
+private String contactEmail;
+private String contactPhone;
+private Boolean callRequested;
+@JsonFormat(pattern = "yyyy-MM-dd")
+private ZonedDateTime deliveryDate; // todo:: changed sf type
+private String customerComment;
+private Double totalCost;
+private Double payableCost;
+private String currencyId;
+private String cancellationReasonId;
+private String customCancellationReason;
+private String notification;
+private String responsibleManager;
+private String analyticsClientId;
+private LocalDateTime deliveredDate;
+private String priceClusterId;
+private Double paidCost;
+
+private Integer itemsQuantity;
+private BigDecimal itemsPrice;
+private BigDecimal itemsDiscountPrice;
+private BigDecimal itemsServiceDiscountPrice;
+private BigDecimal itemsAndServicesDiscountValue;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+private String evrazLegalEntityId;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+private String evrazCustomerType;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+private String evrazSourceId;
+
+public void enrichWithOrderAttributes(List<OrderAttribute> orderAttributes) {
+if (CollectionUtils.isNotEmpty(orderAttributes)) {
+orderAttributes.stream()
+.filter(oa -> "paymentAmount".equalsIgnoreCase(oa.getName()))
+.findFirst()
+.ifPresent(oa -> setPaidCost(Double.valueOf(oa.getValue())));
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/item/ItemDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import ru.liga.evraz.aggregation.adapter.http.out.TimeFormat;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.domain.model.product.MeasureUnit;
+import ru.liga.evraz.aggregation.sf.ItemCA;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ItemDto {
+private String id;
+private String externalId;
+@JsonFormat(pattern = TimeFormat.DATE_TIME_ISO_FORMAT)
+private LocalDateTime dateTimeCreated;
+@JsonFormat(pattern = TimeFormat.ISO_DATE_TIME_UTC_OFFSET, timezone = "GMT")
+private ZonedDateTime createdDateTime;
+private String statusId;
+private String title;
+private String productId;
+private String type;
+private String link;
+private Long quantity;
+private Double price;
+private Double discount;
+private Double tax;
+private String picture;
+private Double weight;
+private Double pickedweight;
+private String datamatrixCode;
+private Boolean deleted;
+private Double loyaltyPointsEarn;
+private Double loyaltyPointsBurn;
+private Boolean loyaltyPointsReturned;
+private List<CustomAttributesDto> customAttributes;
+private BigDecimal discountPrice;
+private Long positionCode;
+
+public ItemDto(ItemDto itemDto) {

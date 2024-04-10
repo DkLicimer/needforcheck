@@ -1,0 +1,468 @@
+﻿application/json:
+schema:
+$ref: './http/order.copy.link.yaml#/GenerateCopyLinkResponse'
+/v1/delivery/additional-attribute:
+post:
+tags:
+- ErpDelivery
+operationId: createOrUpdateDeliveryAttribute
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð°Ð¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/delivery.attribute.create.update.yaml#/CreateUpdateDeliveryAttributeRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/delivery.attribute.create.update.yaml#/CreateUpdateDeliveryAttributeResponse'
+/v1/orders/reload:
+post:
+tags:
+- Order
+summary: Ð’Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€Ð½ÑƒÑŽ Ð²Ñ‹Ð³Ñ€ÑƒÐ·ÐºÑƒ Ð·Ð°ÐºÐ°Ð·Ð¾Ð² Ð² SF
+operationId: reloadOrders
+requestBody:
+required: true
+content:
+multipart/form-data:
+schema:
+$ref: './http/order.reload.yaml#/OrdersReloadRequest'
+responses:
+'200':
+description: OK
+content:
+application/json:
+schema:
+$ref: './http/order.reload.yaml#/OrdersReloadResponse'
+/event/handle/update-variables:
+post:
+tags:
+- EventHandler
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ Ð·Ð°ÐºÐ°Ð·Ð°
+operationId: enrichProcessVariables
+#      parameters:
+#        - in: path
+#          name: methodName
+#          required: true
+#          schema:
+#            type: string
+#          description: Ð˜Ð¼Ñ Ð²Ñ‹Ð·Ñ‹Ð²Ð°ÐµÐ¼Ð¾Ð³Ð¾ Ð¼ÐµÑ‚Ð¾Ð´Ð°.
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/enrich.camunda.variables.yaml#/EnrichCamundaVariablesRequest'
+responses:
+'200':
+description: OK
+content:
+application/json:
+schema:
+$ref: './http/enrich.camunda.variables.yaml#/EnrichCamundaVariablesResponse'
+/v1/command/order-ship-permission:
+post:
+tags:
+- Command
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð¾Ðº Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ" Ð² 1Ð¡
+operationId: createOrderShipPermission
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/OrderShipPermissionItemsCmdRequest'
+responses:
+'200':
+description: ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð° ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ñ‹
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/OrderShipPermissionItemsCmdResponse'
+
+/v1/command/shipping-request-ship-permission:
+post:
+tags:
+- Command
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð¾Ðº (Ñ‚Ð¾Ð²Ð°Ñ€Ð½Ñ‹Ñ… Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð¸ ÑƒÑÐ»ÑƒÐ³) Ð—ÐÐŸ (Ð—Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ) Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ" Ð² 1Ð¡
+operationId: createShippingRequestShipPermission
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/ShippingRequestShipPermissionItemsCmdRequest'
+responses:
+'200':
+description: OK
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/ShippingRequestShipPermissionItemsCmdResponse'
+/v1/command/order-sign-pipeline:
+post:
+tags:
+- Command
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‡Ñƒ Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ OMS Ð¸Ð· OMS Ð² 1C:ERP
+operationId: createOrderSignPipeline
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/OrderSignPipelineCmdRequest'
+responses:
+'200':
+description: ÐŸÐµÑ€ÐµÐ´Ð°Ñ‡Ð° Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ OMS ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾.
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/OrderSignPipelineCmdResponse'
+/v1/command/order-reserve-renewal:
+post:
+tags:
+- Command
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ Ð¸Ð· OMS Ð² 1C:ERP Ð½Ð° Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð·Ð°ÐºÐ°Ð·Ð°
+operationId: createOrderReserveRenewalCommand
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/command/reserve.renewal.command.yaml#/OrderReserveRenewalCmdRequest'
+responses:
+'200':
+description: ÐŸÐµÑ€ÐµÐ´Ð°Ñ‡Ð° Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ OMS ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾.
+content:
+application/json:
+schema:
+$ref: './http/command/reserve.renewal.command.yaml#/OrderReserveRenewalCmdResponse'
+/v1/command/close-erp-order:
+post:
+tags:
+- Command
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ Ð½Ð° Ð·Ð°ÐºÑ€Ñ‹Ñ‚Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° 1Ð¡
+operationId: closeErpOrder
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/CloseErpOrderCmdRequest'
+responses:
+'200':
+description: OK
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/CloseErpOrderCmdResponse'
+/v1/command/cmd-status:
+post:
+tags:
+- Command
+summary: ÐžÑ‚Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ÑÑ‚Ð°Ñ‚ÑƒÑ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² 1Ð¡
+operationId: cmdStatusSend
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/CreateCmdStatusRequest'
+responses:
+'204':
+description: ÐŸÐµÑ€ÐµÐ´Ð°Ñ‡Ð° Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ OMS ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾.
+/v1/command/{commandGuid}:
+get:
+tags:
+- Command
+operationId: getErpCommand
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¿Ð¾ ÐºÐ¾Ð¼Ð°Ð½Ð´Ðµ
+parameters:
+- in: path
+name: commandGuid
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/command/command.yaml#/GetErpCommandResponse'
+/v1/order-reserve:
+post:
+tags:
+- Order
+operationId: createOrUpdateOrderReserve
+description: Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ðµ Ð¸Ð»Ð¸ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð¸Ð· 1C
+x-codegen-request-body-name: body
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: './http/order.reserve.create.update.yaml#/CreateUpdateOrderReserveRequest'
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/order.reserve.create.update.yaml#/CreateUpdateOrderReserveResponse'
+/v1/order/{orderId}/document-status-modified-at:
+get:
+deprecated: true
+tags:
+- Order
+operationId: getOrderDocumentStatusModifiedAt
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð´Ð°Ñ‚Ñ‹ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð¿Ð¾ Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ñƒ
+parameters:
+- in: path
+name: orderId
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð·Ð°ÐºÐ°Ð·Ð°
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/order.document.status.modified.at.get.yaml#/GetOrderDocumentStatusModifiedAtResponse'
+/v1/order/{orderId}/order-attributes:
+get:
+tags:
+- Order
+operationId: getOrderAttributes
+description: ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð·Ð°ÐºÐ°Ð·Ð°
+parameters:
+- in: path
+name: orderId
+schema:
+type: string
+required: true
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð·Ð°ÐºÐ°Ð·Ð°
+responses:
+200:
+description: Ð£ÑÐ¿ÐµÑˆÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚
+content:
+application/json:
+schema:
+$ref: './http/order.attributes.get.yaml#/GetOrderAttributesResponse'
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/common.yaml
+Content:
+Fault:
+type: object
+properties:
+code:
+description: ÐšÐ¾Ð´ Ð¾ÑˆÐ¸Ð±ÐºÐ¸
+type: string
+example: "NOT_FOUND"
+details:
+description: Ð¡Ð¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+type: string
+example: "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ Ð·Ð°ÐºÐ°Ð·"
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/delivery.attribute.create.update.yaml
+Content:
+CreateUpdateDeliveryAttributeRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð´Ð»Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸
+required:
+- payload
+properties:
+payload:
+$ref: "#/DeliveryAttribute"
+
+CreateUpdateDeliveryAttributeResponse:
+description: Ð¢ÐµÐ»Ð¾ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+type: object
+properties:
+payload:
+$ref: '#/DeliveryAttribute'
+fault:
+$ref: './common.yaml#/Fault'
+
+DeliveryAttribute:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ð³Ð¾ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð°
+required:
+- erpDeliveryGuid
+- name
+- deleted
+properties:
+erpDeliveryGuid:
+type: string
+description: GUID Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡.
+positionCode:
+type: integer
+format: int64
+description: ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡.
+name:
+type: string
+description: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°.
+value:
+type: string
+description: Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°.
+deleted:
+type: boolean
+description: false - Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ, ÐµÑÐ»Ð¸ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ Ð½Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½ Ð² 1Ð¡,
+true - ÐµÑÐ»Ð¸ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ ÑƒÐ´Ð°Ð»ÐµÐ½ Ð² 1Ð¡.
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/enrich.camunda.variables.yaml
+Content:
+EnrichCamundaVariablesRequest:
+type: object
+properties:
+orderId:
+type: string
+description: SF orderId
+
+EnrichCamundaVariablesResponse:
+type: object
+properties:
+success:
+type: boolean
+message:
+type: string
+result:
+type: string
+description: Ð ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ Ð¼ÐµÑ‚Ð¾Ð´Ð°
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/erp.delivery.create.update.yaml
+Content:
+CreateUpdateErpDeliveryRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· ERP
+properties:
+payload:
+$ref: '#/ErpDelivery'
+
+CreateUpdateErpDeliveryResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ ERP
+properties:
+payload:
+$ref: '#/ErpDelivery'
+fault:
+$ref: './common.yaml#/Fault'
+
+ErpDelivery:
+type: object
+description: Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ°
+required:
+- deliveryDocumentId
+- deliveryDocumentDateTime
+- deliveryDocumentLink
+- carDeliveryDateTimeFrom
+- carDeliveryDateTimeTo
+- deliveryMethod
+- erpGuid
+- deleted
+- active
+- orders
+- dispatchWarehouseSlotBooked
+- clientDocumentAuthorityForReceiveGoods
+properties:
+deliveryDocumentId:
+description: >
+ÐÐ¾Ð¼ÐµÑ€ Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡
+type: string
+example: "OMS"
+deliveryDocumentDateTime:
+description: >
+Ð”Ð°Ñ‚Ð° Ð¸ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡
+type: string
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+deliveryDocumentLink:
+description: >
+Ð¡ÑÑ‹Ð»ÐºÐ° Ð½Ð° Ð·Ð°ÑÐ²ÐºÑƒ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡
+type: string
+example: "https://1c.evraz.com/in00_1101"
+carDeliveryDateTimeFrom:
+description: >
+Ð’Ñ€ÐµÐ¼Ñ Ð¿Ð¾Ð´Ð°Ñ‡Ð¸ Ð¼Ð°ÑˆÐ¸Ð½Ñ‹ "Ð¡" Ð¸Ð· Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ
+type: string
+example: "2022-11-16T10:30:00.704+00:00"
+carDeliveryDateTimeTo:
+description: >
+Ð’Ñ€ÐµÐ¼Ñ Ð¿Ð¾Ð´Ð°Ñ‡Ð¸ Ð¼Ð°ÑˆÐ¸Ð½Ñ‹ "ÐŸÐ¾" Ð¸Ð· Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ
+type: string
+example: "2022-11-16T11:30:00.704+00:00"
+deliveryMethod:
+description: >
+Ð¡Ð¿Ð¾ÑÐ¾Ð± Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¸Ð· Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ
+type: string
+example: "DISCRETION_OF_THE_TRANSPORT_SERVICE"
+erpGuid:
+description: >
+GUID Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡
+type: string
+example: "b34db9b3-27d6-4c85-a6e6-c15b7df73306"
+deleted:
+description: >
+false - Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ, ÐµÑÐ»Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð½Ðµ Ð¿Ð¾Ð¼ÐµÑ‡ÐµÐ½ Ð½Ð° ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð² 1Ð¡
+type: boolean
+example: "Ð˜Ð²Ð°Ð½Ð¾Ð²"
+active:
+description: >
+Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ñ€Ð¾Ð²ÐµÐ´ÐµÐ½ Ð² 1Ð¡
+type: boolean
+example: "ivanov@ya.ru"
+orders:
+description: >
+Ð˜Ð´ Ñ€Ð¾Ð»Ð¸
+type: array
+items:
+$ref: '#/ErpOrderDelivery'
+recipientFullName:
+type: string
+description: Ð¤Ð˜Ðž Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+recipientPhone:
+type: string
+description: Ð¢ÐµÐ»ÐµÑ„Ð¾Ð½ Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+recipientEmail:
+type: string
+description: Email Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+recipientGuid:
+type: string
+description: GUID ÐºÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ð¾Ð³Ð¾ Ð»Ð¸Ñ†Ð° Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð° Ð² 1Ð¡.
+promisedDeliveryDate:
+type: string
+description: |
+Ð”Ð°Ñ‚Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸
+Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚: yyyy-MM-dd
+Ð¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð»Ñ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ =Ð½Ð° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹.
+x-field-extra-annotation: >-
+@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+example: "2022-11-16"
+deliveryIntervalFrom:
+type: string
+description: |
+Ð’Ñ€ÐµÐ¼Ñ Ð²Ñ‹Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ð¡
+Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚: Ñ‡Ñ‡:Ð¼Ð¼:ÑÑ
+Ð¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð»Ñ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ =Ð½Ð° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹.
+example: "16:00:00"
+deliveryIntervalTo:
+type: string
+description: |
+Ð’Ñ€ÐµÐ¼Ñ Ð²Ñ‹Ð³Ñ€ÑƒÐ·ÐºÐ¸ ÐŸÐ¾

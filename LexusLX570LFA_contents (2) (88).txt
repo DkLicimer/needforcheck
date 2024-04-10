@@ -1,0 +1,429 @@
+﻿import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.LegalEntityDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer.CustomerDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderUpdateContextService;
+import ru.liga.evraz.aggregation.application.service.StarfishUpdateService;
+import ru.liga.evraz.aggregation.application.service.data.OrderUpdateContext;
+import ru.liga.evraz.aggregation.application.service.data.OrderWithTransactionsDto;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+public class StarfishUpdateServiceImpl implements StarfishUpdateService {
+private static final int TRANSACTION_UPDATE_BATCH_SIZE = 99;
+
+@Autowired
+@Qualifier("asyncSecurityCtxTaskExecutor")
+private Executor executor;
+
+@Autowired
+private OrderService orderService;
+
+@Autowired
+private OrderRepository orderRepository;
+
+@Autowired
+private SfOrderMapper sfOrderMapper;
+
+@Autowired
+private StarfishOrderUpdateContextService starfishOrderUpdateContextService;
+
+@Autowired
+private ProductService productService;
+
+@Autowired
+private OrderTransactionRepository orderTransactionRepository;
+
+@Override
+public CompletableFuture<Void> updateOrdersAndTransactions(List<OrderWithTransactionsDto> orders) {
+Set<String> erpGuids = orders.stream()
+.map(OrderWithTransactionsDto::getErpGuid)
+.collect(Collectors.toSet());
+
+updateCustomerServiceCatalog(erpGuids);
+
+return buildUpdateContextAsync(erpGuids)
+// Fixes race condition for order update (should check errors for order creation)
+.thenCompose(this::tryUpdateLegalEntities)
+.thenCompose(this::updateOrdersAndCustomersAsync)
+.thenAcceptAsync(contexts -> updateTransactions(contexts, orders), executor);
+}
+
+// returns successfully update contexts
+private CompletableFuture<List<OrderUpdateContext>> updateOrdersAndCustomersAsync(List<OrderUpdateContext> contexts) {
+List<CompletableFuture<List<OrderUpdateContext>>> byCustomerFeatures = new ArrayList<>();
+
+for (List<OrderUpdateContext> byCustomer : splitByCustomer(contexts).values()) {
+Map<Boolean, List<OrderUpdateContext>> byShouldCreate = splitByShouldCreateOrder(byCustomer);
+
+CompletableFuture<List<OrderUpdateContext>> future;
+
+if (byShouldCreate.containsKey(Boolean.TRUE)) {
+future = createOrdersSeqAsync(byShouldCreate.get(Boolean.TRUE))
+.thenCompose(createdContexts -> updateOrdersAsync(byShouldCreate.getOrDefault(Boolean.FALSE, Collections.emptyList()))
+.thenApply(updateResults -> {
+ArrayList<OrderUpdateContext> result = new ArrayList<>();
+result.addAll(createdContexts);
+result.addAll(updateResults);
+
+return result;
+})
+);
+} else {
+List<OrderUpdateContext> updateContexts = byShouldCreate.get(Boolean.FALSE);
+CustomerDto customer = updateContexts.get(0).getSfOrder().getCustomer();
+
+future = CompletableFuture.runAsync(() -> updateCustomer(customer), executor)
+.thenCompose(unused -> updateOrdersAsync(updateContexts))
+.exceptionally(throwable -> {
+log.error("Error during update customer and orders", throwable);
+return Collections.emptyList();
+});
+}
+
+byCustomerFeatures.add(future);
+}
+
+return allOfType(byCustomerFeatures)
+.thenApply(results -> results.stream()
+.flatMap(Collection::stream)
+.toList()
+);
+}
+
+private CompletableFuture<List<OrderUpdateContext>> createOrdersSeqAsync(List<OrderUpdateContext> contexts) {
+return CompletableFuture.supplyAsync(() -> {
+List<OrderUpdateContext> success = new ArrayList<>();
+for (OrderUpdateContext context : contexts) {
+try {
+createOrder(context);
+success.add(context);
+} catch (Exception e) {
+log.error("Error during order creation: {}, {}", context.getErpGuid(), context.getSfOrderId());
+}
+}
+
+return success;
+}, executor);
+}
+
+private CompletableFuture<List<OrderUpdateContext>> updateOrdersAsync(List<OrderUpdateContext> contexts) {
+if (contexts.size() == 0) {
+return CompletableFuture.completedFuture(Collections.emptyList());
+}
+
+List<CompletableFuture<OrderUpdateContext>> futures = contexts.stream()
+.map(this::updateOrderAsync)
+.toList();
+
+return allOfType(futures)
+.thenApply(result -> result.stream()
+.filter(Objects::nonNull)
+.toList()
+);
+}
+
+private void updateCustomer(CustomerDto customer) {
+orderService.updateCustomer(customer);
+}
+
+private void updateTransactions(List<OrderUpdateContext> contexts, List<OrderWithTransactionsDto> orders) {
+Map<String, Set<String>> transactionsByErpGuid = orders.stream()
+.collect(Collectors.groupingBy(
+OrderWithTransactionsDto::getErpGuid,
+Collectors.flatMapping((o) -> o.getTransactionsIds().stream(), Collectors.toSet())
+));
+
+List<String> transactions = contexts.stream()
+.map(context -> transactionsByErpGuid.get(context.getErpGuid()))
+.filter(Objects::nonNull)
+.flatMap(Collection::stream)
+.collect(Collectors.toList());
+
+if (CollectionUtils.isNotEmpty(transactions)) {
+ListUtils.partition(transactions, TRANSACTION_UPDATE_BATCH_SIZE)
+.forEach(transactionIds -> {
+log.info("Try to update transactions: {}", transactionIds);
+orderTransactionRepository.setShouldSentFalse(transactionIds);
+});
+}
+}
+
+private void updateCustomerServiceCatalog(Set<String> erpGuids) {
+try {
+productService.updateCustomerServiceCatalogForOrderErpGuids(erpGuids);
+} catch (Exception e) {
+log.error("""
+Update itemService catalog failed.\040
+Error occurred while processing scheduled create/update for orders {}""", erpGuids, e);
+}
+}
+
+private CompletableFuture<List<OrderUpdateContext>> buildUpdateContextAsync(Set<String> erpGuids) {
+List<CompletableFuture<OrderUpdateContext>> contextFutures = erpGuids.stream()
+.map(erpGuid -> CompletableFuture.supplyAsync(() -> createContextAndTryUpdateOrderByClientId(erpGuid), executor)
+.exceptionally((throwable) -> {
+log.error("exception during creation update context for erp guid {}", erpGuid, throwable);
+return null;
+}))
+.toList();
+
+return allOfType(contextFutures)
+.thenApply(result -> result.stream()
+.filter(Objects::nonNull)
+.toList()
+);
+}
+
+private void createOrder(OrderUpdateContext context) {
+log.info("Try create order: {}, {}", context.getErpGuid(), context.getSfOrderId());
+final var sfOrderId = orderService.createOrder(context.getErpGuid(), context.getSfOrder(), context.getCancellationReason());
+orderRepository.setStarfishOrderId(context.getErpGuid(), sfOrderId);
+}
+
+private CompletableFuture<OrderUpdateContext> updateOrderAsync(OrderUpdateContext context) {
+OrderCreateExtendedDto sfOrder = context.getSfOrder();
+String sfOrderId = context.getSfOrderId();
+log.info("Call starfish update methods for sfOrderId {}, erpGuid {}", sfOrderId, context.getErpGuid());
+return CompletableFuture
+.runAsync(() -> orderService.createOrUpdateShipping(sfOrderId, sfOrder.getShipping()), executor)
+//.thenRunAsync(() -> orderService.updateCustomer(sfOrder.getCustomer()), executor)
+.thenRunAsync(() -> orderService.updateOrderCustomAttributes(sfOrderId, sfOrder.getCustomAttributes()), executor)
+.thenRunAsync(() -> orderService.updateItems(sfOrderId, sfOrder.getItems()), executor)
+.thenRunAsync(() -> orderService.updateItemServices(sfOrderId, sfOrder.getItemServices()), executor)
+.thenRunAsync(() -> orderService.updateOrdersDetails(sfOrderId, sfOrder.getOrderDetails()), executor)
+.thenRunAsync(() -> {
+if (context.getDeleted()) {
+orderService.markOrderDeleted(sfOrderId);
+}
+}, executor)
+
+.thenApply(unused -> context)
+.exceptionally(throwable -> {
+log.error("Cant update order {}", context.getErpGuid(), throwable);
+return null;
+});
+
+}
+
+private Map<String, List<OrderUpdateContext>> splitByCustomer(List<OrderUpdateContext> contexts) {
+return contexts.stream()
+.collect(Collectors.groupingBy(c -> c.getSfOrder().getCustomer().getId()));
+}
+
+private Map<Boolean, List<OrderUpdateContext>> splitByShouldCreateOrder(List<OrderUpdateContext> contexts) {
+return contexts.stream()
+.collect(Collectors.groupingBy(OrderUpdateContext::shouldCreateOrder));
+}
+
+private <T> CompletableFuture<List<T>> allOfType(List<CompletableFuture<T>> futures) {
+return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+.thenApply(unused -> futures.stream()
+.map(CompletableFuture::join)
+.collect(Collectors.toList()));
+}
+
+private OrderUpdateContext createContextAndTryUpdateOrderByClientId(String orderErpGuid) {
+log.info("start createContextAndTryUpdateOrderByClientId {}", orderErpGuid);
+Order erpOrder = orderRepository.getByErpGuid(orderErpGuid);
+if (erpOrder == null) {
+log.warn("Cannot execute scheduled create/update. Order with erpGuid: {} not found.", orderErpGuid);
+return null;
+}
+
+tryUpdateSfOrderIdByClientIdIfEmpty(erpOrder);
+
+return starfishOrderUpdateContextService.createContext(erpOrder);
+}
+
+private void tryUpdateSfOrderIdByClientIdIfEmpty(Order erpOrder) {
+if (StringUtils.isBlank(erpOrder.getSfOrderId())) {
+log.info("Starfish orderId not found for erpGuid {}", erpOrder.getErpGuid());
+final var clientOrderId = sfOrderMapper.buildClientOrderId(erpOrder);
+
+log.info("Search for starfish orderId by clientOrderId {} for order.erpGuid {}", clientOrderId, erpOrder.getErpGuid());
+final var optSfOrder = orderService.getShortOrderInfoByClientOrderId(clientOrderId);
+if (optSfOrder.isPresent()) {
+log.info("Starfish order found by clientOrderId {} for order.erpGuid {}", clientOrderId, erpOrder.getErpGuid());
+final var sfOrderId = optSfOrder.get().getId();
+orderRepository.setStarfishOrderId(erpOrder.getErpGuid(), sfOrderId);
+erpOrder.setSfOrderId(sfOrderId);
+}
+}
+}
+
+private CompletableFuture<List<OrderUpdateContext>> tryUpdateLegalEntities(List<OrderUpdateContext> contexts) {
+Collection<LegalEntityDto> uniqLegalEntities = contexts.stream()
+.map(context -> context.getSfOrder().getLegalEntity())
+.filter(Objects::nonNull)
+.collect(Collectors.toMap(LegalEntityDto::getId, Function.identity(), (a, b) -> a))
+.values();
+
+List<CompletableFuture<Void>> futures = uniqLegalEntities.stream()
+.map(this::createUpdateLegalEntityAsync)
+.toList();
+
+return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+.thenApply(unused -> contexts);
+}
+
+private CompletableFuture<Void> createUpdateLegalEntityAsync(LegalEntityDto legalEntity) {
+return CompletableFuture.runAsync(() -> orderService.createOrUpdateLegalEntity(legalEntity), executor)
+.exceptionally(throwable -> {
+log.error("Cant create/update legal entity {}", legalEntity.getId(), throwable);
+return null;
+});
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/data/OrderUpdateContext.java
+Content:
+package ru.liga.evraz.aggregation.application.service.data;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.apache.commons.lang.StringUtils;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+
+@AllArgsConstructor
+@Getter
+public class OrderUpdateContext {
+private OrderCreateExtendedDto sfOrder;
+private CancellationReason cancellationReason;
+private String erpGuid;
+private Boolean deleted;
+private String sfOrderId;
+
+public Boolean shouldCreateOrder() {
+return StringUtils.isBlank(sfOrderId);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/data/OrderWithTransactionsDto.java
+Content:
+package ru.liga.evraz.aggregation.application.service.data;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Set;
+
+@AllArgsConstructor
+@Getter
+public class OrderWithTransactionsDto {
+private String erpGuid;
+private Set<String> transactionsIds;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/schedule/LoggableAsyncTaskExecutor.java
+Content:
+package ru.liga.evraz.aggregation.application.schedule;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j
+public class LoggableAsyncTaskExecutor {
+private final AsyncTaskExecutor asyncTaskExecutor;
+
+public LoggableAsyncTaskExecutor(@Qualifier("asyncTaskExecutor") AsyncTaskExecutor asyncTaskExecutor) {
+this.asyncTaskExecutor = asyncTaskExecutor;
+}
+
+@Scheduled(cron = "${async.task.executor.log.cron:*/1 * * * * *}")
+public void threadPoolTaskExecutorState() {
+logThreadPoolTaskExecutorState();
+}
+
+private void logThreadPoolTaskExecutorState() {
+if (asyncTaskExecutor instanceof final ThreadPoolTaskExecutor tpte) {
+log.info("ThreadPoolTaskExecutor -> name prefix {}, activeCount {}, queue size: {}",
+tpte.getThreadNamePrefix(),
+tpte.getActiveCount(),
+tpte.getThreadPoolExecutor().getQueue().size());
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/schedule/ScheduledLockConfig.java
+Content:
+package ru.liga.evraz.aggregation.application.schedule;
+
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.sql.DataSource;
+
+@Configuration
+@EnableSchedulerLock(defaultLockAtMostFor = "${scheduled.lock.defaultLockAtMostFor:PT59S}")
+class ScheduledLockConfig {
+@Bean
+public LockProvider lockProvider(@Qualifier("dataSource") DataSource dataSource) {
+return new JdbcTemplateLockProvider(dataSource, "shedlock");
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/schedule/ScheduledOrderUpdateJob.java
+Content:
+package ru.liga.evraz.aggregation.application.schedule;
+
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+import ru.liga.evraz.aggregation.application.service.StarfishUpdateService;
+import ru.liga.evraz.aggregation.application.service.data.OrderWithTransactionsDto;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.security.service.JwtTokenService;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;

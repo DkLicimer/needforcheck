@@ -1,0 +1,504 @@
+﻿"status": "IN_PROGRESS",
+"decision": "decided",
+"responsible": {
+"responsibleId": "test_responsible_id",
+"responsibleFullName": "ÐšÑƒÐ·Ð½ÐµÑ†Ð¾Ð² Ð",
+"responsibleEmail": "test_email@test.ru"
+}
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/send_command_status/update_erp_tak_status_request_wo_responsible.json
+Content:
+{
+"payload": {
+"guid": "test-erp-task-commandGuid-2",
+"status": "IN_PROGRESS",
+"decision": "decided"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_task/send_command_status/update_erp_tak_status_response.json
+Content:
+{
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/delivery_success_request_1.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "Ð˜Ð12-0212312",
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"deleted": false,
+"active": true,
+"deliveryDocumentDateTime": "2022-11-16T20:27:51+03:00",
+"deliveryDocumentLink": "https://1c.evraz.com/in00_1101",
+"carDeliveryDateTimeFrom": "2022-11-16T10:30:00+03:00",
+"carDeliveryDateTimeTo": "2022-11-16T11:30:00+03:00",
+"deliveryMethod": "DISCRETION_OF_THE_TRANSPORT_SERVICE",
+"recipientFullName": "Test Testovich Testov",
+"recipientPhone": "7(999) 999-99-01",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a99db9b3-27d6-4c85-a6e6-c15b7df73306",
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "DELIVERY_WITH_DOCUMENT_COPY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": false,
+"orders": [
+{
+"erpOrderGuid": "test_delivery_erp_order_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.00
+},
+{
+"positionCode": 2,
+"skuId": "1241255",
+"quantity": 200.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/delivery_success_request_2.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "Ð˜Ð12-0212312",
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"deleted": true,
+"active": false,
+"deliveryDocumentDateTime": "2022-11-16T20:27:51+03:00",
+"deliveryDocumentLink": "https://1c.evraz.com/in00_1101",
+"carDeliveryDateTimeFrom": "2022-11-16T10:30:00+03:00",
+"carDeliveryDateTimeTo": "2022-11-16T11:30:00+03:00",
+"deliveryMethod": "DISCRETION_OF_THE_TRANSPORT_SERVICE",
+"recipientFullName": "Test Testovich Testov",
+"recipientPhone": "7(999) 999-99-01",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a99db9b3-27d6-4c85-a6e6-c15b7df73306",
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "DELIVERY_WITH_DOCUMENT_COPY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": false,
+"orders": [
+{
+"erpOrderGuid": "test_delivery_erp_order_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.00
+},
+{
+"positionCode": 2,
+"skuId": "1241255",
+"quantity": 200.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/delivery_success_response_1.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "Ð˜Ð12-0212312",
+"deliveryDocumentDateTime": "2022-11-16T17:27:51Z",
+"deliveryDocumentLink": "https://1c.evraz.com/in00_1101",
+"carDeliveryDateTimeFrom": "2022-11-16T07:30:00Z",
+"carDeliveryDateTimeTo": "2022-11-16T08:30:00Z",
+"deliveryMethod": "DISCRETION_OF_THE_TRANSPORT_SERVICE",
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"deleted": false,
+"active": true,
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "DELIVERY_WITH_DOCUMENT_COPY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": false,
+"orders": [
+{
+"erpOrderGuid": "test_delivery_erp_order_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": null,
+"skuId": "1241255",
+"quantity": 200.0
+}
+]
+}
+],
+"recipientFullName": "Test Testovich Testov",
+"recipientPhone": "7(999) 999-99-01",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a99db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/delivery_success_response_2.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "Ð˜Ð12-0212312",
+"deliveryDocumentDateTime": "2022-11-16T20:27:51+03:00",
+"deliveryDocumentLink": "https://1c.evraz.com/in00_1101",
+"carDeliveryDateTimeFrom": "2022-11-16T10:30:00+03:00",
+"carDeliveryDateTimeTo": "2022-11-16T11:30:00+03:00",
+"deliveryMethod": "DISCRETION_OF_THE_TRANSPORT_SERVICE",
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"deleted": true,
+"active": false,
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "DELIVERY_WITH_DOCUMENT_COPY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": false,
+"orders": [
+{
+"erpOrderGuid": "test_delivery_erp_order_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": null,
+"skuId": "1241255",
+"quantity": 200.0
+}
+]
+}
+],
+"recipientFullName": "Test Testovich Testov",
+"recipientPhone": "7(999) 999-99-01",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a99db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/delivery_unsuccessful_request_1.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "Ð˜Ð12-0212312",
+"erpGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"deleted": false,
+"active": true,
+"deliveryDocumentDateTime": "2022-11-16T20:27:51+03:00",
+"deliveryDocumentLink": "https://1c.evraz.com/in00_1101",
+"carDeliveryDateTimeFrom": "2022-11-16T10:30:00+03:00",
+"carDeliveryDateTimeTo": "2022-11-16T11:30:00+03:00",
+"deliveryMethod": "DISCRETION_OF_THE_TRANSPORT_SERVICE",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "b34db9b3-27d6-4c85-a6e6-c15b7df73306",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.00
+},
+{
+"positionCode": 2,
+"skuId": "1241255",
+"quantity": 200.00
+},
+{
+"positionCode": 2,
+"skuId": "1241256",
+"quantity": 200.00
+}
+]
+},
+{
+"erpOrderGuid": "5cef54b5-7c6c-4a23-a545-a7ec81d57de6",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1241255",
+"quantity": 109.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/delivery_unsuccessful_response_1.json
+Content:
+{
+"fault": {
+"code": "BAD_REQUEST",
+"details": "Duplicate position code in delivery(guid) b34db9b3-27d6-4c85-a6e6-c15b7df73306"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/delete_for_update_request.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"erpGuid": "1-test-erp_guid",
+"deleted": false,
+"active": false,
+"deliveryDocumentDateTime": "2023-02-25T11:00:00+03:00",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T14:44:44+04:00",
+"carDeliveryDateTimeTo": "2023-02-26T15:55:55+03:00",
+"deliveryMethod": "PICKUP",
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a22db9b3-27d6-4c85-a6e6-c15b7df73306",
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "test_order_erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.00
+},
+{
+"positionCode": 2,
+"skuId": "2222222",
+"quantity": 200.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/delete_for_update_response.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"deliveryDocumentDateTime": "2023-02-25T11:00:00+03:00",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T14:44:44+04:00",
+"carDeliveryDateTimeTo": "2023-02-26T15:55:55+03:00",
+"deliveryMethod": "PICKUP",
+"erpGuid": "1-test-erp_guid",
+"deleted": false,
+"active": false,
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "test_order_erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": null,
+"skuId": "2222222",
+"quantity": 200.0
+}
+]
+},
+{
+"erpOrderGuid": "test_order_erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": 2,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 3,
+"orderPositionCode": 3,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 4,
+"orderPositionCode": 4,
+"skuId": "test_sku_id",
+"quantity": 10.0
+}
+]
+}
+],
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a22db9b3-27d6-4c85-a6e6-c15b7df73306"
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/delete_request.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"erpGuid": "1-test-erp_guid",
+"deleted": true,
+"active": true,
+"deliveryDocumentDateTime": "2023-02-25T11:00:00+03:00",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T14:44:44+04:00",
+"carDeliveryDateTimeTo": "2023-02-26T15:55:55+03:00",
+"deliveryMethod": "PICKUP",
+"recipientFullName": "FullName Updated",
+"recipientPhone": "7(444) 555-55-55",
+"recipientEmail": "test@test.com",
+"recipientGuid": "a11db9b3-27d6-4c85-a6e6-c15b7df73306",
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "test_delivery_erp_order_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.00
+},
+{
+"positionCode": 2,
+"skuId": "2222222",
+"quantity": 200.00
+}
+]
+}
+]
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/erp_delivery/update/delete_response.json
+Content:
+{
+"payload": {
+"deliveryDocumentId": "updated",
+"deliveryDocumentDateTime": "2023-02-25T11:00:00+03:00",
+"deliveryDocumentLink": "updated-link",
+"carDeliveryDateTimeFrom": "2023-02-26T14:44:44+04:00",
+"carDeliveryDateTimeTo": "2023-02-26T15:55:55+03:00",
+"deliveryMethod": "PICKUP",
+"erpGuid": "1-test-erp_guid",
+"deleted": true,
+"active": true,
+"promisedDeliveryDate": "2023-10-31",
+"deliveryIntervalFrom": "20:23:11",
+"deliveryIntervalTo": "21:23:11",
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29",
+"warehouseId": "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2",
+"dispatchWarehouseSlotBooked": true,
+"clientDocumentAuthorityForReceiveGoodsNote": "GET_ORIGINAL_DOCUMENT_AT_DELIVERY",
+"clientDocumentAuthorityForReceiveGoods": true,
+"soleExecutiveGovernment": true,
+"orders": [
+{
+"erpOrderGuid": "test_delivery_erp_order_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "1111111",
+"quantity": 109.0
+},
+{
+"positionCode": 2,
+"orderPositionCode": null,
+"skuId": "2222222",
+"quantity": 200.0
+}
+]
+},
+{
+"erpOrderGuid": "1-test-erp_guid",
+"deliveryItems": [
+{
+"positionCode": 1,
+"orderPositionCode": 1,
+"skuId": "test_sku_id",
+"quantity": 10.0
+},
+{
+"positionCode": 2,

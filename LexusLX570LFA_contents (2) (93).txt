@@ -1,0 +1,447 @@
+﻿this.delegate.configure(configs, isKey);
+this.isForKey = isKey;
+if (this.failedDeserializationFunction == null) {
+setupFunction(configs, isKey ? KEY_FUNCTION : VALUE_FUNCTION);
+}
+}
+
+public void setupDelegate(Map<String, ?> configs, String configKey) {
+if (configs.containsKey(configKey)) {
+try {
+Object value = configs.get(configKey);
+Class<?> clazz = value instanceof Class ? (Class<?>) value : ClassUtils.forName((String) value, null);
+this.delegate = setupDelegate(clazz.getDeclaredConstructor().newInstance());
+} catch (Exception e) {
+throw new IllegalStateException(e);
+}
+}
+}
+
+@SuppressWarnings("unchecked")
+private Deserializer<T> setupDelegate(Object delegate) {
+Assert.isInstanceOf(Deserializer.class, delegate, "'delegate' must be a 'Deserializer', not a ");
+return (Deserializer<T>) delegate;
+}
+
+@SuppressWarnings("unchecked")
+private void setupFunction(Map<String, ?> configs, String configKey) {
+if (configs.containsKey(configKey)) {
+try {
+Object value = configs.get(configKey);
+Class<?> clazz = value instanceof Class ? (Class<?>) value : ClassUtils.forName((String) value, null);
+Assert.isTrue(Function.class.isAssignableFrom(clazz), "'function' must be a 'Function ', not a "
++ clazz.getName());
+this.failedDeserializationFunction = (Function<FailedDeserializationInfo, T>)
+clazz.getDeclaredConstructor().newInstance();
+} catch (Exception e) {
+throw new IllegalStateException(e);
+}
+}
+}
+
+@Override
+public T deserialize(String topic, byte[] data) {
+try {
+return this.delegate.deserialize(topic, data);
+} catch (Exception e) {
+return recoverFromSupplier(topic, null, data, e);
+}
+}
+
+@Override
+public T deserialize(String topic, Headers headers, byte[] data) {
+try {
+if (this.isForKey) {
+headers.remove(SerializationUtils.KEY_DESERIALIZER_EXCEPTION_HEADER);
+} else {
+headers.remove(SerializationUtils.VALUE_DESERIALIZER_EXCEPTION_HEADER);
+}
+return this.delegate.deserialize(topic, headers, data);
+} catch (Exception e) {
+log.error("Error on Kafka Message Deserialization", e);
+SerializationUtils.deserializationException(headers, data, e, this.isForKey);
+return recoverFromSupplier(topic, headers, data, e);
+}
+}
+
+private T recoverFromSupplier(String topic, Headers headers, byte[] data, Exception exception) {
+if (this.failedDeserializationFunction != null) {
+FailedDeserializationInfo failedDeserializationInfo =
+new FailedDeserializationInfo(topic, headers, data, this.isForKey, exception);
+return this.failedDeserializationFunction.apply(failedDeserializationInfo);
+} else {
+return null;
+}
+}
+
+@Override
+public void close() {
+if (this.delegate != null) {
+this.delegate.close();
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaCloseErpOrderProperties.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "aggregation.kafka.close-erp-order")
+public class KafkaCloseErpOrderProperties {
+
+private Request request;
+
+@Getter
+@Setter
+public static class Request {
+private String topic;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaConfig.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.ConsumerAwareRecordInterceptor;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
+import ru.liga.evraz.aggregation.adapter.http.out.kafka.OrderReloadRecordInterceptor;
+import ru.liga.evraz.aggregation.domain.model.*;
+import ru.liga.evraz.aggregation.domain.model.OrderReloadDto;
+import ru.liga.evraz.aggregation.domain.model.OrderReserveRenewalDto;
+import ru.liga.evraz.aggregation.domain.model.OrderShipPermissionDto;
+import ru.liga.evraz.aggregation.domain.model.OrderSignPipelineDto;
+import ru.liga.evraz.aggregation.domain.model.ShippingRequestShipPermissionDto;
+import ru.liga.evraz.aggregation.security.service.JwtTokenService;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+* Kafka config.
+*/
+@EnableKafka
+@Configuration
+@EnableConfigurationProperties({
+KafkaOrderReloadProperties.class,
+KafkaOrderShipPermissionProperties.class,
+KafkaShippingRequestShipPermissionProperties.class,
+KafkaOrderSignPipelineProperties.class,
+KafkaCloseErpOrderProperties.class,
+KafkaOrderReserveRenewalProperties.class
+})
+@RequiredArgsConstructor
+@Slf4j
+class KafkaConfig {
+
+private final KafkaProperties kafkaProperties;
+private final JwtTokenService jwtTokenService;
+
+@Bean
+public KafkaAdmin kafkaAdmin() {
+Map<String, Object> configs = kafkaProperties.buildAdminProperties();
+return new KafkaAdmin(configs);
+}
+
+@Bean
+public ProducerFactory<String, OrderReloadDto> orderReloadProducerFactory() {
+return new DefaultKafkaProducerFactory<>(buildProperties());
+}
+
+@Bean
+public ProducerFactory<CommandGuidKey, OrderShipPermissionDto> orderShipPermissionProducerFactory() {
+return new DefaultKafkaProducerFactory<>(buildPropertiesWithJsonKey());
+}
+
+@Bean
+public ProducerFactory<CommandGuidKey, ShippingRequestShipPermissionDto> shippingRequestShipPermissionProducerFactory() {
+return new DefaultKafkaProducerFactory<>(buildPropertiesWithJsonKey());
+}
+
+@Bean
+public ProducerFactory<CommandGuidKey, OrderReserveRenewalDto> orderReserveRenewalProducerFactory() {
+return new DefaultKafkaProducerFactory<>(buildPropertiesWithJsonKey());
+}
+
+@Bean
+public ProducerFactory<CommandGuidKey, OrderSignPipelineDto> orderSignPipelineProducerFactory() {
+return new DefaultKafkaProducerFactory<>(buildPropertiesWithJsonKey());
+}
+
+@Bean
+public ProducerFactory<CommandGuidKey, CloseErpOrderDto> closeErpOrderProducerFactory() {
+return new DefaultKafkaProducerFactory<>(buildPropertiesWithJsonKey());
+}
+
+@Bean
+public KafkaTemplate<String, OrderReloadDto> orderReloadKafkaTemplate() {
+return new KafkaTemplate<>(orderReloadProducerFactory());
+}
+
+@Bean
+public KafkaTemplate<CommandGuidKey, OrderShipPermissionDto> orderShipPermissionKafkaTemplate() {
+return new KafkaTemplate<>(orderShipPermissionProducerFactory());
+}
+
+@Bean
+public KafkaTemplate<CommandGuidKey, ShippingRequestShipPermissionDto> shippingRequestShipPermissionKafkaTemplate() {
+return new KafkaTemplate<>(shippingRequestShipPermissionProducerFactory());
+}
+
+@Bean
+public KafkaTemplate<CommandGuidKey, OrderReserveRenewalDto> orderReserveRenewalKafkaTemplate() {
+return new KafkaTemplate<>(orderReserveRenewalProducerFactory());
+}
+
+@Bean
+public KafkaTemplate<CommandGuidKey, OrderSignPipelineDto> orderSignPipelineKafkaTemplate() {
+return new KafkaTemplate<>(orderSignPipelineProducerFactory());
+}
+
+@Bean
+public KafkaTemplate<CommandGuidKey, CloseErpOrderDto> closeErpOrderKafkaTemplate(ProducerFactory<CommandGuidKey, CloseErpOrderDto> closeErpOrderProducerFactory) {
+return new KafkaTemplate<>(closeErpOrderProducerFactory);
+}
+
+@Bean
+public ConsumerFactory<String, OrderReloadDto> consumerFactory() {
+var properties = kafkaProperties.buildConsumerProperties();
+addDeserializerProperties(properties);
+properties.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getConsumer().getGroupId());
+properties.put(JsonDeserializer.VALUE_DEFAULT_TYPE, OrderReloadDto.class);
+properties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+log.info("kafkaConsumerFactory -> {}", properties.entrySet().stream()
+.filter(entry -> !"sasl.jaas.config".equals(entry.getKey()) && !entry.getKey().contains("password"))
+.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+return new DefaultKafkaConsumerFactory<>(properties);
+}
+
+@Bean
+public ConcurrentKafkaListenerContainerFactory<String, OrderReloadDto> kafkaListenerContainerFactory() {
+ConcurrentKafkaListenerContainerFactory<String, OrderReloadDto> factory =
+new ConcurrentKafkaListenerContainerFactory<>();
+factory.setConsumerFactory(consumerFactory());
+factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+factory.setRecordInterceptor(orderReloadInterceptor());
+return factory;
+}
+
+@Bean
+public ConsumerAwareRecordInterceptor<String, OrderReloadDto> orderReloadInterceptor() {
+return new OrderReloadRecordInterceptor(jwtTokenService);
+}
+
+private static void addDeserializerProperties(Map<String, Object> properties) {
+properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+properties.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
+properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, EvrazErrorHandlingDeserializer.class);
+properties.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+}
+
+private Map<String, Object> buildPropertiesWithJsonKey() {
+var properties = kafkaProperties.buildProducerProperties();
+properties.put(ProducerConfig.ACKS_CONFIG, "all");
+properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+log.info("kafkaProducerFactory -> {}", properties.entrySet().stream()
+.filter(entry -> !"sasl.jaas.config".equals(entry.getKey()) && !entry.getKey().contains("password"))
+.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+return properties;
+}
+
+private Map<String, Object> buildProperties() {
+var properties = kafkaProperties.buildProducerProperties();
+properties.put(ProducerConfig.ACKS_CONFIG, "all");
+properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+log.info("kafkaProducerFactory -> {}", properties.entrySet().stream()
+.filter(entry -> !"sasl.jaas.config".equals(entry.getKey()) && !entry.getKey().contains("password"))
+.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+return properties;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaOrderReloadProperties.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "aggregation.kafka.order-reload")
+public class KafkaOrderReloadProperties {
+
+private Request request;
+
+@Getter
+@Setter
+public static class Request {
+private String topic;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaOrderReserveRenewalProperties.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "aggregation.kafka.command-order-reserve-renewal")
+public class KafkaOrderReserveRenewalProperties {
+
+private Request request;
+
+@Getter
+@Setter
+public static class Request {
+private String topic;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaOrderShipPermissionProperties.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "aggregation.kafka.command-order-ship-permission")
+public class KafkaOrderShipPermissionProperties {
+
+private Request request;
+
+@Getter
+@Setter
+public static class Request {
+private String topic;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaOrderSignPipelineProperties.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "aggregation.kafka.command-sign-pipeline")
+public class KafkaOrderSignPipelineProperties {
+
+private Request request;
+
+@Getter
+@Setter
+public static class Request {
+private String topic;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/kafka/KafkaShippingRequestShipPermissionProperties.java
+Content:
+package ru.liga.evraz.aggregation.adapter.kafka;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@Getter
+@Setter
+@ConfigurationProperties(prefix = "aggregation.kafka.command-shipping-request-ship-permission")
+public class KafkaShippingRequestShipPermissionProperties {
+
+private Request request;
+
+@Getter
+@Setter
+public static class Request {
+private String topic;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/HttpConfig.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.spring.web.json.JacksonModuleRegistrar;
+
+@Configuration
+class HttpConfig {
+@Bean
+public JacksonModuleRegistrar jacksonModuleRegistrar() {
+return new DateTimeSerialization();
+}
+
+static class DateTimeSerialization implements JacksonModuleRegistrar {
+
+@Override
+public void maybeRegisterModule(ObjectMapper objectMapper) {
+objectMapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
+objectMapper.registerModule(new JavaTimeModule());
+}
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/ErpZonedDateTimeSerializer.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
+import java.io.IOException;
+import java.time.ZoneId;

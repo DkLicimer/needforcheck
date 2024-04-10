@@ -1,0 +1,399 @@
+﻿import ru.liga.evraz.aggregation.application.service.OrderCopyLinkService;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static ru.liga.evraz.aggregation.adapter.http.out.TimeFormat.DATE_FORMAT_BY_DOT;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class OrderCopyLinkServiceImpl implements OrderCopyLinkService {
+private static final Pattern TIMEZONE_PATTERN = Pattern.compile("^UTC ?([+-])(\\d\\d?)$");
+private static final Pattern ORDER_UID_PATTERN = Pattern.compile("....-......");
+private static final String UTC_STRING = "UTC";
+private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT_BY_DOT);
+
+private final OrderRepository orderRepository;
+
+@Value("${evraz.webshop.copy.link.url:https://preprod.evraz.market/operator/basket/}")
+private String copyLinkUrl;
+
+@Override
+public String buildLink(String sfOrderId) {
+Order order = orderRepository.getByStarfishOrderId(sfOrderId);
+if (order != null) {
+if (validate(order)) {
+
+if (order.isDeleted() || order.isDeletedMark()) {
+log.warn("Order by sfOrderId {} was deleted or deleted_mark. Copy link DISABLED!", sfOrderId);
+return null;
+}
+
+String date = formatDocumentDateTime(order.getDocumentDateTime(), order.getDocumentTimeZone(), sfOrderId);
+String entityID = order.getPartnerGuid() + "#" + order.getCustomerGuid();
+String orderUid = order.getDocumentId();
+
+if (StringUtils.isBlank(date) || StringUtils.isBlank(entityID) || StringUtils.isBlank(orderUid) || !ORDER_UID_PATTERN.matcher(orderUid).matches()) {
+log.warn("Cant build link for order: {}", sfOrderId);
+return null;
+}
+
+return buildUrl(date, entityID, orderUid);
+}
+} else {
+log.error("Order not found by sfOrderId: {}", sfOrderId);
+}
+
+return null;
+}
+
+private boolean validate(Order order) {
+return order.getDocumentDateTime() != null
+&& StringUtils.isNotBlank(order.getDocumentTimeZone())
+&& StringUtils.isNotBlank(order.getPartnerGuid())
+&& StringUtils.isNotBlank(order.getCustomerGuid())
+&& StringUtils.isNotBlank(order.getDocumentId());
+}
+
+private String buildUrl(String date, String entityID, String orderUid) {
+try {
+URIBuilder builder = new URIBuilder(copyLinkUrl);
+builder.addParameter("orderuid", orderUid);
+builder.addParameter("date", date);
+builder.addParameter("entityid", entityID);
+
+return builder.build().toString();
+} catch (URISyntaxException e) {
+log.error("Cant build url. {}", e.getMessage(), e);
+return null;
+}
+}
+
+private String parseTimeZone(String documentTimeZone, String sfOrderId) {
+Matcher matcher = TIMEZONE_PATTERN.matcher(documentTimeZone);
+
+if (!matcher.matches()) {
+log.error("Invalid timezone format. SfOrderId: {}, timeZone {}", sfOrderId, documentTimeZone);
+return null;
+}
+
+String sign = matcher.group(1);
+String time = matcher.group(2);
+
+return UTC_STRING + sign + Integer.parseInt(time);
+}
+
+private String formatDocumentDateTime(ZonedDateTime documentDateTime, String documentTimeZone, String sfOrderId) {
+try {
+String zone = parseTimeZone(documentTimeZone, sfOrderId);
+if (zone != null) {
+LocalDate documentDate = documentDateTime.withZoneSameInstant(ZoneId.of(zone)).toLocalDate();
+return DATE_TIME_FORMATTER.format(documentDate);
+}
+} catch (Exception e) {
+log.error("Cant format documentDateTime. SfOrderId: {}, date: {}, timeZone: {}, message: {}", sfOrderId, documentDateTime, documentTimeZone, e.getMessage(), e);
+}
+
+return null;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/impl/StarfishOrderContextServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderUpdateContextService;
+import ru.liga.evraz.aggregation.application.service.data.OrderUpdateContext;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+
+import java.util.List;
+
+import static java.util.Objects.nonNull;
+
+@Service
+@Slf4j
+public class StarfishOrderContextServiceImpl implements StarfishOrderUpdateContextService {
+@Autowired
+private OrderAttributeRepository orderAttributeRepository;
+
+@Autowired
+private StarfishOrderEnricher starfishOrderEnricher;
+
+@Autowired
+private DeliveryAttributeRepository deliveryAttributeRepository;
+
+@Autowired
+private SfOrderMapper sfOrderMapper;
+
+@Override
+public OrderUpdateContext createContext(Order erpOrder) {
+// TODO:: collect erpOrder additional attributes if exists
+// TODO:: collect delivery additional attributes if exists
+// TODO:: enrich erpOrder and map to SF24 erpOrder
+final var orderAttributes = orderAttributeRepository.findByErpOrderGuid(erpOrder.getErpGuid());
+final var deliveryList = starfishOrderEnricher.getAllDeliveryDataIfExist(erpOrder.getErpGuid());
+final var delivery = starfishOrderEnricher.getDeliveryDataIfExist(deliveryList);
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+
+final var sfOrder = sfOrderMapper.mapToCreateDto(erpOrder, deliveryList);
+
+boolean createOrder = StringUtils.isBlank(erpOrder.getSfOrderId());
+
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithOrderAttributes(sfOrder, orderAttributes, erpOrder.getErpGuid());
+if (!createOrder || nonNull(delivery)) {
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDelivery(sfOrder, delivery, deliveryList);
+}
+starfishOrderEnricher.enrichOrderCreateExtendedDtoWithDeliveryAttributes(sfOrder, delivery, deliveryAttributes);
+sfOrder.enrichOrderItemsAndServicesWithShippingErpGuid(delivery);
+starfishOrderEnricher.enrichOrderWithCalculatedAttributes(sfOrder, deliveryList);
+starfishOrderEnricher.enrichOrderWithSubdivisionNameAttribute(sfOrder, erpOrder);
+starfishOrderEnricher.enrichOrderWithReserveAttribute(sfOrder, erpOrder);
+// TODO:: Another enrich operations
+
+return new OrderUpdateContext(sfOrder, erpOrder.getDocumentCancellationReason(), erpOrder.getErpGuid(), erpOrder.isDeleted(), erpOrder.getSfOrderId());
+}
+
+private List<DeliveryAttribute> getDeliveryAttributesForDelivery(ErpDelivery delivery) {
+return delivery != null && StringUtils.isNotBlank(delivery.getErpGuid())
+? deliveryAttributeRepository.findByDeliveryErpGuid(delivery.getErpGuid())
+: List.of();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/impl/StarfishOrderEnricherImpl.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderReserveRepository;
+import ru.liga.evraz.aggregation.domain.repository.SubdivisionService;
+
+import java.util.Comparator;
+import java.util.List;
+
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.DeliveryAttributeHelper.addShippedQuantityToItems;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.DeliveryAttributeHelper.getCustomAttributesFromDeliveryAttributes;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.addClientDocumentAuthorityForReceiveGoodsRequiredAttrIfNotExists;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.addDispatchWarehouseCountAttrIfNotExists;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.addOrUpdateAttributeByName;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.calculateShippingCount;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.enrichItemServicesWithMetalProcessingInfo;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.enrichItemsWithMetalProcessingInfo;
+import static ru.liga.evraz.aggregation.adapter.http.out.service.OrderAttributeHelper.getAdditionalOrderCustomAttributesFromOrderAttributes;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class StarfishOrderEnricherImpl implements StarfishOrderEnricher {
+private static final String SUBDIVISION_NAME = "subdivisionName";
+private static final String RESERVATION_REMOVAL_DATE = "reservationRemovalDate";
+private static final String RESERVATION_EXTENSION_REASON = "reservationExtensionReason";
+
+private final OrderReserveRepository orderReserveRepo;
+private final SubdivisionService subdivisionService;
+private final ErpDeliveryRepository deliveryRepo;
+
+protected final SfOrderMapper sfOrderMapper;
+
+@Override
+public void enrichOrderWithReserveAttribute(OrderCreateExtendedDto sfOrder, Order erpOrder) {
+String reservationRemovalDate = EMPTY;
+String reservationExtensionReason = EMPTY;
+final var orderReserveExists = orderReserveRepo.existsByOrderErpGuid(erpOrder.getErpGuid());
+if (orderReserveExists) {
+var orderReseve = orderReserveRepo.getByErpOrderGuid(erpOrder.getErpGuid());
+reservationRemovalDate = orderReseve.isActive() ? orderReseve.getReservationRemovalDate() : EMPTY;
+reservationExtensionReason = orderReseve.isActive() ? orderReseve.getReservationExtensionReason().name() : EMPTY;
+} else {
+log.warn("OrderReserve not found for order with orderErpGuid = {}", erpOrder.getErpGuid());
+}
+List<CustomAttributesDto> sfOrderCustomAttributes = sfOrder.getCustomAttributes();
+final var reservationRemovalDateAttribute = CustomAttributesDto.builder()
+.name(RESERVATION_REMOVAL_DATE)
+.value(reservationRemovalDate)
+.build();
+addOrUpdateAttributeByName(sfOrderCustomAttributes, reservationRemovalDateAttribute, RESERVATION_REMOVAL_DATE);
+final var reservationExtensionReasonAttribute = CustomAttributesDto.builder()
+.name(RESERVATION_EXTENSION_REASON)
+.value(reservationExtensionReason)
+.build();
+addOrUpdateAttributeByName(sfOrderCustomAttributes, reservationExtensionReasonAttribute, RESERVATION_EXTENSION_REASON);
+}
+
+@Override
+public void enrichOrderWithSubdivisionNameAttribute(OrderCreateExtendedDto sfOrder, Order erpOrder) {
+String subdivisionName = EMPTY;
+final var subdivisionExists = subdivisionService.existsById(erpOrder.getSubdivisionId());
+if (subdivisionExists) {
+var subdivision = subdivisionService.getById(erpOrder.getSubdivisionId());
+subdivisionName = !subdivision.isDeleted() ? subdivision.getSubdivisionName() : EMPTY;
+} else {
+log.warn("Subdivision with id {} not found for order with orderErpGuid = {}", erpOrder.getSubdivisionId(), erpOrder.getErpGuid());
+}
+List<CustomAttributesDto> sfOrderCustomAttributes = sfOrder.getCustomAttributes();
+final var subdivisionNameAttr = CustomAttributesDto.builder()
+.name(SUBDIVISION_NAME)
+.value(subdivisionName)
+.build();
+addOrUpdateAttributeByName(sfOrderCustomAttributes, subdivisionNameAttr, SUBDIVISION_NAME);
+}
+
+@Override
+public void enrichOrderCreateExtendedDtoWithOrderAttributes(OrderCreateExtendedDto sfOrder,
+List<OrderAttribute> orderAttributes,
+String orderErpGuid) {
+log.info("Enrich order with erpGuid {} by additional order attributes", orderErpGuid);
+enrichItemsWithMetalProcessingInfo(sfOrder.getItems(), orderAttributes);
+enrichItemServicesWithMetalProcessingInfo(sfOrder.getItemServices(), orderAttributes);
+final var additionalOrderCustomAttributes = getAdditionalOrderCustomAttributesFromOrderAttributes(orderAttributes);
+sfOrder.getCustomAttributes().addAll(additionalOrderCustomAttributes);
+sfOrder.getOrderDetails().enrichWithOrderAttributes(orderAttributes);
+}
+
+@Override
+public void enrichOrderCreateExtendedDtoWithDelivery(OrderCreateExtendedDto sfOrder, ErpDelivery delivery, List<ErpDelivery> deliveryList) {
+var sfShippingDto = sfOrder.getShipping();
+var orderDetails = sfOrder.getOrderDetails();
+final List<CustomAttributesDto> deliveryCustomAttributes;
+if (nonNull(delivery)) {
+/*final var deliveryAttributes = deliveryAttributeRepo.findByDeliveryErpGuid(delivery.getErpGuid());
+enrichOrderCreateExtendedDtoWithDeliveryAttributes(sfOrder, delivery, deliveryAttributes);*/
+deliveryCustomAttributes = sfOrderMapper.getListDeliveryCustomAttributes(delivery, sfOrder.getCustomAttributes());
+sfShippingDto.setRecipientFirstName(delivery.getRecipientFullName());
+sfShippingDto.setPromissedDeliveryDate(delivery.getPromisedDeliveryDate());
+sfShippingDto.setDeliveryIntervalFrom(delivery.getDeliveryIntervalFrom());
+sfShippingDto.setDeliveryIntervalTo(delivery.getDeliveryIntervalTo());
+sfShippingDto.setDispatchWarehouseId(delivery.getWarehouseId());
+orderDetails.setContactPhone(delivery.getRecipientPhone());
+orderDetails.setContactEmail(delivery.getRecipientEmail());
+} else {
+deliveryCustomAttributes = sfOrderMapper.getListDeliveryCustomAttributes(null, sfOrder.getCustomAttributes());
+/*enrichOrderCreateExtendedDtoWithDeliveryAttributes(sfOrder, null, List.of());*/
+// TODO:: check work with null field values
+sfShippingDto.setRecipientFirstName(null);
+orderDetails.setContactPhone(null);
+orderDetails.setContactEmail(null);
+}
+sfOrder.getCustomAttributes().addAll(deliveryCustomAttributes);
+sfOrder.setShipping(sfShippingDto);
+sfOrder.setOrderDetails(orderDetails);
+}
+
+@Override
+public void enrichOrderCreateExtendedDtoWithDeliveryAttributes(OrderCreateExtendedDto sfOrder, ErpDelivery delivery,
+List<DeliveryAttribute> deliveryAttributes) {
+List<CustomAttributesDto> deliveryCustomAttrList;
+if (nonNull(delivery)) {
+final var deliveryErpGuid = delivery.getErpGuid();
+log.info("Enrich delivery with erpGuid {} by delivery attributes", deliveryErpGuid);
+//final var deliveryAttributes = deliveryAttributeRepo.findByDeliveryErpGuid(deliveryErpGuid);
+deliveryCustomAttrList = getCustomAttributesFromDeliveryAttributes(deliveryAttributes);
+addShippedQuantityToItems(sfOrder, deliveryAttributes);
+sfOrder.getCustomAttributes().addAll(deliveryCustomAttrList);
+} else {
+deliveryCustomAttrList = getCustomAttributesFromDeliveryAttributes(List.of());
+addShippedQuantityToItems(sfOrder, List.of());
+sfOrder.getCustomAttributes().addAll(deliveryCustomAttrList);
+}
+}
+
+@Override
+public void enrichOrderWithCalculatedAttributes(OrderCreateExtendedDto sfOrder, List<ErpDelivery> deliveryList) {
+List<CustomAttributesDto> sfOrderCustomAttributes = sfOrder.getCustomAttributes();
+final var shippingCountEnum = calculateShippingCount(sfOrder, deliveryList);
+sfOrderCustomAttributes.add(shippingCountEnum);
+addDispatchWarehouseCountAttrIfNotExists(sfOrder, sfOrderCustomAttributes);
+addClientDocumentAuthorityForReceiveGoodsRequiredAttrIfNotExists(sfOrder, sfOrderCustomAttributes, getDeliveryDataIfExist(deliveryList));
+}
+
+
+@Override
+public ErpDelivery getDeliveryDataIfExist(List<ErpDelivery> allDeliveriesForOrder) {
+if (CollectionUtils.isNotEmpty(allDeliveriesForOrder)) {
+if (allDeliveriesForOrder.size() == 1) {
+return allDeliveriesForOrder.get(0);
+}
+final var optFirstDelivery = allDeliveriesForOrder.stream()
+.min(Comparator.comparing(ErpDelivery::getCreatedDate));
+return optFirstDelivery.orElse(null);
+}
+return null;
+}
+
+@Override
+public List<ErpDelivery> getAllDeliveryDataIfExist(String orderErpGuid) {
+final var orderDeliveryIds = deliveryRepo.findAllByErpOrderGuid(orderErpGuid).stream()
+.map(DeliveryOrder::getDeliveryId)
+.toList();
+
+if (CollectionUtils.isNotEmpty(orderDeliveryIds)) {
+final var allDeliveriesForOrder = deliveryRepo.findAllByIds(orderDeliveryIds);
+if (CollectionUtils.isNotEmpty(allDeliveriesForOrder)) {
+for (ErpDelivery delivery : allDeliveriesForOrder) {
+if (CollectionUtils.isNotEmpty(delivery.getOrders())) {
+delivery.setOrders(delivery.getOrders().stream().filter(o -> orderErpGuid.equals(o.getErpOrderGuid())).toList());
+}
+}
+return allDeliveriesForOrder;
+}
+}
+return null;
+}
+
+//Private methods
+private void addShippingCountEnumAttrIfNotExists(OrderCreateExtendedDto sfOrder,
+List<CustomAttributesDto> sfOrderCustomAttributes, List<ErpDelivery> deliveryList) {
+if (!isShippingCountAttributeExists(sfOrder)) {
+final var shippingCount = calculateShippingCount(sfOrder, deliveryList);
+sfOrderCustomAttributes.add(shippingCount);
+}
+}
+
+private boolean isShippingCountAttributeExists(OrderCreateExtendedDto sfOrder) {
+return sfOrder.getCustomAttributes().stream()
+.anyMatch(ca -> "shippingCountEnum".equals(ca.getName()));
+}
+
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/service/impl/StarfishUpdateServiceImpl.java
+Content:
+package ru.liga.evraz.aggregation.application.service.impl;
+

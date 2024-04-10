@@ -1,0 +1,488 @@
+﻿type: string
+example: "N-2222"
+roleName:
+description: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð Ð¾Ð»Ð¸
+type: string
+example: "Ñ€ÑƒÐºÐ¾Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ ÑÐ½Ð°Ð±Ð¶ÐµÐ½Ñ†ÐµÐ²"
+
+CreateUpdateUserGroupResponse:
+type: object
+description: Ð—Ð°Ð¿Ñ€Ð¾Ñ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+properties:
+userGroupId:
+description: >
+(roleId+unitId) ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐ¾ÑÑ‚Ð°Ð²Ð½Ð¾Ðµ Ð¿Ð¾Ð»Ñ: Ð˜Ð” Ð Ð¾Ð»Ð¸ + Ð˜Ð” Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ
+
+Ð¾Ð¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€ ÑÐºÐ»ÐµÐ¸Ð²Ð°Ð½Ð¸Ñ Ð½Ð° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ 1Ð¡
+type: string
+example: "M-1232_N-2222"
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/warehouse.create.update.yaml
+Content:
+CreateUpdateWarehouseRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¡ÐºÐ»Ð°Ð´Ð° Ð´Ð»Ñ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ.
+required:
+- id
+- name
+- timeZone
+- subdivisionId
+- subdivisionName
+properties:
+id:
+description: >
+ID ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "Ð¡ÐºÐ»Ð°Ð´ ID-TEST"
+name:
+description: >
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "Ð¡ÐºÐ»Ð°Ð´ â„–1-TÐ•Ð¡Ð¢"
+timeZone:
+description: Ð¢Ð°Ð¹Ð¼Ð·Ð¾Ð½Ð°
+type: string
+example: "UTC+3"
+workDays:
+description: Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ðµ Ð´Ð½Ð¸
+type: array
+items:
+$ref: '#/DaySchedule'
+subdivisionId:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'M-1232-TEST'
+subdivisionName:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST'
+warehouseType:
+description: Ð¢Ð¸Ð¿ ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "Ð¢Ð¾Ð²Ð°Ñ€Ñ‹"
+address:
+description: ÐÐ´Ñ€ÐµÑ
+type: string
+example: "Ð³ ÐœÐ¾ÑÐºÐ²Ð°, Ð›Ð¸Ð³Ð¾Ð²ÑÐºÐ¸Ð¹ Ð¿ÐµÑ€ÐµÑƒÐ»Ð¾Ðº"
+city:
+description: Ð“Ð¾Ñ€Ð¾Ð´
+type: string
+example: "Ð³ ÐœÐ¾ÑÐºÐ²Ð°"
+active:
+description: Ð¤Ð»Ð°Ð³ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚Ð¸
+type: boolean
+example: true
+deleted:
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº ÑƒÐ´Ð°Ð»ÐµÐ½Ð½Ð¾Ð³Ð¾ ÑÐºÐ»Ð°Ð´Ð° Ð² ERP
+type: boolean
+example: false
+
+DaySchedule:
+type: object
+description: Ð Ð°ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ð´Ð½Ñ
+properties:
+name:
+description: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð½Ñ
+type: string
+example: "MONDAY"
+workSchedule:
+description: Ð Ð°Ð±Ð¾Ñ‡ÐµÐµ Ñ€Ð°ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ
+type: array
+items:
+$ref: '#/WorkSchedule'
+
+WorkSchedule:
+type: object
+properties:
+start:
+description: Ð”Ð°Ñ‚Ð° Ð½Ð°Ñ‡Ð°Ð»Ð° Ð¿ÐµÑ€Ð¸Ð¾Ð´Ð°
+type: string
+example: "09:00"
+end:
+description: Ð”Ð°Ñ‚Ð° Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¸Ñ Ð¿ÐµÑ€Ð¸Ð¾Ð´Ð°
+type: string
+example: "18:00"
+
+
+CreateUpdateWarehouseResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¡ÐºÐ»Ð°Ð´Ð° Ðº ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸ÑŽ
+properties:
+id:
+description: >
+ID ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "Ð¡ÐºÐ»Ð°Ð´ ID-TEST"
+name:
+description: >
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "Ð¡ÐºÐ»Ð°Ð´ â„–1-TÐ•Ð¡Ð¢"
+timeZone:
+description: Ð¢Ð°Ð¹Ð¼Ð·Ð¾Ð½Ð°
+type: string
+example: "UTC+3"
+workDays:
+description: Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ðµ Ð´Ð½Ð¸
+type: array
+items:
+$ref: '#/DaySchedule'
+subdivisionId:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'M-1232-TEST'
+subdivisionName:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST'
+warehouseType:
+description: Ð¢Ð¸Ð¿ ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "Ð¢Ð¾Ð²Ð°Ñ€Ñ‹"
+address:
+description: ÐÐ´Ñ€ÐµÑ
+type: string
+example: "Ð³ ÐœÐ¾ÑÐºÐ²Ð°, Ð›Ð¸Ð³Ð¾Ð²ÑÐºÐ¸Ð¹ Ð¿ÐµÑ€ÐµÑƒÐ»Ð¾Ðº"
+city:
+description: Ð“Ð¾Ñ€Ð¾Ð´
+type: string
+example: "Ð³ ÐœÐ¾ÑÐºÐ²Ð°"
+active:
+description: Ð¤Ð»Ð°Ð³ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚Ð¸
+type: boolean
+example: true
+deleted:
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº ÑƒÐ´Ð°Ð»ÐµÐ½Ð½Ð¾Ð³Ð¾ ÑÐºÐ»Ð°Ð´Ð° Ð² ERP
+type: boolean
+example: false
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/warehouse.get.yaml
+Content:
+GetWarehouseResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð¡ÐºÐ»Ð°Ð´Ð°
+properties:
+payload:
+description: Ð¢ÐµÐ»Ð¾ Ð¾Ñ‚Ð²ÐµÑ‚Ð°
+$ref: '#/Warehouse'
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+Warehouse:
+type: object
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾ ÑÐºÐ»Ð°Ð´Ðµ
+properties:
+id:
+description: >
+ID ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "M-1232-TEST-2"
+name:
+description: >
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐºÐ»Ð°Ð´Ð°
+type: string
+example: "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST"
+subdivisionId:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'M-1232-TEST'
+subdivisionName:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST'
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/work.schedule.yaml
+Content:
+DaySchedule:
+type: object
+description: Ð Ð°ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ð´Ð½Ñ
+required:
+- name
+- workSchedule
+properties:
+name:
+description: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð½Ñ
+type: string
+example: "MONDAY"
+workSchedule:
+description: Ð Ð°Ð±Ð¾Ñ‡ÐµÐµ Ñ€Ð°ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ
+type: array
+items:
+$ref: '#/WorkSchedule'
+
+WorkSchedule:
+type: object
+required:
+- start
+- end
+properties:
+start:
+description: Ð”Ð°Ñ‚Ð° Ð½Ð°Ñ‡Ð°Ð»Ð° Ð¿ÐµÑ€Ð¸Ð¾Ð´Ð°
+type: string
+example: "09:00"
+end:
+description: Ð”Ð°Ñ‚Ð° Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¸Ñ Ð¿ÐµÑ€Ð¸Ð¾Ð´Ð°
+type: string
+example: "18:00"
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/command/command.yaml
+Content:
+OrderShipPermissionItemsCmdRequest:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ skuStatus'Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð°
+properties:
+payload:
+$ref: '#/OrderShipPermissionItemsCmdData'
+
+OrderShipPermissionItemsCmdData:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ skuStatus'Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð°
+required:
+- instanceId
+- orderId
+properties:
+instanceId:
+type: string
+description: Ð˜Ð” ÑÐºÐ·ÐµÐ¼Ð¿Ð»ÑÑ€Ð° Ð±Ð¸Ð·Ð½ÐµÑ-Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Camunda
+orderId:
+type: string
+description: Id Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMC SF24.
+documentStatus:
+type: string
+description: Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð·Ð°ÐºÐ°Ð·Ð° Ð² 1Ð¡
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp = "TO_BE_COMPLETED")
+documentItems:
+type: array
+items:
+$ref: '#/OrderItemShortData'
+
+OrderShipPermissionItemsCmdResponse:
+type: object
+description: Ok
+properties:
+payload:
+$ref: '#/OrderShipPermissionItemsCmdPayload'
+fault:
+$ref: './../common.yaml#/Fault'
+
+OrderShipPermissionItemsCmdPayload:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñƒ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+properties:
+commandGuid:
+type: string
+description: Id ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹
+commandName:
+type: string
+description: ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+commandTopic:
+type: string
+description: Ð¢Ð¾Ð¿Ð¸Ðº ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+commandDateTime:
+type: string
+description: Ð”Ð°Ñ‚Ð° Ð¸ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ"
+
+OrderItemShortData:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð·Ð°ÐºÐ°Ð·Ð°
+required:
+- skuId
+- positionCode
+- skuStatus
+properties:
+skuId:
+type: string
+description: Ð£Ð½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ ÐºÐ¾Ð´ SKU (Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° + Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ°).
+GUID Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ GUID Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸.
+example: "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d7_803068f2-5290-44f2-a93f-bed0478a3609"
+positionCode:
+type: integer
+format: int64
+description: ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡.
+example: 1
+skuStatus:
+type: string
+description: Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ 1Ð¡.
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp = "SHIP")
+
+ShippingRequestShipPermissionItemsCmdRequest:
+type: object
+description: Ð—Ð°Ð¿Ñ€Ð¾Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ (Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð¸ ÑƒÑÐ»ÑƒÐ³) Ð—ÐÐŸ (Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ)
+properties:
+payload:
+$ref: '#/ShippingRequestShipPermissionItemsCmdData'
+
+ShippingRequestShipPermissionItemsCmdData:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ skuStatus'Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ (Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð¸ ÑƒÑÐ»ÑƒÐ³) Ð—ÐÐŸ (Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ)
+required:
+- commandType
+- instanceId
+- orderId
+- shippingErpGuid
+properties:
+commandType:
+type: string
+description: Ð¢Ð¸Ð¿ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹, Ð²ÑÐµÐ³Ð´Ð° ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ÑÑ SHIPPING_REQUEST_SHIP_PERMISSION
+instanceId:
+type: string
+description: Ð˜Ð” ÑÐºÐ·ÐµÐ¼Ð¿Ð»ÑÑ€Ð° Ð±Ð¸Ð·Ð½ÐµÑ-Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Camunda
+orderId:
+type: string
+description: Id Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMC SF24.
+shippingErpGuid:
+type: string
+description: Id Ð—ÐÐŸ Ð² 1C:ERP.
+
+ShippingRequestShipPermissionItemsCmdResponse:
+description: Ð¢ÐµÐ»Ð¾ (body) Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð½Ð° Ð·Ð°Ð¿Ñ€Ð¾Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸ ÑÑ‚Ñ€Ð¾Ðº Ð—ÐÐŸ Ð´Ð»Ñ 1C:ERP Ð¸Ð· ÐžÐœÐ¡
+type: object
+properties:
+payload:
+$ref: '#/ShippingRequestShipPermissionItemsCmdResponseData'
+fault:
+$ref: './../common.yaml#/Fault'
+
+ShippingRequestShipPermissionItemsCmdResponseData:
+description: Ð¢ÐµÐ»Ð¾ (payload) Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð½Ð° Ð·Ð°Ð¿Ñ€Ð¾Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸ ÑÑ‚Ñ€Ð¾Ðº Ð—ÐÐŸ Ð´Ð»Ñ 1C:ERP Ð¸Ð· ÐžÐœÐ¡
+type: object
+properties:
+commandGuid:
+type: string
+description: GUID ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÑƒ ÑÑ‚Ñ€Ð¾Ðº Ð—ÐÐŸ Ð´Ð»Ñ 1C:ERP Ð¸Ð· OMS
+commandName:
+type: string
+description: ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÑƒ ÑÑ‚Ñ€Ð¾Ðº Ð—ÐÐŸ Ð´Ð»Ñ 1C:ERP Ð¸Ð· OMS
+commandTopic:
+type: string
+description: Ð¢Ð¾Ð¿Ð¸Ðº ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÑƒ ÑÑ‚Ñ€Ð¾Ðº Ð—ÐÐŸ Ð´Ð»Ñ 1C:ERP Ð¸Ð· OMS
+commandDateTime:
+type: string
+description: Ð”Ð°Ñ‚Ð° Ð¸ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð½Ð° Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÑƒ ÑÑ‚Ñ€Ð¾Ðº Ð—ÐÐŸ Ð´Ð»Ñ 1C:ERP Ð¸Ð· OMS
+
+OrderSignPipelineCmdRequest:
+type: object
+properties:
+payload:
+$ref: '#/OrderSignPipelineCmdData'
+
+OrderSignPipelineCmdData:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‡Ð¸ Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€Ð°
+required:
+- commandType
+- instanceId
+- orderId
+- erpGuid
+- omsPipeline
+properties:
+commandType:
+type: string
+description: Ð¢Ð¸Ð¿ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹, Ð²ÑÐµÐ³Ð´Ð° ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ÑÑ ORDER_SHIP_PERMISSION
+instanceId:
+type: string
+description: Ð˜Ð” ÑÐºÐ·ÐµÐ¼Ð¿Ð»ÑÑ€Ð° Ð±Ð¸Ð·Ð½ÐµÑ-Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Camunda
+orderId:
+type: string
+description: Id Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMC SF24.
+erpGuid:
+type: string
+description: Id Ð·Ð°ÐºÐ°Ð·Ð° Ð² 1C:ERP.
+omsPipeline:
+type: boolean
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ OMS.
+
+OrderSignPipelineCmdResponse:
+type: object
+description: Ok
+properties:
+payload:
+$ref: '#/OrderSignPipelineCmdPayload'
+fault:
+$ref: './../common.yaml#/Fault'
+
+OrderSignPipelineCmdPayload:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñƒ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ð° Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‡Ñƒ Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€Ð°
+properties:
+commandGuid:
+type: string
+description: Id ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹
+
+CloseErpOrderCmdRequest:
+type: object
+properties:
+payload:
+$ref: '#/CloseErpOrderCmdData'
+
+CloseErpOrderCmdData:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð»Ñ Ð·Ð°ÐºÑ€Ñ‹Ñ‚Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð° 1Ð¡
+required:
+- orderId
+- instanceId
+properties:
+orderId:
+type: string
+description: Id Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMC SF24.
+instanceId:
+type: string
+description: Ð˜Ð” ÑÐºÐ·ÐµÐ¼Ð¿Ð»ÑÑ€Ð° Ð±Ð¸Ð·Ð½ÐµÑ-Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Camunda
+
+CloseErpOrderCmdResponse:
+type: object
+description: Ok
+properties:
+payload:
+$ref: '#/CloseErpOrderCmdPayload'
+fault:
+$ref: './../common.yaml#/Fault'
+
+CloseErpOrderCmdPayload:
+type: object
+required:
+- commandGuid
+properties:
+commandGuid:
+type: string
+description: Id ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ð¾Ð¹ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹
+
+CreateCmdStatusRequest:
+type: object
+description: Ð—Ð°Ð¿Ñ€Ð¾Ñ Ð½Ð° Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÑƒ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð¸ÑÐ¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² 1Ð¡.
+required:
+- payload
+properties:
+payload:
+$ref: '#/CmdStatusData'
+
+CmdStatusData:
+type: object
+properties:
+commandGuid:
+type: string
+description: Ð˜Ð” ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ OMS
+status:
+type: string
+description: |
+Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² 1Ð¡.
+Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+OK - ÐºÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1Ð¡ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ð»Ð°ÑÑŒ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ (ÑÑ‚Ð°Ñ‚ÑƒÑ Ð½Ðµ Ð²Ð»Ð¸ÑÐµÑ‚ Ð½Ð° Ð¿Ñ€Ð¾Ñ†ÐµÑÑ Ð¸ÑÐ¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°)
+ERROR - Ð¾ÑˆÐ¸Ð±ÐºÐ° Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ Ð´Ð°Ð½Ð½Ñ‹Ñ…
+details:
+type: string
+description: Ð”ÐµÑ‚Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ ÑÑ‚Ð°Ñ‚ÑƒÑÐ°. Ð”Ð»Ñ Ð¿Ñ€Ð¸Ð·Ð½Ð°ÐºÐ° ÐºÐ¾Ð½Ð²ÐµÐ¹ÐµÑ€ OMS Ð½Ðµ Ð¿ÐµÑ€ÐµÐ´Ð°ÐµÑ‚ÑÑ.
+
+GetErpCommandResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð¿Ð¾ Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ñƒ
+properties:
+payload:
+$ref: '#/GetErpCommandPayload'
+fault:
+$ref: './../common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+

@@ -1,0 +1,451 @@
+﻿}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateDeliveryAttributeCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class CreateUpdateDeliveryAttributeCmd {
+
+@NotEmpty
+private String erpDeliveryGuid;
+private Long positionCode;
+@NotEmpty
+private String name;
+private String value;
+@NotNull
+private Boolean deleted;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateErpDeliveryCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Validated
+public record CreateUpdateErpDeliveryCmd(@NotEmpty String deliveryDocumentId, @NotNull ZonedDateTime deliveryDocumentDateTime,
+@NotEmpty String deliveryDocumentLink, @NotNull ZonedDateTime carDeliveryDateTimeFrom,
+@NotNull ZonedDateTime carDeliveryDateTimeTo, @NotEmpty String deliveryMethod,
+@NotEmpty String erpGuid, @NotNull Boolean deleted,
+@NotNull Boolean active,
+@Valid @NotEmpty List<Order> orders,
+String recipientFullName, String recipientPhone, String recipientEmail,
+String recipientGuid,
+@Valid LocalDate promisedDeliveryDate,
+@Valid LocalTime deliveryIntervalFrom,
+@Valid LocalTime deliveryIntervalTo,
+String address,
+String warehouseId,
+@NotNull Boolean dispatchWarehouseSlotBooked,
+String clientDocumentAuthorityForReceiveGoodsNote,
+@NotNull Boolean clientDocumentAuthorityForReceiveGoods,
+Boolean soleExecutiveGovernment) {
+
+public record Order(@NotEmpty String erpOrderGuid, @Valid @NotEmpty List<DeliveryItem> deliveryItems) {
+}
+public record DeliveryItem(@NotNull Integer positionCode, Integer orderPositionCode,
+@NotEmpty String skuId, @NotNull Double quantity) {
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateOrderAttributeCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class CreateUpdateOrderAttributeCmd {
+
+@NotEmpty
+private String erpOrderGuid;
+private Long positionCode;
+@NotEmpty
+private String name;
+private String value;
+private boolean deleted;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateOrderCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpDeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderAgreement;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderContractType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentSource;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentStatus;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderPaymentMethod;
+import ru.liga.evraz.aggregation.domain.model.product.SkuStatus;
+
+import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.PositiveOrZero;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import static ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentType.CLIENT_ORDER;
+import static ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentType.CLIENT_REQUEST;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class CreateUpdateOrderCmd {
+private static final java.util.regex.Pattern DOCUMENT_TIMEZONE_PATTERN = java.util.regex.Pattern.compile("^UTC ?[+-]\\d\\d?$");
+
+//private String id;
+@NotNull
+private OrderDocumentType documentType;
+private String baseErpGuid;
+@NotEmpty
+private String documentId;
+@NotNull
+private ZonedDateTime documentDateTime;
+@NotNull
+private OrderDocumentSource documentSource;
+// for CLIENT_ORDER
+private Boolean orderType;
+@NotEmpty
+private String documentLink;
+// for CLIENT_ORDER
+private OrderContractType contractType;
+
+private String saleManagerResponsibleId;
+private String saleManagerResponsibleEmail;
+
+@NotNull
+private OrderDocumentStatus documentStatus;
+private CancellationReason documentCancellationReason;
+@NotNull
+private OrderPaymentMethod paymentMethod;
+// for CLIENT_ORDER
+private OrderAgreement agreement;
+@PositiveOrZero
+private Double totalCost;
+
+@NotNull
+private ErpDeliveryMethod deliveryMethod;
+//@NotEmpty
+private String recipientFullName;
+//@NotEmpty
+private String recipientPhone;
+//@NotEmpty
+private String recipientEmail;
+
+@NotEmpty
+private String clientGuid;
+@NotEmpty
+@Pattern(regexp = "INDIVIDUAL|ENTITY")
+private String clientType;
+private String clientInn;
+@NotEmpty
+private String clientName;
+
+@NotEmpty
+private String customerFullName;
+private String customerPhone;
+private String customerEmail;
+@NotEmpty
+private String subdivisionId;
+@NotEmpty
+private String erpGuid;
+@NotNull
+private Boolean deleted;
+@NotNull
+private Boolean deletedMark;
+@NotNull
+private Boolean active;
+
+@NotEmpty
+private String contractNumber;
+private String saleManagerResponsibleName;
+private String customerComment;
+private Boolean erpPipeline;
+@NotNull
+private Boolean inPieces;
+private Integer deliveryPeriod;
+@NotNull
+private Boolean pricesAgreed;
+private String customerGuid;
+private Boolean orderPaid;
+private ZonedDateTime orderPaidAssignmentDate;
+private Boolean specificationApprovalRequired;
+private Double itemsPrice;
+private Double itemsDiscountPrice;
+private Double itemsServiceDiscountPrice;
+private Double discountValue;
+private String partnerGuid;
+private String documentTimeZone;
+private Boolean requiredQuotation;
+private Boolean requiredCall;
+private Boolean branching;
+private String address;
+private Boolean invoiceWithout;
+private String paymentLink;
+
+@NotEmpty
+@Valid
+private Set<OrderItem> orderItems = new HashSet<>();
+
+// TODO:: refactoring
+public void validate() {
+final var errorMessages = new HashSet<String>();
+
+if (documentType != null) {
+if (CLIENT_ORDER.equals(documentType)) {
+fillClientOrderErrorMessages(errorMessages);
+} else if (CLIENT_REQUEST.equals(documentType)) {
+fillClientRequestErrorMessages(errorMessages);
+}
+} else {
+errorMessages.add("documentType Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½");
+}
+
+if (CollectionUtils.isNotEmpty(errorMessages)) {
+final var orderBaseInfo = String.format("Order (erpGuid: %s, documentId: %s). ",
+this.erpGuid, this.documentId);
+final var errorInfo = String.join("; ", errorMessages);
+throw new ValidationException(String.format("%s%s", orderBaseInfo, errorInfo));
+}
+
+if (this.requiredCall == null) {
+errorMessages.add("requiredCall param is null, but required");
+}
+
+if (this.branching == null) {
+errorMessages.add("branching param is null, but required");
+}
+
+if (CollectionUtils.isNotEmpty(errorMessages)) {
+final var orderBaseInfo = String.format("Order (erpGuid: %s, documentId: %s). ",
+this.erpGuid, this.documentId);
+final var errorInfo = String.join("; ", errorMessages);
+
+throw new ValidationException(String.format("%s%s", orderBaseInfo, errorInfo));
+}
+}
+
+public void validateCustomerGuid() {
+if (StringUtils.isBlank(customerGuid)) {
+final var orderBaseInfo = String.format("Order (erpGuid: %s, documentId: %s). ",
+this.erpGuid, this.documentId);
+throw new ValidationException(String.format("%s%s", orderBaseInfo, "customerGuid Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½."));
+}
+}
+
+public void validateOrderPaidAndSpecificationApprovalRequired() {
+if (documentType != null) {
+if (CLIENT_ORDER.equals(documentType)) {
+final var orderBaseInfo = String.format("Order (erpGuid: %s, documentId: %s). ",
+this.erpGuid, this.documentId);
+if (this.orderPaid == null) {
+throw new ValidationException(String.format("%s%s", orderBaseInfo, "orderPaid Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½."));
+}
+if (this.specificationApprovalRequired == null) {
+throw new ValidationException(String.format("%s%s", orderBaseInfo, "specificationApprovalRequired Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½."));
+}
+}
+}
+}
+
+private void fillClientOrderErrorMessages(HashSet<String> errorMessages) {
+if (this.orderType == null) {
+errorMessages.add("orderType Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½ Ð´Ð»Ñ documentType = CLIENT_ORDER");
+}
+if (this.contractType == null) {
+errorMessages.add("contractType Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½ Ð´Ð»Ñ documentType = CLIENT_ORDER");
+}
+if (this.documentStatus != null && !OrderDocumentStatus.CLIENT_ORDER_SET.contains(this.documentStatus)) {
+errorMessages.add("ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ documentStatus");
+}
+if (this.documentCancellationReason != null
+&& !CancellationReason.CLIENT_ORDER_SET.contains(this.documentCancellationReason)) {
+errorMessages.add("ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ documentCancellationReason");
+}
+if (this.agreement == null) {
+errorMessages.add("agreement Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½ Ð´Ð»Ñ documentType = CLIENT_ORDER");
+}
+if (StringUtils.isBlank(this.partnerGuid)) {
+errorMessages.add("partnerGuid Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ Ð·Ð°Ð¿Ð¾Ð»Ð½ÐµÐ½");
+}
+if (StringUtils.isBlank(this.documentTimeZone)) {
+errorMessages.add("documentTimeZone Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ Ð·Ð°Ð¿Ð¾Ð»Ð½ÐµÐ½");
+} else if (!DOCUMENT_TIMEZONE_PATTERN.matcher(this.documentTimeZone).matches()) {
+errorMessages.add("documentTimeZone Ð½ÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚");
+}
+
+validateClientOrderItems(errorMessages);
+}
+
+private void validateClientOrderItems(HashSet<String> errorMessages) {
+final var positionCodes = new HashSet<Long>();
+orderItems.forEach(item -> {
+positionCodes.add(item.getPositionCode());
+if (item.getSkuStatus() != null) {
+if (!SkuStatus.CLIENT_ORDER_SET.contains(item.getSkuStatus())) {
+errorMessages.add("ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ skuStatus Ð´Ð»Ñ documentType = CLIENT_ORDER");
+}
+
+if (!SkuStatus.CANCELED.equals(item.getSkuStatus())
+&& item.getPositionCancellationReason() != null) {
+errorMessages.add("positionCancellationReason Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ñ skuStatus = CANCELED");
+} else if (SkuStatus.CANCELED.equals(item.getSkuStatus()) && item.getPositionCancellationReason() == null) {
+errorMessages.add("ÐŸÐ¾Ð»Ðµ positionCancellationReason Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½Ð¾ Ð´Ð»Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ñ skuStatus = CANCELED");
+}
+} else {
+errorMessages.add("ÐŸÐ¾Ð»Ðµ skuStatus Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½Ð¾ Ð´Ð»Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ñ documentType = CLIENT_REQUEST");
+}
+
+if (item.getSkuType().isSkuServiceNeedLinkedPosition() && item.getLinkedSkuPositionCode() == null) {
+errorMessages.add(
+String.format("Ð”Ð»Ñ skuType %s Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ð½Ð¾ Ð¿Ð¾Ð»Ðµ linkedSkuPositionCode", item.getSkuType())
+);
+}
+});
+
+if (positionCodes.size() < orderItems.size()) {
+errorMessages.add("ÐžÐ±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ñ‹ Ð´ÑƒÐ±Ð»Ð¸Ñ€ÑƒÑŽÑ‰Ð¸ÐµÑÑ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ positionCode Ð² documentItems");
+}
+}
+
+private void fillClientRequestErrorMessages(HashSet<String> errorMessages) {
+if (StringUtils.isNotBlank(this.baseErpGuid)) {
+errorMessages.add("ÐŸÐ¾Ð»Ðµ baseErpGuid Ð´Ð»Ñ documentType = CLIENT_REQUEST Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÑƒÑÑ‚Ñ‹Ð¼");
+}
+if (this.documentStatus != null
+&& !OrderDocumentStatus.CLIENT_REQUEST_SET.contains(this.documentStatus)) {
+errorMessages.add("ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ documentStatus");
+}
+if (this.documentCancellationReason != null
+&& !CancellationReason.CLIENT_REQUEST_SET.contains(this.documentCancellationReason)) {
+errorMessages.add("ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ documentCancellationReason");
+}
+validateClientRequestItems(errorMessages);
+}
+
+private void validateClientRequestItems(HashSet<String> errorMessages) {
+final var positionCodes = new HashSet<Long>();
+orderItems.forEach(item -> {
+positionCodes.add(item.getPositionCode());
+if (item.getSkuStatus() != null) {
+errorMessages.add("skuStatus Ð½Ðµ Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ Ð´Ð»Ñ documentType = CLIENT_REQUEST");
+}
+});
+if (positionCodes.size() < orderItems.size()) {
+errorMessages.add("ÐžÐ±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ñ‹ Ð´ÑƒÐ±Ð»Ð¸Ñ€ÑƒÑŽÑ‰Ð¸ÐµÑÑ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ positionCode Ð² documentItems");
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateOrderReserveCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.enums.ReservationReason;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class CreateUpdateOrderReserveCmd {
+@NotEmpty
+private String erpOrderGuid;
+@NotNull
+private Boolean active;
+private String reservationRemovalDate;
+private ReservationReason reservationExtensionReason;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/cmd/CreateUpdateSubdivisionCmd.java
+Content:
+package ru.liga.evraz.aggregation.application.cmd;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.domain.model.WorkDay;
+
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class CreateUpdateSubdivisionCmd {
+@NotEmpty
+private String subdivisionId;
+private String subdivisionName;
+@NotEmpty

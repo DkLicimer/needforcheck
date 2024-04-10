@@ -1,0 +1,400 @@
+﻿ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse)
+);
+
+final var productPathesToExpectedResources = Map.of(
+PRODUCT_UPDATE, Pair.of(extOneItemProductCreateRequest_forOrderAttributes, extOneItemProductCreateResponse),
+CUSTOMERSERVICE_UPDATE, Pair.of(extOneServiceCreateRequest, extOneServiceCreateResponse)
+);
+
+initProductScenario(productPathesToExpectedResources, Map.of());
+initOrderScenario(
+orderPathesToExpectedResources,
+Map.of("expected_starfish_order_id", "test_starfish24_erp_guid",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_customer_id", "test-customer_guid",
+"legalEntityId", "test-client_guid")
+);
+
+final var bpmPathsToExpectedResources = Map.of(
+BPM_SEND_MESSAGE, Pair.of(bpmnReq, bpmnRes)
+);
+
+initBpmScenario(
+bpmPathsToExpectedResources,
+Map.of("messageId", "MESSAGE_ORDER_DELETED",
+"orderId", "test_starfish24_erp_guid")
+);
+
+customPostScenarioFromResource("/v1/order",
+orderAlreadyExistsRequest_forOrderAttributes, orderAlreadyExistsResponse_forOrderAttributes, true, 200);
+
+// ÐŸÑ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ñ‡Ñ‚Ð¾ ProductSku Ð½Ðµ Ñ€Ð°ÑÑˆÐ¸Ñ€Ð¸Ð»Ð¸ÑÑŒ
+assertEquals(2, productSkuRepository.findAll().size());
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(7, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(1, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð°. ÐžÑ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ sfOrderId Ð² Agg + ÐŸÑ€Ð¸ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² SF24")
+@SqlGroup({
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(scripts = "/db/order/order_created_with_order_attributes_without_starfishOrderId.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = AFTER_TEST_METHOD),
+})
+public void updateOrderWithOrderAttributes_withoutStarfishOrderId_orderExistsInStarfish() {
+assertEquals(5, productSkuRepository.findAll().size());
+
+final var orderPathesToExpectedResources = Map.ofEntries(
+Map.entry(ORDER_CREATE, Pair.of(extOrderWithServiceCreateRequest, extOrderWithServiceCreateResponse)),
+Map.entry(ORDER_GET_BY_CLIENT_ORDER_ID, Pair.<Resource, Resource>of(null, extOrderGetByClientOrderIdResponse)),
+Map.entry(ORDERS_DETAILS_UPDATE, Pair.of(extOrderDetailsUpdateRequest_withOrderAttributes, extOrderDetailsUpdateResponse)),
+Map.entry(ORDER_CUSTOM_ATTRIBUTES_UPDATE, Pair.of(extOrderCustomAttributesUpdateRequest_withOrderAttributes, extOrderCustomAttributesUpdateResponse)),
+Map.entry(ORDER_CUSTOMER_UPDATE, Pair.of(extOrderCustomerUpdateRequest, extOrderCustomerUpdateResponse)),
+Map.entry(ORDER_ITEMS_UPDATE_TEMPLATE, Pair.of(extOrderItemsUpdateRequest_withOrderAttributes_orderExistsInStarfish, extOrderItemsUpdateResponse)),
+Map.entry(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, Pair.of(extOrderItemServicesUpdateRequest_withOrderAttributes_withoutStarfishOrderId_orderExistsInStarfish, extOrderItemServicesUpdateResponse)),
+Map.entry(ORDERS_SHIPPING_UPDATE_TEMPLATE, Pair.of(extOrderShippingUpdateRequest, extOrderShippingUpdateResponse)),
+Map.entry(ORDER_SET_CANCELLATION_REASON, Pair.<Resource, Resource>of(null, extOrderCancellationReasonUpdateResponse)),
+Map.entry(ORDER_DELETE, Pair.<Resource, Resource>of(null, null)),
+Map.entry(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse))
+);
+
+
+final var productPathesToExpectedResources = Map.of(
+PRODUCT_UPDATE, Pair.of(extOneItemProductCreateRequest_forOrderAttributes, extOneItemProductCreateResponse),
+CUSTOMERSERVICE_UPDATE, Pair.of(extOneServiceCreateRequest, extOneServiceCreateResponse)
+);
+
+initProductScenario(productPathesToExpectedResources, Map.of());
+initOrderScenario(
+orderPathesToExpectedResources,
+Map.of("expected_starfish_order_id", "test_starfish_order_id",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_customer_id", "test-customer_guid",
+"expected_client_order_id", "documentId___27.12.2022",
+"legalEntityId", "test-client_guid")
+);
+
+final var bpmPathsToExpectedResources = Map.of(
+BPM_SEND_MESSAGE, Pair.of(bpmnReq, bpmnRes)
+);
+
+initBpmScenario(
+bpmPathsToExpectedResources,
+Map.of("messageId", "MESSAGE_ORDER_DELETED",
+"orderId", "test_starfish_order_id")
+);
+
+customPostScenarioFromResource("/v1/order",
+orderAlreadyExistsRequest_forOrderAttributes, orderAlreadyExistsResponse_forOrderAttributes, true, 200);
+
+// ÐŸÑ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ñ‡Ñ‚Ð¾ ProductSku Ð½Ðµ Ñ€Ð°ÑÑˆÐ¸Ñ€Ð¸Ð»Ð¸ÑÑŒ
+assertEquals(7, productSkuRepository.findAll().size());
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(8, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(2, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð°. ÐžÑ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ sfOrderId Ð² Agg + ÐžÑ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð² SF24 -> Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° Ð² SF24.")
+@SqlGroup({
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(scripts = "/db/order/order_created_with_order_attributes_without_starfishOrderId.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = AFTER_TEST_METHOD),
+})
+@Disabled
+public void updateOrderWithOrderAttributes_withoutStarfishOrderId_orderNotExistsInStarfish() {
+assertEquals(5, productSkuRepository.findAll().size());
+
+final var orderPathesToExpectedResources = Map.of(
+ORDER_CREATE, Pair.of(extOrderWithServiceCreateOnUpdateRequest, extOrderWithServiceCreateResponse),
+ORDER_GET_BY_CLIENT_ORDER_ID, Pair.<Resource, Resource>of(null, extOrderGetByClientOrderIdResponse),
+ORDER_SET_CANCELLATION_REASON, Pair.<Resource, Resource>of(null, extOrderCancellationReasonUpdateResponse),
+ORDER_DELETE, Pair.<Resource, Resource>of(null, null),
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, Pair.<Resource, Resource>of(legalEntityUpdateRequest, legalEntityUpdateResponse)
+);
+
+final var productPathesToExpectedResources = Map.of(
+PRODUCT_UPDATE, Pair.of(extOneItemProductCreateRequest_forOrderAttributes, extOneItemProductCreateResponse),
+CUSTOMERSERVICE_UPDATE, Pair.of(extOneServiceCreateRequest, extOneServiceCreateResponse)
+);
+
+initProductScenario(productPathesToExpectedResources, Map.of());
+initOrderScenario(
+orderPathesToExpectedResources,
+Map.of(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.BAD_REQUEST),
+Map.of("expected_starfish_order_id", "test_starfish_order_id",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_client_order_id", "documentId___27.12.2022",
+"legalEntityId", "test-client_guid")
+);
+
+final var bpmPathsToExpectedResources = Map.of(
+BPM_SEND_MESSAGE, Pair.of(bpmnReq, bpmnRes)
+);
+
+initBpmScenario(
+bpmPathsToExpectedResources,
+Map.of("messageId", "MESSAGE_ORDER_DELETED",
+"orderId", "test_starfish_order_id")
+);
+
+customPostScenarioFromResource("/v1/order",
+orderAlreadyExistsRequest_forOrderAttributes, orderAlreadyExistsResponse_forOrderAttributes, true, 200);
+
+// ÐŸÑ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ñ‡Ñ‚Ð¾ ProductSku Ð½Ðµ Ñ€Ð°ÑÑˆÐ¸Ñ€Ð¸Ð»Ð¸ÑÑŒ
+assertEquals(7, productSkuRepository.findAll().size());
+
+final var orderDispatcher = (StarfishOrderDispatcher) sfOrderServer.getDispatcher();
+final var productDispatcher = (StarfishProductDispatcher) sfProductServer.getDispatcher();
+assertEquals(4, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+assertEquals(2, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+
+@Test
+@DisplayName("ÐÐµÐ²Ð°Ð»Ð¸Ð´Ð½Ñ‹Ð¹ Ð·Ð°Ð¿Ñ€Ð¾Ñ")
+public void invalidRequestCreateOrder() {
+customPostScenarioFromResource("/v1/order",
+invalidRequest, invalidRequestResponse, 400);
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(0, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(0, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+
+protected void initOrderScenario(Map<OrderPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+initOrderScenario(pathToExpectedResources, Map.of(), pathTemplateParameters);
+}
+
+/**
+* Ð—Ð°Ð³Ð»ÑƒÑˆÐºÐ¸.
+*
+* @param pathToExpectedResources   - Ð¼Ð°Ð¿Ð° {@link OrderPath} Ð¿ÑƒÑ‚Ð¸ Ðº order-service Ð½Ð° Ð¿Ð°Ñ€Ñƒ Ð¾Ñ‚Ð²ÐµÑ‚-Ð·Ð°Ð¿Ñ€Ð¾Ñ
+* Ð´Ð»Ñ Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ñ.
+* @param pathsToExpectedHttpStatus - Ð¼Ð°Ð¿Ð° {@link OrderPath} Ð¿ÑƒÑ‚Ð¸ Ð½Ð° ÐºÐ¾Ð´ Ð¾Ñ‚Ð²ÐµÑ‚Ð°, ÐµÑÐ»Ð¸ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð¾ ÐºÐ»ÑŽÑ‡Ñƒ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾,
+* ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ÑÑ HttpStatus.OK.
+* @param pathTemplateParameters    - Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð´Ð»Ñ ÑˆÐ°Ð±Ð»Ð¾Ð½Ð¾Ð² {@link OrderPath} Ð¿ÑƒÑ‚Ð¸.
+*/
+@SuppressWarnings("PMD.UnusedPrivateMethod")
+protected void initOrderScenario(Map<OrderPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<OrderPath, HttpStatus> pathsToExpectedHttpStatus,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(ORDER_CREATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CREATE);
+dispatcherDatas.add(
+ORDER_CREATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CREATE, HttpStatus.OK)));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_DETAILS_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_DETAILS_UPDATE);
+dispatcherDatas.add(
+ORDER_DETAILS_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DETAILS_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_DETAILS_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_DETAILS_UPDATE);
+dispatcherDatas.add(
+ORDERS_DETAILS_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_DETAILS_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMER_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMER_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMER_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMER_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOM_ATTRIBUTES_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOM_ATTRIBUTES_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOM_ATTRIBUTES_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOM_ATTRIBUTES_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEMS_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEMS_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEMS_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEMS_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDERS_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SET_CANCELLATION_REASON)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SET_CANCELLATION_REASON);
+dispatcherDatas.add(
+ORDER_SET_CANCELLATION_REASON.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SET_CANCELLATION_REASON, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_GET_BY_CLIENT_ORDER_ID)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_GET_BY_CLIENT_ORDER_ID);
+dispatcherDatas.add(
+ORDER_GET_BY_CLIENT_ORDER_ID.buildDispatcherData(
+resourceResourcePair, HttpMethod.GET,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (StringUtils.isNotBlank(pathTemplateParameters.get("expected_starfish_order_id").toString())
+&& pathToExpectedResources.containsKey(ORDER_DELETE)) {
+final Pair<Resource, Resource> req2resp = Pair.of(
+null,
+new ByteArrayResource("Order is deleted".getBytes(StandardCharsets.UTF_8)));
+dispatcherDatas.add(
+ORDER_DELETE.buildDispatcherData(
+req2resp, HttpMethod.DELETE,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DELETE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+var dispatcher = new StarfishOrderDispatcher(dispatcherDatas);
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+private void initProductScenario(Map<ProductPath, Pair<Resource, Resource>> pathToExpectedResources,
+Map<String, Object> pathTemplateParameters) {
+final var dispatcherDatas = new ArrayList<DispatcherData>();
+
+if (pathToExpectedResources.containsKey(PRODUCT_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(PRODUCT_UPDATE);
+dispatcherDatas.add(
+PRODUCT_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(CUSTOMERSERVICE_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(CUSTOMERSERVICE_UPDATE);
+dispatcherDatas.add(
+CUSTOMERSERVICE_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST, HttpStatus.OK, pathTemplateParameters));
+}
+
+var dispatcher = new StarfishProductDispatcher(dispatcherDatas);
+sfProductServer.setDispatcher(dispatcher);
+}
+
+@SuppressWarnings("PMD.UnusedPrivateMethod")
+private void initProductScenario() {
+final var productUpdateDispatcherData = DispatcherData.builder()
+.path("/product/update")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(extOneItemProductCreateRequest)
+.expectedResponse(extOneItemProductCreateResponse)
+.status(HttpStatus.OK)
+.build();
+final var customerServiceDispatcherData = DispatcherData.builder()
+.path("/customerservice/list")
+.httpMethod(HttpMethod.POST.toString())
+.expectedRequest(extOneServiceCreateRequest)
+.expectedResponse(extOneServiceCreateResponse)
+.status(HttpStatus.OK)
+.build();
+var dispatcher = new StarfishProductDispatcher(List.of(
+productUpdateDispatcherData, customerServiceDispatcherData));
+sfProductServer.setDispatcher(dispatcher);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/event_handler/UpdateCamundaProcessVariablesTest.java
+Content:
+package ru.liga.evraz.aggregation.module.event_handler;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.config.path.BaseEnum;
+import ru.liga.evraz.aggregation.dispatcher.BpmDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static ru.liga.evraz.aggregation.config.path.BpmPath.BPM_SET_VARIABLES;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_GET_BY_ORDER_ID;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_GET_CUSTOM_ATTRIBUTES;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ñ… Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Ð·Ð°ÐºÐ°Ð·Ð° Ð² Camunda")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class UpdateCamundaProcessVariablesTest extends BaseIntegrationTest {
+
+private static final String SF_ORDER_ID = "tenantId-clientOrderId-hash";

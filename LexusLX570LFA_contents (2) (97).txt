@@ -1,0 +1,424 @@
+﻿.name("clientInn")
+.value(Optional.ofNullable(source.getPartner())
+.map(Partner::getClientInn).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("clientName")
+.value(Optional.ofNullable(source.getPartner())
+.map(Partner::getClientName).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("orderPaidAssignmentDate")
+.value(Optional.ofNullable(source.getOrderPaidAssignmentDate())
+.map(a -> a.format(DateTimeFormatter.ISO_INSTANT)).orElse(EMPTY))
+.build());
+customAttributes.add(CustomAttributesDto.builder()
+.name("specificationApprovalRequired")
+.value(Optional.ofNullable(source.getSpecificationApprovalRequired())
+.map(String::valueOf).orElse(EMPTY))
+.build());
+customAttributes.add(buildStringOrderCustomAttributeOrDefault(
+"partnerGuid", source.getPartnerGuid(), EMPTY));
+customAttributes.add(buildStringOrderCustomAttributeOrDefault(
+"documentTimeZone", source.getDocumentTimeZone(), EMPTY));
+customAttributes.add(buildBooleanOrderCustomAttributeOrDefault(
+"requiredQuotation", source.getRequiredQuotation(), Boolean.FALSE.toString()));
+customAttributes.add(buildBooleanOrderCustomAttributeOrDefault(
+"invoiceWithout", source.getInvoiceWithout(), Boolean.FALSE.toString()));
+customAttributes.add(buildBooleanOrderCustomAttributeOrDefault(
+"requiredCall", source.getRequiredCall(), EMPTY));
+customAttributes.add(buildBooleanOrderCustomAttributeOrDefault(
+"branching", source.getBranching(), EMPTY));
+customAttributes.add(buildStringOrderCustomAttributeOrDefault(
+"address", trim(source.getAddress()), EMPTY)
+.updCustomAttributeSource(ORDER));
+customAttributes.add(buildStringOrderCustomAttributeOrDefault(
+"paymentLink", source.getPaymentLink(), EMPTY));
+
+return customAttributes;
+}
+return new ArrayList<>();
+}
+
+public List<CustomAttributesDto> getListDeliveryCustomAttributes(ErpDelivery source,
+List<CustomAttributesDto> alreadyCollectedCustomAttributes) {
+List<CustomAttributesDto> result = new ArrayList<>();
+result.add(CustomAttributesDto.builder()
+.name("deliveryDocumentId")
+.value(isNull(source) ? EMPTY : source.getDeliveryDocumentId())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("deliveryDocumentLink")
+.value(isNull(source) ? EMPTY : source.getDeliveryDocumentLink())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("carDeliveryDateTimeFrom")
+.value(isNull(source) ? EMPTY : source.getCarDeliveryDateTimeFrom()
+.format(DateTimeFormatter.ISO_INSTANT))
+.build());
+result.add(CustomAttributesDto.builder()
+.name("carDeliveryDateTimeTo")
+.value(isNull(source) ? EMPTY : source.getCarDeliveryDateTimeTo()
+.format(DateTimeFormatter.ISO_INSTANT))
+.build());
+result.add(CustomAttributesDto.builder()
+.name("carDeliveryDateTimeFromDescription")
+.value(isNull(source) ? EMPTY : source.getCarDeliveryDateTimeFromDescription())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("carDeliveryDateTimeToDescription")
+.value(isNull(source) ? EMPTY : source.getCarDeliveryDateTimeToDescription())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("shippingDeliveryMethod")
+.value(isNull(source) ? EMPTY : source.getDeliveryMethod().toString())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("shippingErpGuid")
+.value(isNull(source) ? EMPTY : source.getErpGuid())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("shippingRecipientGuid")
+.value(isNull(source) || isNull(source.getRecipientGuid()) ? EMPTY : source.getRecipientGuid())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("deliveryTimeZone")
+.value(isNull(source) ? EMPTY : source.getDeliveryTimeZone())
+.build());
+
+
+// Ð£Ð´Ð°Ð»ÑÐµÐ¼ ÐºÐ°ÑÑ‚Ð¾Ð¼Ð½Ñ‹Ð¹ Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚ address Ð¸Ð· Ð¼Ð°ÑÑÐ¸Ð²Ð°, ÐµÑÐ»Ð¸ Ð¾Ð½ ÐµÑÑ‚ÑŒ Ð¸ ÐµÑÐ»Ð¸ Ð² Ð°Ð´Ñ€ÐµÑÐµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¿ÑƒÑÑ‚Ð¾
+final var deliveryAddressPresent = !isNull(source) && isNotBlank(trim(source.getAddress()));
+alreadyCollectedCustomAttributes.removeIf(cad -> {
+final var orderAddressCustomAttributePresent = "address".equals(cad.getName()) && ORDER.equals(cad.getCustomAttributeSource());
+return deliveryAddressPresent && orderAddressCustomAttributePresent;
+});
+if (deliveryAddressPresent) {
+result.add(CustomAttributesDto.builder()
+.name("address")
+.value(trim(source.getAddress()))
+.build());
+}
+
+result.add(CustomAttributesDto.builder()
+.name("promissedDeliveryDate")
+.value(isNull(source) || isNull(source.getPromisedDeliveryDate()) ? EMPTY : DateTimeFormatter.ofPattern(DATE_FORMAT_BY_DOT).format(source.getPromisedDeliveryDate()))
+.build());
+result.add(CustomAttributesDto.builder()
+.name("dispatchWarehouseSlotBooked")
+.value(isNull(source) || isNull(source.getDispatchWarehouseSlotBooked()) ? EMPTY : source.getDispatchWarehouseSlotBooked().toString())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("clientDocumentAuthorityForReceiveGoodsNote")
+.value(isNull(source) || isNull(source.getClientDocumentAuthorityForReceiveGoodsNote()) ? EMPTY : source.getClientDocumentAuthorityForReceiveGoodsNote())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("clientDocumentAuthorityForReceiveGoods")
+.value(isNull(source) || isNull(source.getClientDocumentAuthorityForReceiveGoods()) ? EMPTY : source.getClientDocumentAuthorityForReceiveGoods().toString())
+.build());
+result.add(CustomAttributesDto.builder()
+.name("soleExecutiveGovernment")
+.value(isNull(source) || isNull(source.getSoleExecutiveGovernment()) ? EMPTY : source.getSoleExecutiveGovernment().toString())
+.build());
+return result;
+}
+
+public ShippingDto mapToShippingDto(Order source, List<ErpDelivery> erpDeliveries) {
+if (source != null) {
+/*final var splitFio = splitFullName(source.getRecipientFullName()); // TODO:: need check recipientFullName is really full.
+final var surname = splitFio[0]; // TODO:: check splitFio array length
+final var firstName = splitFio[1];
+final var patronymic = splitFio[2];*/
+
+final var sfDeliveryMethod = detectDeliveryTypeId(source, erpDeliveries);
+final var warehouseId = getWarehouseId(source);
+
+return ShippingDto.builder()
+.deliveryTypeId(sfDeliveryMethod.getSfDeliveryTypeValue())
+.recipientFirstName(source.getRecipientFullName()) // Ð’ Ð²Ð¸Ð´Ñƒ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²Ð¸Ñ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ð¾Ð³Ð¾ Ð¿Ð°Ñ‚Ñ‚ÐµÑ€Ð½Ð° Ð¸ Ð¿Ñ€Ð°Ð²Ð¸Ð» Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ customerFullName
+//.recipientFirstName(firstName)
+//.recipientLastName(surname)
+//.recipientMiddleName(patronymic)
+.address(AddressDto.builder().build()) // it's MOCK to create order in SF24
+.dispatchWarehouseId(warehouseId) //Ð‘ÑƒÐ´ÐµÑ‚ Ð¿ÐµÑ€ÐµÐ·Ð°Ð¿Ð¸ÑÐ°Ð½Ð¾ Ð² enrichOrderCreateExtendedDtoWithDelivery Ð¸Ð· Ð—ÐÐŸ Ð¿Ñ€Ð¸ ÐµÐµ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ð¸
+.deliveryCost(buildDeliveryCost(source))
+.build();
+}
+return null;
+}
+
+private static Double buildDeliveryCost(Order source) {
+return source.getOrderItems().stream()
+.filter(item -> item.getSkuType().isDeliverySkuService())
+.mapToDouble(OrderItem::getPositionCost).sum();
+}
+
+private String getWarehouseId(Order source) {
+final var optOrderItemWithMinPositionCode = source.getOrderItems().stream()
+.filter(item -> !Objects.equals(item.getSkuStatus(), SkuStatus.DO_NOT_PROVIDE)
+&& !Objects.equals(item.getSkuStatus(), SkuStatus.CANCELED)
+&& StringUtils.isNotBlank(item.getWarehouseId()))
+.min(Comparator.comparing(OrderItem::getPositionCode));
+return optOrderItemWithMinPositionCode.map(OrderItem::getWarehouseId).orElse(null);
+}
+
+private SfDeliveryMethod detectDeliveryTypeId(Order order, List<ErpDelivery> erpDeliveries) {
+if (CollectionUtils.isNotEmpty(erpDeliveries) && erpDeliveries.size() == 1) {
+return DELIVERY_TO_SF_DELIVERY_MAPPING.getOrDefault(erpDeliveries.get(0).getDeliveryMethod(), SfDeliveryMethod.DELIVERY_OTHER);
+}
+
+return ORDER_TO_SF_DELIVERY_MAPPING.getOrDefault(order.getDeliveryMethod(), SfDeliveryMethod.DELIVERY_OTHER);
+}
+
+public CustomerDto mapCustomerDto(final Partner partner, final String customerGuid, final String fullName,
+final String email, final String phone) {
+/*
+final var splitFio = splitFullName(fullName); // TODO:: need check customerFullName is really full.
+final var surname = splitFio[0]; // TODO:: check splitFio array length
+final var firstName = splitFio[1];
+final var patronymic = splitFio[2];
+*/
+
+return (nonNull(partner) && StringUtils.isNotBlank(customerGuid))
+? CustomerDto.builder()
+.id(customerGuid)
+.organizationINN(partner.getClientInn())
+.organizationName(partner.getClientName())
+.customerType(buildCustomerType(partner))
+.firstName(fullName) // Ð’ Ð²Ð¸Ð´Ñƒ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²Ð¸Ñ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ð¾Ð³Ð¾ Ð¿Ð°Ñ‚Ñ‚ÐµÑ€Ð½Ð° Ð¸ Ð¿Ñ€Ð°Ð²Ð¸Ð» Ñ„Ð¾Ñ€Ð¼Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ customerFullName
+//.firstName(firstName)
+//.lastName(surname)
+//.middleName(patronymic)
+.emails(StringUtils.isNotBlank(email) ? singletonList(email) : List.of())
+.phones(StringUtils.isNotBlank(phone) ? singletonList(phone) : List.of())
+.build()
+: null;
+}
+
+private static String buildCustomerType(Partner partner) {
+return Optional.ofNullable(partner)
+.map(Partner::getClientType)
+.map(String::toLowerCase).orElse(null);
+}
+
+public static CustomAttributesDto buildBooleanOrderCustomAttributeOrDefault(String fieldName, Boolean value, String defaultValue) {
+return CustomAttributesDto.builder()
+.name(fieldName)
+.value(Optional.ofNullable(value)
+.map(String::valueOf).orElse(defaultValue))
+.build();
+}
+
+public static CustomAttributesDto buildStringOrderCustomAttributeOrDefault(String fieldName, String value, String defaultValue) {
+return CustomAttributesDto.builder()
+.name(fieldName)
+.value(Optional.ofNullable(value)
+.map(String::valueOf).orElse(defaultValue))
+.build();
+}
+
+public LegalEntityDto mapLegalEntity(Order source) {
+return nonNull(source.getPartner())
+? LegalEntityDto.builder()
+.id(source.getPartner().getClientGuid())
+.inn(source.getPartner().getClientInn())
+.name(source.getPartner().getClientName())
+.build()
+: null;
+}
+
+private static String[] splitFullName(String fullName) {
+return fullName.split("\\s+"); // TODO:: need check customerFullName is really full.
+}
+
+@Mapping(target = "sfOrderId", source = "id")
+abstract Order map(OrderSearchDto source); // TODO:: Ð¼Ð¾Ð³ÑƒÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ñ‹
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfOrderService.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import feign.FeignException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.LegalEntityDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer.CustomerDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDetails;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderUpdateDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping.ShippingDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.BpmFeignClient;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.OrderFeignClient;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+class SfOrderService implements OrderService {
+private final OrderFeignClient feignOrder;
+private final OrderRepository orderRepo;
+private final BpmFeignClient bpmFeignClient;
+
+@Autowired
+private SfOrderMapper mapper;
+
+@Override
+public String createOrder(Order originalOrder, OrderCreateExtendedDto sfOrder) {
+return createOrder(originalOrder.getErpGuid(), sfOrder, originalOrder.getDocumentCancellationReason());
+}
+
+@Override
+public String createOrder(String erpGuid, OrderCreateExtendedDto sfOrder, CancellationReason cancellationReason) {
+log.info("POST /order/create with clientOrderId {}, erpGuid {}",
+sfOrder.getOrderDetails().getClientOrderId(), erpGuid);
+
+final var sfOrderResponse = feignOrder.createOrder(sfOrder);
+final var createOrderResponse = sfOrderResponse.getBody();
+// TODO:: check response for error
+final var sfOrderId = createOrderResponse.getOrderId();
+
+// maybe need additional calculation and order update
+
+setOrderCancellationReason(cancellationReason, sfOrderId);
+
+if (Boolean.TRUE.equals(sfOrder.getDeleted())) {
+markOrderDeleted(sfOrderId);
+}
+
+return sfOrderId;
+}
+
+@Override
+public Order getShortOrderInfoByStarfishOrderId(String sfOrderId) {
+log.info("GET /order/{}", sfOrderId);
+final var result = feignOrder.getOrderByStarfishOrderId(sfOrderId);
+// TODO:: check response
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+
+final var starfishOrderId = result.getBody().getId();
+final var byStarfishOrderId = orderRepo.getByStarfishOrderId(starfishOrderId);
+return byStarfishOrderId;
+}
+
+@Override
+public Optional<OrderSearchDto> getShortOrderInfoByClientOrderId(String clientOrderId) {
+log.info("GET /client/order/{}", clientOrderId);
+try {
+final var result = feignOrder.getOrderByClientOrderId(clientOrderId);
+// TODO:: check response
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+return Optional.ofNullable(result.getBody());
+} catch (FeignException e) {
+if (e.status() == 400) {
+log.warn("Exception with status code {} occurred while try to get order by clientOrderId = {}", e.status(), clientOrderId);
+} else {
+log.error("Exception occurred while try to get order by clientOrderId = {}", clientOrderId, e);
+}
+return Optional.empty();
+}
+}
+
+@Override
+public void setOrderCancellationReason(Order order, String sfOrderId) {
+setOrderCancellationReason(order.getDocumentCancellationReason(), sfOrderId);
+}
+
+@Override
+public void setOrderCancellationReason(CancellationReason cancellationReason, String sfOrderId) {
+if (cancellationReason != null) {
+
+log.info("POST /order/{}/cancelationreason/{}/set", sfOrderId, cancellationReason.name());
+
+final var result = feignOrder.setCancellationReason(sfOrderId, cancellationReason.name(), null);
+// TODO:: check response for error
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+}
+}
+
+@Override
+public void markOrderDeleted(String starfishOrderId) {
+log.info("DELETE /order/{}", starfishOrderId);
+
+final var result = feignOrder.deleteOrder(starfishOrderId);
+// TODO:: check response for error
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {}", result.getStatusCode(), result.getBody());
+}
+
+try {
+bpmFeignClient.sendMessage(
+"MESSAGE_ORDER_DELETED", starfishOrderId, "evraz_oms_dev", Collections.emptyList());
+} catch (Exception e) {
+log.error("could not send message MESSAGE_ORDER_DELETED to bpm", e);
+throw e;
+}
+}
+
+@Override
+public ResponseEntity<OrderDto> updateOrderCustomAttributes(String sfOrderId, List<CustomAttributesDto> attributes) {
+log.info("POST /order/{}/customattributes", sfOrderId);
+final var result = feignOrder.updateCustomAttributes(sfOrderId, attributes);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to update custom attributes",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+
+@Override
+public ResponseEntity<OrderDto> updateOrderDetails(String sfOrderId, OrderDetails orderDetails) {
+log.info("POST /order/{}", sfOrderId);
+final var result = feignOrder.updateOrderDetails(sfOrderId, orderDetails);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to update order details",
+result.getStatusCode(), result.getBody());
+}
+return result;
+}
+
+@Override
+public ResponseEntity<OrderUpdateDto> updateOrdersDetails(String sfOrderId, OrderDetails orderDetails) {
+log.info("PUT /orders/{}/details", sfOrderId);
+final var body = mapper.mapOrderUpdateDto(orderDetails);
+final var result = feignOrder.updateOrderDetails(body, sfOrderId);
+if (!result.getStatusCode().is2xxSuccessful()) {
+log.warn("Not successful status code: {}, body: {} when trying to update order details",
+result.getStatusCode(), result.getBody());
+}
+if (orderDetails.isDeleted()) {
+try {
+bpmFeignClient.sendMessage(
+"MESSAGE_ORDER_DELETED", sfOrderId, "evraz_oms_dev", Collections.emptyList());
+} catch (Exception e) {
+log.error("could not send message MESSAGE_ORDER_DELETED to bpm", e);
+throw e;
+}
+}
+return result;
+}
+
+@Override

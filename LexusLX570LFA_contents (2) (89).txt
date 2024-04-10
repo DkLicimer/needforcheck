@@ -1,0 +1,456 @@
+﻿import java.util.stream.Collectors;
+
+@Component
+@Slf4j
+// TODO:: Ð’Ñ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ðµ Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ, ÑÐ¾ Ð²Ñ€ÐµÐ¼ÐµÐ½ÐµÐ¼ Ð´Ð¾Ð»Ð¶Ð½Ð¾ ÑƒÐ¹Ñ‚Ð¸
+public class ScheduledOrderUpdateJob {
+@Value("${scheduled.order.createUpdate.enabled:true}")
+private Boolean scheduledUpdateEnabled;
+
+@Value("${scheduled.order.createUpdate.limit:100}")
+private Integer createUpdateLimitByIteration;
+
+@Value("${tenantId:evraz_oms_dev}")
+private String tenantId;
+
+@Value("${scheduled.order.metric.transactions.enabled:true}")
+private Boolean metricsEnabled;
+
+@Autowired
+private JwtTokenService jwtTokenService;
+
+@Autowired
+private OrderTransactionRepository orderTransactionRepo;
+
+@Autowired
+private MeterRegistry meterRegistry;
+
+@Autowired
+private StarfishUpdateService starfishUpdateService;
+
+@PostConstruct
+public void setupMetrics() {
+if (metricsEnabled) {
+Gauge.builder("aggregation.order.transaction.to_be_sent", () -> orderTransactionRepo.countActiveOrderTransactions(false))
+.register(meterRegistry);
+Gauge.builder("aggregation.order.orders.to_be_sent", () -> orderTransactionRepo.countActiveOrderTransactions(true))
+.register(meterRegistry);
+Gauge.builder("aggregation.order.transaction.max_wait_time", () -> orderTransactionRepo.findOldestActiveOrderTransactionTimeDiff())
+.register(meterRegistry);
+}
+}
+
+@Scheduled(cron = "${scheduled.order.createUpdate.cron:0 0/1 * * * *}")
+@SchedulerLock(name = "ScheduledOrderUpdateJob_doUpdateNotUploadedOrders",
+lockAtLeastFor = "${scheduled.order.createUpdate.lockAtLeastFor:PT59S}",
+lockAtMostFor = "${scheduled.order.createUpdate.lockAtMostFor:PT59S}")
+public void doUpdateNotUploadedOrders() {
+if (scheduledUpdateEnabled) {
+StopWatch stopWatch = new StopWatch();
+stopWatch.start();
+jwtTokenService.fillSecurityContextWithIntegrationUser(tenantId);
+
+final var now = LocalDateTime.now();
+log.info("Prepare to scheduled order create/update... at {}", now);
+final var orderErpGuidToTransactions = orderTransactionRepo.findNotUpdatedOrderErpGuidsWithTransactions(now, createUpdateLimitByIteration);
+
+if (orderErpGuidToTransactions.isEmpty()) {
+log.info("Cannot find unsent orders at {}", now);
+stopWatch.stop();
+long processTimeMs = stopWatch.getTotalTimeMillis();
+log.info("Scheduled iteration process time: {}ms", processTimeMs);
+return;
+}
+
+final var orderErpGuids = orderErpGuidToTransactions.keySet();
+log.info("Scheduled update started for orders: {} at: {}", orderErpGuids, now);
+
+List<OrderWithTransactionsDto> ordersWithTransactions = orderErpGuidToTransactions.entrySet().stream()
+.map(entry -> {
+Set<String> transactionIds = entry.getValue().stream()
+.map(OrderTransactionEntity::getId)
+.collect(Collectors.toSet());
+
+return new OrderWithTransactionsDto(entry.getKey(), transactionIds);
+}).toList();
+
+try {
+starfishUpdateService.updateOrdersAndTransactions(ordersWithTransactions).get();
+} catch (InterruptedException | ExecutionException e) {
+log.error("Error occurred while processing orders: {}", orderErpGuids, e);
+}
+
+stopWatch.stop();
+long processTimeMs = stopWatch.getTotalTimeMillis();
+log.info("Scheduled iteration process time: {}ms. Orders count: {}, orderErpGuid IN {}",
+processTimeMs, orderErpGuidToTransactions.size(), orderErpGuids);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/exception/BusinessException.java
+Content:
+package ru.liga.evraz.aggregation.application.exception;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+public class BusinessException extends RuntimeException {
+public BusinessException(String message) {
+super(message);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/exception/NotFoundException.java
+Content:
+package ru.liga.evraz.aggregation.application.exception;
+
+public class NotFoundException extends RuntimeException {
+public NotFoundException(String message) {
+super(message);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/AdditionalOrderAttributeEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+
+@Getter
+public class AdditionalOrderAttributeEvent extends BaseEvent {
+
+private final EventType eventType;
+private final OrderAttribute attribute;
+
+@Builder
+public AdditionalOrderAttributeEvent(String transactionId, String orderErpGuid,
+EventType eventType, OrderAttribute attribute) {
+super(transactionId, orderErpGuid, eventType);
+this.eventType = eventType;
+this.attribute = attribute;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/BaseEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Getter;
+
+@Getter
+public class BaseEvent {
+private final String transactionId;
+private final String orderErpGuid;
+
+private final EventType eventType;
+
+public BaseEvent(String transactionId, String orderErpGuid, EventType eventType) {
+this.transactionId = transactionId;
+this.orderErpGuid = orderErpGuid;
+this.eventType = eventType;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/DeliveryAttributeEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+
+@Getter
+public class DeliveryAttributeEvent extends BaseEvent {
+
+private final DeliveryAttribute attribute;
+private final String deliveryErpGuid;
+
+@Builder
+public DeliveryAttributeEvent(String transactionId, String orderErpGuid,
+EventType eventType, DeliveryAttribute attribute, String deliveryErpGuid) {
+super(transactionId, orderErpGuid, eventType);
+this.attribute = attribute;
+this.deliveryErpGuid = deliveryErpGuid;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/DeliveryEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+public class DeliveryEvent extends BaseEvent {
+
+private final String deliveryErpGuid;
+
+@Builder
+public DeliveryEvent(String transactionId, String orderErpGuid, String deliveryErpGuid, EventType eventType) {
+super(transactionId, orderErpGuid, eventType);
+this.deliveryErpGuid = deliveryErpGuid;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/EventType.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.EnumSet;
+import java.util.Set;
+
+@Slf4j
+public enum EventType {
+CREATE_ORDER,
+CREATE_ORDER_ATTRIBUTE,
+CREATE_DELIVERY,
+CREATE_DELIVERY_ATTRIBUTE,
+UPDATE_ORDER,
+UPDATE_ORDER_ATTRIBUTE,
+UPDATE_DELIVERY,
+UPDATE_DELIVERY_ATTRIBUTE,
+//DELETE_ORDER,
+DELETE_ORDER_ATTRIBUTE,
+DELETE_DELIVERY,
+DELETE_DELIVERY_ATTRIBUTE,
+RELOAD_ORDER,
+CREATE_ORDER_RESERVE,
+UPDATE_ORDER_RESERVE;
+
+public static final Set<EventType> ORDER_EVENT_TYPES = EnumSet.of(
+CREATE_ORDER, CREATE_ORDER_ATTRIBUTE,
+UPDATE_ORDER, UPDATE_ORDER_ATTRIBUTE,
+DELETE_ORDER_ATTRIBUTE, RELOAD_ORDER,
+CREATE_ORDER_RESERVE, UPDATE_ORDER_RESERVE
+);
+
+public static final Set<EventType> DELIVERY_EVENT_TYPES = EnumSet.of(
+CREATE_DELIVERY, CREATE_DELIVERY_ATTRIBUTE,
+UPDATE_DELIVERY, UPDATE_DELIVERY_ATTRIBUTE,
+DELETE_DELIVERY, DELETE_DELIVERY_ATTRIBUTE
+);
+
+public static boolean isOrderEventType(EventType eventType) {
+if (eventType == null) {
+log.warn("eventType was not passed as parameter");
+return false;
+}
+return ORDER_EVENT_TYPES.contains(eventType);
+}
+
+public static boolean isDeliveryEventType(EventType eventType) {
+if (eventType == null) {
+log.warn("eventType was not passed as parameter");
+return false;
+}
+return DELIVERY_EVENT_TYPES.contains(eventType);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/OrderReserveEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+import ru.liga.evraz.aggregation.domain.model.OrderReserve;
+
+@Getter
+public class OrderReserveEvent extends BaseEvent {
+
+private final EventType eventType;
+private final OrderReserve orderReserve;
+
+@Builder
+public OrderReserveEvent(String transactionId, String orderErpGuid,
+EventType eventType, OrderReserve orderReserve) {
+super(transactionId, orderErpGuid, eventType);
+this.eventType = eventType;
+this.orderReserve = orderReserve;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/ReloadOrderEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+public class ReloadOrderEvent extends BaseEvent {
+@Builder
+public ReloadOrderEvent(String transactionId, String orderErpGuid) {
+super(transactionId, orderErpGuid, EventType.RELOAD_ORDER);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/SendOrderCreateEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+public class SendOrderCreateEvent extends BaseEvent {
+@Builder
+public SendOrderCreateEvent(String transactionId, String orderErpGuid) {
+super(transactionId, orderErpGuid, EventType.CREATE_ORDER);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/event/SendOrderUpdateEvent.java
+Content:
+package ru.liga.evraz.aggregation.application.event;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+public class SendOrderUpdateEvent extends BaseEvent {
+@Builder
+public SendOrderUpdateEvent(String transactionId, String orderErpGuid) {
+super(transactionId, orderErpGuid, EventType.UPDATE_ORDER);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/CommandMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.application.cmd.*;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.*;
+import ru.liga.evraz.aggregation.domain.model.command.*;
+import ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission.ShippingRequestItemShortData;
+import ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission.ShippingRequestShipPermissionItemsCommand;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface CommandMapper {
+@Mappings({
+@Mapping(target = "commandType", constant = "ORDER_SHIP_PERMISSION"),
+@Mapping(target = "erpGuid", source = "orderErpGuid"),
+@Mapping(target = "orderItems", source = "source.documentItems")
+})
+OrderShipPermissionItemsCommand map(OrderShipPermissionItemsCmd source, String orderErpGuid);
+
+@Mapping(target = "documentItems", source = "orderItems")
+OrderShipPermissionDto map(OrderShipPermissionItemsCommand source);
+
+ShippingRequestShipPermissionItemsCommand map(ShippingRequestShipPermissionItemsCmd source);
+
+ShippingRequestShipPermissionDto map(ShippingRequestShipPermissionItemsCommand source, String orderErpGuid);
+
+@Mapping(target = "skuStatus", constant = "SHIP") // Ð’ Ð¿Ð¾ÑÐ»ÐµÐ´ÑÑ‚Ð²Ð¸Ð¸ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ð¾Ð¼ÐµÐ½ÑÑ‚ÑŒÑÑ/Ñ€Ð°ÑÑˆÐ¸Ñ€Ð¸Ñ‚ÑŒÑÑ
+ShippingRequestItemShortData map(DeliveryItem source);
+
+CommandGuidKey mapCommandGuidKey(String commandGuid);
+
+OrderSignPipelineCommand map(OrderSignPipelineCmd cmd);
+
+OrderSignPipelineDto map(OrderSignPipelineCommand commandSaveResult);
+
+@Mapping(target = "documentCancellationReason", constant = "CANCELED")
+@Mapping(target = "positionCancellationReason", constant = "CLOSED_BY_DEADLINE")
+@Mapping(target = "commandType", constant = "CLOSE_ERP_ORDER")
+CloseErpOrderCommand map(CloseErpOrderCmd cmd, String erpGuid);
+
+CloseErpOrderDto map(CloseErpOrderCommand commandSaveResult);
+
+@BeanMapping(ignoreByDefault = true)
+@Mapping(target = "instanceId", source = "cmd.instanceId")
+@Mapping(target = "orderId", source = "task.orderId")
+@Mapping(target = "commandType", expression = "java(mapErpTaskType(task))")
+@Mapping(target = "taskGuid", source = "task.id")
+ErpTaskCommand map(CreateErpTaskCmd cmd, ErpTask task);
+
+@BeanMapping(ignoreByDefault = true)
+@Mapping(target = "instanceId", source = "cmd.instanceId")
+@Mapping(target = "orderId", source = "task.orderId")
+@Mapping(target = "commandType", expression = "java(mapCancelErpTaskType(task))")
+@Mapping(target = "taskGuid", source = "task.id")
+ErpTaskCommand map(CancelErpTaskCmd cmd, ErpTask task);
+
+@Mappings({
+@Mapping(target = "commandType", constant = "ORDER_RESERVE_RENEWAL"),
+@Mapping(target = "erpGuid", source = "orderErpGuid")
+})
+OrderReserveRenewalCommand map(OrderReserveRenewalCmd cmd, String orderErpGuid);
+
+OrderReserveRenewalDto map(OrderReserveRenewalCommand commandSaveResult);
+
+default String mapErpTaskType(ErpTask task) {
+return "ERP_TASK_" + task.getTaskType();
+}
+
+default String mapCancelErpTaskType(ErpTask task) {
+return "ERP_TASK_CANCEL_" + task.getTaskType();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/ErpDeliveryModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateDeliveryAttributeCmd;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateErpDeliveryCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+public interface ErpDeliveryModelMapper {
+String HUMAN_DATE_WITH_TIME = "dd.MM.yyyy HH:mm:ss"; //  03.03.2023 11.00.00
+
+@Mappings({
+@Mapping(target = "carDeliveryDateTimeFromDescription", source = "carDeliveryDateTimeFrom", dateFormat = HUMAN_DATE_WITH_TIME),
+@Mapping(target = "carDeliveryDateTimeToDescription", source = "carDeliveryDateTimeTo", dateFormat = HUMAN_DATE_WITH_TIME),
+@Mapping(target = "deliveryTimeZone", expression = "java(cmd.carDeliveryDateTimeFrom().getZone().toString())")
+})
+ErpDelivery map(CreateUpdateErpDeliveryCmd cmd);
+
+DeliveryAttribute map(CreateUpdateDeliveryAttributeCmd cmd);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/converter/ErpTaskModelMapper.java
+Content:
+package ru.liga.evraz.aggregation.application.converter;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.application.cmd.CreateErpTaskCmd;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.model.ErpTask;
+
+/**

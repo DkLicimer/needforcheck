@@ -1,0 +1,404 @@
+﻿if (pathToExpectedResources.containsKey(ORDER_CUSTOM_ATTRIBUTES_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOM_ATTRIBUTES_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOM_ATTRIBUTES_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOM_ATTRIBUTES_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEMS_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEMS_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEMS_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEMS_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_ITEM_SERVICES_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_ITEM_SERVICES_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDER_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDERS_SHIPPING_UPDATE_TEMPLATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDERS_SHIPPING_UPDATE_TEMPLATE);
+dispatcherDatas.add(
+ORDERS_SHIPPING_UPDATE_TEMPLATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDERS_SHIPPING_UPDATE_TEMPLATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_SET_CANCELLATION_REASON)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_SET_CANCELLATION_REASON);
+dispatcherDatas.add(
+ORDER_SET_CANCELLATION_REASON.buildDispatcherData(
+resourceResourcePair, HttpMethod.POST,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_SET_CANCELLATION_REASON, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_GET_BY_CLIENT_ORDER_ID)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_GET_BY_CLIENT_ORDER_ID);
+dispatcherDatas.add(
+ORDER_GET_BY_CLIENT_ORDER_ID.buildDispatcherData(
+resourceResourcePair, HttpMethod.GET,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (StringUtils.isNotBlank(pathTemplateParameters.get("expected_starfish_order_id").toString())) {
+final Pair<Resource, Resource> req2resp = Pair.of(
+null,
+new ByteArrayResource("Order is deleted".getBytes(StandardCharsets.UTF_8)));
+dispatcherDatas.add(
+ORDER_DELETE.buildDispatcherData(
+req2resp, HttpMethod.DELETE,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_DELETE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+if (pathToExpectedResources.containsKey(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE)) {
+final var resourceResourcePair = pathToExpectedResources.get(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE);
+dispatcherDatas.add(
+ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE.buildDispatcherData(
+resourceResourcePair, HttpMethod.PUT,
+pathsToExpectedHttpStatus.getOrDefault(ORDER_CUSTOMERS_LEGAL_ENTITY_UPDATE, HttpStatus.OK),
+pathTemplateParameters));
+}
+
+var dispatcher = new StarfishOrderDispatcher(dispatcherDatas);
+sfOrderServer.setDispatcher(dispatcher);
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/order_attribute/UpdateOrderAttributeTest.java
+Content:
+package ru.liga.evraz.aggregation.module.order_attribute;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð·Ð°ÐºÐ°Ð·Ð°, Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð½Ñ‹Ñ… Ð¾Ñ‚ 1Ð¡")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class UpdateOrderAttributeTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order_attribute/truncate_order_attributes.sql";
+private static final String DB_FILL = "/db/order_attribute/fill_order_attributes.sql";
+
+@Autowired
+private OrderAttributeRepository orderAttributeRepository;
+
+@Value("classpath:api/order_attribute/update/request/update_order_attribute_request.json")
+private Resource updateOrderAttributeBooleanValueRequest;
+@Value("classpath:api/order_attribute/update/response/update_order_attribute_response.json")
+private Resource updateOrderAttributeBooleanValueResponse;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð¿ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð·Ð°ÐºÐ°Ð·Ð°")
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void updateOrderAttributeBooleanValueSuccess() {
+customPostScenarioFromResource("/v1/order/additional-attribute",
+updateOrderAttributeBooleanValueRequest, updateOrderAttributeBooleanValueResponse, true,
+200);
+
+final var orderAttribute = orderAttributeRepository.findByErpOrderGuidAndNameAndPositionCode("update_test_guid", "inserted", 2L);
+final var allAttributes = orderAttributeRepository.findAll();
+
+Assertions.assertAll(
+() -> assertThat(orderAttribute.getValue()).isEqualTo("updated_true"),
+() -> assertThat(orderAttribute.getPositionCode()).isEqualTo(2),
+() -> assertThat(allAttributes.size()).isEqualTo(3)
+);
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(0, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(0, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/order/CreateOrderTest.java
+Content:
+package ru.liga.evraz.aggregation.module.order;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.config.path.ProductPath;
+import ru.liga.evraz.aggregation.dispatcher.DispatcherData;
+import ru.liga.evraz.aggregation.dispatcher.StarfishOrderDispatcher;
+import ru.liga.evraz.aggregation.dispatcher.StarfishProductDispatcher;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.BpmPath.BPM_SEND_MESSAGE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_CREATE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_DELETE;
+import static ru.liga.evraz.aggregation.config.path.OrderPath.ORDER_GET_BY_CLIENT_ORDER_ID;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.CUSTOMERSERVICE_UPDATE;
+import static ru.liga.evraz.aggregation.config.path.ProductPath.PRODUCT_UPDATE;
+
+@Slf4j
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð¾Ð², Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð½Ñ‹Ñ… Ð¾Ñ‚ 1Ð¡")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CreateOrderTest extends BaseIntegrationTest {
+
+@Value("classpath:/api/order/create/invalidRequest_oneItem_request.json")
+private Resource invalidRequest;
+
+@Value("classpath:/api/order/create/invalidRequest_oneItem_response.json")
+private Resource invalidRequestResponse;
+
+@Value("classpath:/api/order/create/invalidRequest_invalidPositionCodeValue_request.json")
+private Resource invalidPositionCodeValueRequest;
+
+@Value("classpath:/api/order/create/invalidRequest_invalidPositionCodeValue_response.json")
+private Resource invalidPositionCodeValueResponse;
+
+@Value("classpath:/api/order/create/invalidRequest_duplicate_positionCode_request.json")
+private Resource duplicatedPositionCodesRequest;
+
+@Value("classpath:/api/order/create/invalidRequest_duplicate_positionCode_response.json")
+private Resource duplicatedPositionCodesResponse;
+
+@Value("classpath:/api/order/create/invalidRequest_requiredPositionCancellationReason_request.json")
+private Resource requiredPositionCancellationReasonRequest;
+
+@Value("classpath:/api/order/create/invalidRequest_requiredPositionCancellationReason_response.json")
+private Resource requiredPositionCancellationReasonResponse;
+
+@Value("classpath:/api/order/create/successRequest_oneItem.json")
+private Resource oneItemOrderRequest;
+
+@Value("classpath:/api/order/create/successResponse_oneItem.json")
+private Resource oneItemOrderResponse;
+
+@Value("classpath:/api/order/create/orderCreate_severalDelivery_request.json")
+private Resource orderWithSeveralDeliveryServicesRequest;
+
+@Value("classpath:/api/order/create/orderCreate_severalDelivery_response.json")
+private Resource orderWithSeveralDeliveryServicesResponse;
+
+@Value("classpath:/api/order/create/successRequest_orderWithService.json")
+private Resource orderWithServiceRequest;
+
+@Value("classpath:/api/order/create/successResponse_orderWithService.json")
+private Resource orderWithServiceResponse;
+
+@Value("classpath:/api/order/create/successRequest_order_deleted.json")
+private Resource deletedOrderRequest;
+
+@Value("classpath:/api/order/create/successResponse_order_deleted.json")
+private Resource deletedOrderResponse;
+
+@Value("classpath:/api/order/create/successRequest_oneItem_deleted.json")
+private Resource deletedOneItemOrderRequest;
+
+@Value("classpath:/api/order/create/successResponse_oneItem_deleted.json")
+private Resource deletedOneItemOrderResponse;
+
+// Product
+@Value("classpath:/external/product/product/productCreate_severalDelivery_request.json")
+private Resource extItemProductCreate_severalDelivery_request;
+
+@Value("classpath:/external/product/product/product_create_request.json")
+private Resource extOneItemProductCreateRequest;
+
+@Value("classpath:/external/product/product/product_create_response.json")
+private Resource extOneItemProductCreateResponse;
+
+@Value("classpath:/external/product/customer_service/service_create_severalDelivery_request.json")
+private Resource extServiceCreate_severalDelivery_request;
+
+@Value("classpath:/external/product/customer_service/service_create_request.json")
+private Resource extOneServiceCreateRequest;
+
+@Value("classpath:/external/product/customer_service/service_create_response.json")
+private Resource extOneServiceCreateResponse;
+
+// Order
+@Value("classpath:/external/order/create/order_one_item_create_request.json")
+private Resource extOneItemOrderCreateRequest;
+
+@Value("classpath:/external/order/create/order_one_item_create_response.json")
+private Resource extOneItemOrderCreateResponse;
+
+@Value("classpath:/external/order/create/order_with_several_delivery_service_create_request.json")
+private Resource extOrderWithSeveralDeliveryServiceCreateRequest;
+
+@Value("classpath:/external/order/create/order_with_several_delivery_service_create_response.json")
+private Resource extOrderWithSeveralDeliveryServiceCreateResponse;
+
+@Value("classpath:/external/order/create/order_with_service_create_request.json")
+private Resource extOrderWithServiceCreateRequest;
+
+@Value("classpath:/external/order/create/order_with_service_create_response.json")
+private Resource extOrderWithServiceCreateResponse;
+
+@Value("classpath:/external/order/create/order_one_item_deleted_create_request.json")
+private Resource extOneItemDeletedOrderCreateRequest;
+
+@Value("classpath:/external/order/create/order_one_item_deleted_create_response.json")
+private Resource extOneItemDeletedOrderCreateResponse;
+
+@Value("classpath:/external/order/create/order_deleted_create_request.json")
+private Resource extDeletedOrderCreateRequest;
+
+@Value("classpath:/external/order/create/order_deleted_create_response.json")
+private Resource extDeletedOrderCreateResponse;
+
+// BPM - service
+@Value("classpath:external/bpm/message_order_deleted_req.json")
+private Resource bpmnReq;
+@Value("classpath:external/bpm/message_order_deleted_resp.json")
+private Resource bpmnRes;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° c Ð¾Ð´Ð½Ð¾Ð¹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÐµÐ¹")
+@SqlGroup({
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = AFTER_TEST_METHOD),
+})
+@Disabled
+public void createSimpleOrder() {
+initProductScenario();
+
+final var orderPathesToExpectedResources = Map.of(
+ORDER_CREATE, Pair.of(extOneItemOrderCreateRequest, extOneItemOrderCreateResponse),
+ORDER_GET_BY_CLIENT_ORDER_ID, Pair.<Resource, Resource>of(null, null)
+);
+
+initOrderScenario(
+orderPathesToExpectedResources,
+Map.of(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.BAD_REQUEST),
+Map.of("expected_starfish_order_id", "test_starfish_order_id",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_client_order_id", "documentId___27.12.2022")
+);
+
+customPostScenarioFromResource("/v1/order",
+oneItemOrderRequest, oneItemOrderResponse, true, 200);
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(2, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(1, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° c Ð¾Ð´Ð½Ð¾Ð¹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÐµÐ¹ Ð¸ ÑÐ²ÑÐ·Ð°Ð½Ð½Ð¾Ð¹ ÑƒÑÐ»ÑƒÐ³Ð¾Ð¹")
+@SqlGroup({
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = AFTER_TEST_METHOD),
+})
+@Disabled
+public void createSimpleOrderWithItemService() {
+initProductScenario();
+
+final var orderPathesToExpectedResources = Map.of(
+ORDER_CREATE, Pair.of(extOrderWithServiceCreateRequest, extOrderWithServiceCreateResponse),
+ORDER_GET_BY_CLIENT_ORDER_ID, Pair.<Resource, Resource>of(null, null)
+);
+
+initOrderScenario(
+orderPathesToExpectedResources,
+Map.of(ORDER_GET_BY_CLIENT_ORDER_ID, HttpStatus.BAD_REQUEST),
+Map.of("expected_starfish_order_id", "test_starfish_order_id",
+"expected_order_cancellation_reason", CancellationReason.NO_REASON.name(),
+"expected_client_order_id", "documentId___27.12.2022")
+);
+
+customPostScenarioFromResource("/v1/order",
+orderWithServiceRequest, orderWithServiceResponse, true, 200);
+
+if (sfOrderServer.getDispatcher() instanceof final StarfishOrderDispatcher orderDispatcher) {
+assertEquals(2, orderDispatcher.getValidDispatches(), "Check dispatched ORDER requests");
+}
+if (sfProductServer.getDispatcher() instanceof final StarfishProductDispatcher productDispatcher) {
+assertEquals(2, productDispatcher.getValidDispatches(), "Check dispatched PRODUCT requests");
+}
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¿Ð¾ Ð½ÐµÑÐºÐ¾Ð»ÑŒÐºÐ¸Ð¼ ÑƒÑÐ»ÑƒÐ³Ð°Ð¼ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸")
+@SqlGroup({
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = "/db/order/truncate_order_entities.sql", executionPhase = AFTER_TEST_METHOD),
+})
+@Disabled
+public void createSimpleOrderWithSeveralDeliveryServices() {
+final var productPathesToExpectedResources = Map.of(
+PRODUCT_UPDATE, Pair.of(extItemProductCreate_severalDelivery_request, extOneItemProductCreateResponse),

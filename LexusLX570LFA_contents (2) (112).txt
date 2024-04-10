@@ -1,0 +1,457 @@
+﻿}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/ErpTaskUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Component
+public class ErpTaskUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderAttributeJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.OrederAttribute.OrderAttributeEntity;
+
+import java.util.List;
+import javax.validation.constraints.NotEmpty;
+
+@Validated
+interface OrderAttributeJpaRepository extends JpaRepository<OrderAttributeEntity, String> {
+
+void deleteByErpOrderGuidAndNameAndPositionCode(@NotEmpty String erpOrderGuid, @NotEmpty String name, Long positionCode);
+
+OrderAttributeEntity findByErpOrderGuidAndNameAndPositionCode(@NotEmpty String erpOrderGuid, @NotEmpty String name, Long positionCode);
+
+List<OrderAttributeEntity> findByErpOrderGuid(@NotEmpty String erpOrderGuid);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderAttributeRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.OrderAttributeEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+import ru.liga.evraz.aggregation.application.event.AdditionalOrderAttributeEvent;
+import ru.liga.evraz.aggregation.application.event.EventType;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+
+import java.util.List;
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class OrderAttributeRepositoryImpl implements OrderAttributeRepository {
+
+private final OrderAttributeJpaRepository jpaOrderAttributeRepo;
+private final OrderAttributeEntityMapper mapper;
+private final OrderAttributeUuidGenerator uuidGenerator;
+private final OrderTransactionRepository orderTransactionRepo;
+private final ApplicationEventPublisher applicationEventPublisher;
+
+@Override
+public OrderAttribute create(OrderAttribute attribute) {
+log.info("Try to create attribute {}, with order erpGuid {} for positionCode {}",
+attribute.getName(), attribute.getErpOrderGuid(), attribute.getPositionCode());
+
+final var entity = mapper.map(attribute);
+entity.setNewEntity(true);
+entity.setId(uuidGenerator.generateUuid());
+final var newAttribute = jpaOrderAttributeRepo.save(entity);
+
+produceEvent(attribute.getErpOrderGuid(), attribute, EventType.CREATE_ORDER_ATTRIBUTE);
+
+return mapper.map(newAttribute);
+}
+
+@Override
+public OrderAttribute update(OrderAttribute attribute) {
+log.info("Try to update attribute {}, with order erpGuid {} for positionCode {}",
+attribute.getName(), attribute.getErpOrderGuid(), attribute.getPositionCode());
+
+final var entity = mapper.map(attribute);
+entity.setNewEntity(false);
+final var newAttribute = jpaOrderAttributeRepo.save(entity);
+
+produceEvent(attribute.getErpOrderGuid(), attribute, EventType.UPDATE_ORDER_ATTRIBUTE);
+
+return mapper.map(newAttribute);
+}
+
+@Override
+public void deleteByErpOrderGuidAndAttributeNameAndPositionCode(OrderAttribute attribute) {
+final var attributeName = attribute.getName();
+final var erpOrderGuid = attribute.getErpOrderGuid();
+final var positionCode = attribute.getPositionCode();
+
+log.info("Try to delete attribute {}, with order erpGuid {} for positionCode {}",
+attributeName, erpOrderGuid, positionCode);
+jpaOrderAttributeRepo.deleteByErpOrderGuidAndNameAndPositionCode(
+erpOrderGuid, attributeName, positionCode);
+
+produceEvent(erpOrderGuid, attribute, EventType.DELETE_ORDER_ATTRIBUTE);
+}
+
+private void produceEvent(String erpGuid, OrderAttribute attribute, EventType eventType) {
+final var orderTransactionEntity = OrderTransactionEntity.builder()
+.transactionId(uuidGenerator.generateUuid())
+.erpGuid(erpGuid)
+.shouldSend(true)
+.newEntity(true)
+.build();
+final var orderTransaction = orderTransactionRepo.save(orderTransactionEntity);
+
+final var event = AdditionalOrderAttributeEvent.builder()
+.orderErpGuid(erpGuid)
+.transactionId(orderTransaction.getId())
+.attribute(attribute)
+.eventType(eventType)
+.build();
+applicationEventPublisher.publishEvent(event);
+}
+
+@Override
+public OrderAttribute findByErpOrderGuidAndNameAndPositionCode(String erpGuid, String name, Long positionCode) {
+final var entity = jpaOrderAttributeRepo.findByErpOrderGuidAndNameAndPositionCode(erpGuid, name, positionCode);
+return mapper.map(entity);
+}
+
+@Override
+public List<OrderAttribute> findAll() {
+return jpaOrderAttributeRepo.findAll().stream()
+.map(mapper::map)
+.toList();
+}
+
+@Override
+public List<OrderAttribute> findByErpOrderGuid(String erpOrderGuid) {
+return jpaOrderAttributeRepo.findByErpOrderGuid(erpOrderGuid).stream()
+.map(mapper::map)
+.toList();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderAttributeUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderAttributeUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderItemJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderItemEntity;
+
+import java.util.Collection;
+import java.util.Set;
+import javax.validation.constraints.NotEmpty;
+
+@Validated
+interface OrderItemJpaRepository extends JpaRepository<OrderItemEntity, String> {
+@Transactional(readOnly = true)
+boolean existsByOrderId(String orderId);
+
+@Transactional(readOnly = true)
+Collection<OrderItemEntity> findByOrderId(@NotEmpty String orderId);
+
+@Transactional(readOnly = true)
+Collection<OrderItemEntity> findByOrderErpGuidIn(@NotEmpty Set<String> erpGuids);
+
+@Transactional(readOnly = true)
+Collection<OrderItemEntity> findByOrderErpGuid(@NotEmpty String erpGuid);
+
+@Transactional(readOnly = true)
+boolean existsByPositionCodeAndOrderId(@NotEmpty String positionCode,
+@NotEmpty String orderId);
+
+@Transactional(readOnly = true)
+OrderItemEntity getByPositionCodeAndOrderId(@NotEmpty String positionCode,
+@NotEmpty String orderId);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderItemRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.OrderEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.converter.OrderItemEntityMapper;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+import ru.liga.evraz.aggregation.domain.repository.OrderItemRepository;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class OrderItemRepositoryImpl implements OrderItemRepository {
+
+private final OrderItemJpaRepository orderItemJpaRepo;
+
+private final OrderEntityMapper orderEntityMapper;
+private final OrderItemEntityMapper orderItemEntityMapper;
+
+@Override
+public List<OrderItem> getOrderItemsByOrders(Set<String> orderErpGuids) {
+return orderItemJpaRepo.findByOrderErpGuidIn(orderErpGuids).stream()
+.map(orderItemEntityMapper::mapOrderItemWithShortOrder)
+.filter(i -> {
+final var order = i.getOrder();
+if (order == null) {
+// ÐÐ°Ð±Ð»ÑŽÐ´Ð°Ð»Ð¾ÑÑŒ Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ð¾ Ð¿Ñ€Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°Ñ… Ð±ÐµÐ· Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð° (inner join partner),
+// Ð½Ð° Ð¿Ñ€Ð¾Ð´Ðµ Ð½Ð° Ñ‚ÐµÐº. Ð¼Ð¾Ð¼ÐµÐ½Ñ‚ (05.06.2023) Ñ‚Ð°ÐºÐ¸Ñ… ÑÐ¸Ñ‚ÑƒÐ°Ñ†Ð¸Ð¹ Ð±Ñ‹Ñ‚ÑŒ Ð½Ðµ Ð´Ð¾Ð»Ð¶Ð½Ð¾
+log.warn("Link to order not found for item id {}, skuId {}", i.getId(), i.getSkuId());
+}
+return order != null;
+})
+.collect(Collectors.toList());
+}
+
+@Override
+public List<OrderItem> getOrderItemsByOrder(String orderErpGuid) {
+return orderItemJpaRepo.findByOrderErpGuid(orderErpGuid).stream()
+.map(orderEntityMapper::orderItemEntityMapToOrderItem)
+.collect(Collectors.toList());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderItemUuidGenerator.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderItemUuidGenerator implements UuidGenerator {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderJpaRepository.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderEntity;
+
+import java.util.Optional;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Validated
+interface OrderJpaRepository extends JpaRepository<OrderEntity, String> {
+boolean existsByErpGuid(@NotEmpty String erpGuid);
+
+OrderEntity getByErpGuid(@NotEmpty String erpGuid);
+
+boolean existsBySfOrderId(@NotEmpty String sfOrderId);
+
+OrderEntity getBySfOrderId(@NotEmpty String sfOrderId);
+
+Optional<OrderEntity> findByErpGuid(@NotEmpty String erpGuid);
+
+@Transactional
+@Modifying
+@Query("update OrderEntity oe set oe.sfOrderId = :sfOrderId where oe.erpGuid = :orderErpGuid")
+void setStarfishOrderId(@NotEmpty @Param("orderErpGuid") String orderErpGuid,
+@NotEmpty @Param("sfOrderId") String sfOrderId);
+
+@Transactional
+@Modifying
+@Query("update OrderEntity oe set oe.omsPipeline = :omsPipeline where oe.sfOrderId = :sfOrderId")
+void updateOmsPipeline(@NotEmpty @Param("sfOrderId") String sfOrderId,
+@NotNull @Param("omsPipeline") Boolean omsPipeline);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/OrderRepositoryImpl.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Repository;
+import ru.liga.evraz.aggregation.adapter.db.converter.OrderEntityMapper;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderEntity;
+import ru.liga.evraz.aggregation.adapter.db.entity.transaction.OrderTransactionEntity;
+import ru.liga.evraz.aggregation.application.event.SendOrderCreateEvent;
+import ru.liga.evraz.aggregation.application.event.SendOrderUpdateEvent;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderDocumentStatus;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+class OrderRepositoryImpl implements OrderRepository {
+private final OrderJpaRepository orderJpaRepo;
+private final OrderEntityMapper orderEntityMapper;
+private final OrderUuidGenerator orderUuidGenerator;
+private final OrderItemUuidGenerator orderItemUuidGenerator;
+
+private final OrderTransactionRepository orderTransactionRepo;
+
+private final ApplicationEventPublisher eventPublisher;
+
+@Override
+public boolean existsByErpGuid(String erpGuid) {
+return orderJpaRepo.existsByErpGuid(erpGuid);
+}
+
+@Override
+public Order getByErpGuid(String erpGuid) {
+final var order = orderJpaRepo.getByErpGuid(erpGuid);
+return orderEntityMapper.map(order);
+}
+
+@Override
+public boolean existsByStarfishOrderId(String sfOrderId) {
+return orderJpaRepo.existsBySfOrderId(sfOrderId);
+}
+
+@Override
+public Order getByStarfishOrderId(String sfOrderId) {
+final var entity = orderJpaRepo.getBySfOrderId(sfOrderId);
+final var result = orderEntityMapper.map(entity);
+return result;
+}
+
+@Override
+public String getErpGuidByStarfishOrderId(String sfOrderId) {
+OrderEntity orderEntity = orderJpaRepo.getBySfOrderId(sfOrderId);
+if (orderEntity != null) {
+return orderEntity.getErpGuid();
+}
+
+return null;
+}
+
+@Override
+public Order create(Order order) {
+final var orderErpGuid = order.getErpGuid();
+log.info("Create order. ErpGuid {}", orderErpGuid);
+
+final var entity = orderEntityMapper.map(order);
+entity.setNewEntity(true);
+entity.setId(orderUuidGenerator.generateUuid());
+entity.getOrderItems()
+.forEach(i -> {
+i. setId(orderItemUuidGenerator.generateUuid());
+i. setOrder(entity);
+});
+entity.setDocumentStatusModifiedAt(LocalDateTime.now(ZoneOffset.UTC));
+final var newOrderEntity = orderJpaRepo.save(entity);
+
+log.info("Create order transaction. ErpGuid {}.", orderErpGuid);
+final var orderTransaction = orderTransactionRepo.save(OrderTransactionEntity.builder()
+.newEntity(true)
+.shouldSend(true)
+.erpGuid(orderErpGuid)
+.transactionId(orderUuidGenerator.generateUuid())
+.build());
+
+final var transactionId = orderTransaction.getId();
+log.info("Publish SendOrderCreateEvent to create. ErpGuid {}, transactionId: {}.", orderErpGuid, transactionId);
+eventPublisher.publishEvent(SendOrderCreateEvent.builder()
+.orderErpGuid(orderErpGuid)
+.transactionId(transactionId)
+.build());
+
+return orderEntityMapper.map(newOrderEntity);
+}
+
+@Override
+public Order update(Order order) {
+final var orderErpGuid = order.getErpGuid();
+log.info("Update order. ErpGuid {}, starfish orderId {}", orderErpGuid, order.getSfOrderId());
+final var oldOrder = getByErpGuid(order.getErpGuid());
+OrderDocumentStatus prevDocumentStatus = oldOrder.getDocumentStatus();
+final var updOrder = oldOrder.update(order);
+
+final var entity = orderEntityMapper.map(updOrder);
+entity.setNewEntity(false);
+entity.getOrderItems()
+.forEach(i -> {
+i. setId(orderItemUuidGenerator.generateUuid());
+i. setOrder(entity);
+});
+if (!prevDocumentStatus.equals(updOrder.getDocumentStatus())) {
+entity.setDocumentStatusModifiedAt(LocalDateTime.now(ZoneOffset.UTC));
+}
+final var newOrderEntity = orderJpaRepo.save(entity);
+
+log.info("Create order transaction to update. ErpGuid {}.", orderErpGuid);
+final var orderTransaction = orderTransactionRepo.save(OrderTransactionEntity.builder()
+.newEntity(true)
+.shouldSend(true)
+.erpGuid(orderErpGuid)
+.transactionId(orderUuidGenerator.generateUuid())
+.build());
+
+final var transactionId = orderTransaction.getId();
+log.info("Publish SendOrderUpdateEvent. ErpGuid {}, transactionId: {}.", orderErpGuid, transactionId);
+eventPublisher.publishEvent(SendOrderUpdateEvent.builder()
+.orderErpGuid(orderErpGuid)
+.transactionId(transactionId)
+.build());
+
+return orderEntityMapper.map(newOrderEntity);
+}
+
+@Override
+public void setStarfishOrderId(String orderErpGuid, String sfOrderId) {
+log.info("Update order. Set starfish orderId ErpGuid {}, starfish orderId {}", orderErpGuid, sfOrderId);
+orderJpaRepo.setStarfishOrderId(orderErpGuid, sfOrderId);
+}
+
+@Override
+public void setOmsPipelineFlag(String sfOrderId, Boolean omsPipeline) {
+log.info("Update order. Set omsPipeline {}, starfish orderId {}", omsPipeline, sfOrderId);
+orderJpaRepo.updateOmsPipeline(sfOrderId, omsPipeline);
+}
+
+@Override
+public void createOrderTransactionForOmsPipelineUpdate(String orderErpGuid, String orderTransactionIdSuffix) {

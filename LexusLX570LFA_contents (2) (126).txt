@@ -1,0 +1,497 @@
+﻿Region: sib
+PROXY: http://sib-prx-009.sib.evraz.com:3128
+PROXY_HOST: sib-prx-009.sib.evraz.com
+RegistryServer: sib-reg-001.sib.evraz.com
+MavenRepoUrl: https://$(RegistryServer)/repository/$(Region)-maven-hosted/
+HelmRepoUrl: https://$(RegistryServer)/repository/$(Region)-helm/
+HelmRepoUser: osh.azure.nexus.prx
+HelmRepoPass: $(HELM_PASSWORD_SIB)
+HelmTimeout: 10m
+Namespace: $(Project)-$(Stage)
+appscreener: appScreener-sib
+
+Project: "emi-9887"
+App: $(Project)-aggregation-service
+AppImageName: $(App)
+
+stages:
+- stage: Linters
+condition: and(succeeded(), eq(variables['IsPr'], True))
+
+jobs:
+- deployment: Linters
+environment: WithoutApproval
+strategy:
+runOnce:
+deploy:
+steps:
+- checkout: self
+clean: "true"
+
+- template: appscreener.yml@templates
+parameters:
+ProjectName: $(Project)
+ProjectUuid: "b1e99059-88a0-4de3-ae23-8c241a091fc0"
+Languages: "CS,CONFIG,HTML5,JAVASCRIPT,PHP,PLSQL,PYTHON,TSQL,TYPESCRIPT"
+
+# - template: linters.yml@templates
+#   parameters:
+#     Region: sib
+
+- stage: DevTestDeploy
+condition: and(or(eq(variables['DevTestDeploy'], True), eq(variables['ProdDeployment'], True)), eq(variables['IsPr'], False))
+jobs:
+- deployment: DevTestDeploy
+environment: WithoutApproval
+variables:
+${{ if eq( variables['Build.SourceBranchName'], 'dev') }}:
+Stage: dev
+REGISTRY: $(RegistryServer):5011
+ContainerRegistryConnection: nexus-evraz-9887-dev
+ContainerRegistry: evraz-9887-dev
+KubeUser: admin-user
+KubeApiServer: https://10.240.37.246
+KubeCaData: $(KUBE_CA_DATA_TEST)
+KubeToken: $(KUBE_TOKEN_TEST)
+KubeClusterName: starfish
+HelmOpts: |
+--set imagePullSecrets.$(App)=$(JSONCONFIG_DEV) \
+--set tls.crt=$(CRT) \
+--set tls.key=$(KEY) \
+- f deployment/helm/values.dev.yml
+${{ if eq( variables['Build.SourceBranchName'], 'main') }}:
+Stage: test
+REGISTRY: $(RegistryServer):5010
+ContainerRegistryConnection: nexus-evraz-9887-test
+ContainerRegistry: evraz-9887-test
+KubeUser: admin-user
+KubeApiServer: https://10.240.37.246
+KubeCaData: $(KUBE_CA_DATA_TEST)
+KubeToken: $(KUBE_TOKEN_TEST)
+KubeClusterName: starfish
+HelmOpts: |
+--set imagePullSecrets.$(App)=$(JSONCONFIG_TEST) \
+--set tls.crt=$(CRT) \
+--set tls.key=$(KEY) \
+- f deployment/helm/values.test.yml
+strategy:
+runOnce:
+deploy:
+steps:
+- checkout: self
+clean: True
+
+- template: pre-build.yml@templates
+
+- template: replacer.yml@templates
+parameters:
+targetFiles: |
+deployment/settings.xml
+deployment/k8s/kubeconfig
+pom.xml
+rootDirectory: "$(Build.Repository.LocalPath)/"
+
+- template: docker.yml@templates
+parameters:
+AppName: StarfishAggregationService
+ContainerRegistryConnection: $(ContainerRegistryConnection)
+ContainerRegistry: $(ContainerRegistry)
+DockerfilePath: deployment/Dockerfile
+ImageName: $(AppImageName)
+buildContext: .
+arguments: --build-arg HTTP_PROXY=$(PROXY) --build-arg HTTPS_PROXY=$(PROXY) --build-arg http_proxy=$(PROXY) --build-arg https_proxy=$(PROXY)
+
+- task: CmdLine@2
+displayName: Deploy
+inputs:
+script: |
+set -x
+export HTTP_PROXY=http://sib-prx-009.sib.evraz.com:3128
+export HTTPS_PROXY=http://sib-prx-009.sib.evraz.com:3128
+export KUBECONFIG=$(Build.Repository.LocalPath)/deployment/k8s/kubeconfig
+
+helm repo add evraz $(HelmRepoUrl) --username $(HelmRepoUser) --password $(HelmRepoPass) --insecure-skip-tls-verify
+helm repo update
+helm upgrade $(App) evraz/evraz-helm-chart \
+--install --wait \
+--debug \
+--timeout $(HelmTimeout) \
+--namespace $(Namespace) \
+--set nameOverride=$(App) \
+--set app.defaultImageTag=$(Tag) \
+- f $(Build.Repository.LocalPath)/deployment/helm/values.default.yml \
+$(HelmOpts)
+
+- task: CmdLine@2
+displayName: Unset KUBECONFIG
+condition: always()
+inputs:
+script: |
+unset KUBECONFIG
+
+- template: final.yml@templates
+
+- stage: ProdDeploy
+dependsOn: DevTestDeploy
+condition: and(eq(dependencies.DevTestDeploy.result,'Succeeded'), eq( variables['ProdDeployment'], True), eq(variables['IsPr'] ,False))
+jobs:
+- deployment: ProdDeploy
+environment: WithApproval-evraz-9887
+variables:
+Stage: prod
+REGISTRY: $(RegistryServer):5012
+ContainerRegistryConnection: nexus-evraz-9887-prod
+ContainerRegistry: evraz-9887-prod
+ContainerRegistryConnectionTest: nexus-evraz-9887-test
+ContainerRegistryTest: evraz-9887-test
+RegistryTest: $(RegistryServer):5010
+TestTag: test_$(Build.BuildId)
+KubeUser: admin-user
+KubeApiServer: https://10.240.39.26
+KubeCaData: $(KUBE_CA_DATA_PROD)
+KubeToken: $(KUBE_TOKEN_PROD)
+KubeClusterName: starfish
+HelmOpts: |
+--set imagePullSecrets.$(App)=$(JSONCONFIG_PROD) \
+--set tls.crt=$(CRT) \
+--set tls.key=$(KEY) \
+- f deployment/helm/values.prod.yml
+strategy:
+runOnce:
+deploy:
+steps:
+- download: none
+
+- checkout: self
+clean: True
+
+- template: pre-build.yml@templates
+
+- template: replacer.yml@templates
+parameters:
+targetFiles: |
+k8s/kubeconfig
+rootDirectory: "$(Build.Repository.LocalPath)/deployment/"
+
+- template: docker-prod.yml@templates
+parameters:
+AppName: StarfishAggregationService
+ImageName: $(AppImageName)
+ContainerRegistryConnectionTest: $(ContainerRegistryConnectionTest)
+ContainerRegistryConnection: $(ContainerRegistryConnection)
+RegistryTest: $(RegistryTest)
+Registry: $(REGISTRY)
+ContainerRegistryTest: $(ContainerRegistryTest)
+ContainerRegistry: $(ContainerRegistry)
+TestTag: $(TestTag)
+Tag: $(Tag)
+
+- task: CmdLine@2
+displayName: Deploy
+inputs:
+script: |
+set -x
+export HTTP_PROXY=http://sib-prx-009.sib.evraz.com:3128
+export HTTPS_PROXY=http://sib-prx-009.sib.evraz.com:3128
+export KUBECONFIG=$(Build.Repository.LocalPath)/deployment/k8s/kubeconfig
+
+helm repo add evraz $(HelmRepoUrl) --username $(HelmRepoUser) --password $(HelmRepoPass) --insecure-skip-tls-verify
+helm repo update
+helm upgrade $(App) evraz/evraz-helm-chart \
+--install --wait \
+--debug \
+--timeout $(HelmTimeout) \
+--namespace $(Namespace) \
+--set nameOverride=$(App) \
+--set app.defaultImageTag=$(Tag) \
+- f $(Build.Repository.LocalPath)/deployment/helm/values.default.yml \
+$(HelmOpts)
+
+- task: CmdLine@2
+displayName: Unset KUBECONFIG
+condition: always()
+inputs:
+script: |
+unset KUBECONFIG
+
+- template: final.yml@templates
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/settings.xml
+Content:
+<settings>
+<servers>
+<server>
+<id>__RegistryServer__</id>
+<username>__HelmRepoUser__</username>
+<password>__HelmRepoPass__</password>
+</server>
+</servers>
+<proxies>
+<proxy>
+<id>httpproxy</id>
+<active>true</active>
+<protocol>http</protocol>
+<host>__PROXY_HOST__</host>
+<port>3128</port>
+<nonProxyHosts>evraz.com</nonProxyHosts>
+</proxy>
+<proxy>
+<id>httpsproxy</id>
+<active>true</active>
+<protocol>https</protocol>
+<host>__PROXY_HOST__</host>
+<port>3128</port>
+<nonProxyHosts>evraz.com</nonProxyHosts>
+</proxy>
+
+</proxies>
+</settings>
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/k8s/kubeconfig
+Content:
+apiVersion: v1
+clusters:
+- cluster:
+server: __KubeApiServer__
+certificate-authority-data: __KubeCaData__
+name: __KubeClusterName__
+contexts:
+- context:
+cluster: __KubeClusterName__
+user: __KubeUser__
+name: starfish
+current-context: starfish
+kind: Config
+preferences: {}
+users:
+- name: __KubeUser__
+user:
+token: __KubeToken__
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/k8s/ns.yaml
+Content:
+apiVersion: v1
+kind: Namespace
+metadata:
+name: emi-9887-test
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/k8s/rq.yaml
+Content:
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+name: emi-9887-test
+namespace: emi-9887-test
+spec:
+hard:
+requests.cpu: '5'
+requests.memory: 5Gi
+limits.cpu: '5'
+limits.memory: 5Gi
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/helm/values.default.yml
+Content:
+app:
+defaultImage: sib-reg-001.sib.evraz.com:5011/evraz-9887-dev/emi-9887-aggregation-service
+defaultImageTag: latest
+domain: order-service.starfish.evraz.com
+envs:
+JAVA_OPTS: "-Xmx512m -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/dumps/aggregation-service/"
+CONFIG_SERVER_ADDRESS: "http://config-server"
+SPRING_PROFILES_ACTIVE: "dev"
+HOST_NAME: "api.dev.oms.evraz.market"
+
+# ingress:
+#   enabled: true
+#   annotations:
+#     kubernetes.io/ingress.class: 'nginx'
+#   hosts:
+#     - hostname: app.starfish.evraz.com
+#       paths:
+#         - path: /
+#           servicePort: http
+#           serviceName: app
+
+# services:
+#   app:
+#     ports:
+#       - name: http
+#         protocol: TCP
+#         port: 80
+#         targetPort: 8080
+#     extraSelectorLabels:
+#       app: aggregation-service
+
+deployments:
+aggregation-service:
+replicas: 1
+extraSelectorLabels:
+app: aggregation-service
+svc: int-svc-ingress
+initContainers:
+init-conf-srv:
+image: curlimages/curl
+tag: "8.2.1"
+command:
+- sh
+- -c
+- |
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://config-server-actuator:18080/actuator/health)" != "200" ]]; do
+sleep 15;
+done
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://adapter-actuator:18080/actuator/health)" != "200" ]]; do
+sleep 15;
+done
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://parser-actuator:18080/actuator/health)" != "200" ]]; do
+sleep 15;
+done
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://message-gateway-actuator:18080/actuator/health)" != "200" ]]; do
+sleep 15;
+done
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://delivery-actuator:18080/actuator/health)" != "200" ]]; do
+sleep 15;
+done
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://dwh-adapter-actuator:18080/actuator/health)" != "200" ]]; do
+sleep 15;
+done
+resources:
+requests:
+memory: "20Mi"
+cpu: "10m"
+limits:
+memory: "30Mi"
+cpu: "20m"
+containers:
+aggregation-service:
+livenessProbe:
+failureThreshold: 5
+httpGet:
+path: /actuator/health
+port: 18080
+scheme: HTTP
+initialDelaySeconds: 120
+periodSeconds: 30
+successThreshold: 1
+timeoutSeconds: 15
+readinessProbe:
+failureThreshold: 3
+httpGet:
+path: /actuator/health
+port: 18080
+scheme: HTTP
+initialDelaySeconds: 105
+periodSeconds: 30
+successThreshold: 1
+timeoutSeconds: 15
+imagePullPolicy: Always
+resources:
+limits:
+memory: 800Mi
+cpu: "0.3"
+requests:
+memory: 700Mi
+cpu: "0.3"
+envsFromConfigmap:
+envs:
+- JAVA_OPTS
+- CONFIG_SERVER_ADDRESS
+- SPRING_PROFILES_ACTIVE
+volumeMounts:
+- name: dumps
+mountPath: /tmp/dumps
+volumes:
+- name: dumps
+persistentVolumeClaim:
+claimName: "emi-9887-config-server-dumps"
+
+extraDeploy:
+- |
+apiVersion: v1
+kind: Service
+metadata:
+name: aggregation-service
+namespace: {{ $.Release.Namespace }}
+spec:
+ports:
+- name: http
+protocol: TCP
+port: 80
+targetPort: 8080
+selector:
+app: aggregation-service
+app.kubernetes.io/instance: emi-9887-aggregation-service
+app.kubernetes.io/name: emi-9887-aggregation-service
+type: ClusterIP
+sessionAffinity: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+name: aggregation-service-actuator
+namespace: {{ $.Release.Namespace }}
+spec:
+ports:
+- name: http
+protocol: TCP
+port: 18080
+targetPort: 18080
+selector:
+app: aggregation-service
+app.kubernetes.io/instance: emi-9887-aggregation-service
+app.kubernetes.io/name: emi-9887-aggregation-service
+type: ClusterIP
+sessionAffinity: None
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+name: emi-9887-aggregation-service
+namespace: {{ $.Release.Namespace }}
+annotations:
+nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+kubernetes.io/ingress.class: 'nginx'
+nginx.ingress.kubernetes.io/use-regex: 'true'
+nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+tls:
+- hosts:
+- {{ $.Values.app.envs.HOST_NAME }}
+secretName: emi-9887-tls-conf
+rules:
+- host: {{ $.Values.app.envs.HOST_NAME }}
+http:
+paths:
+- path: /api/aggregation-service(/|$)(.*)
+pathType: Prefix
+backend:
+service:
+name: aggregation-service
+port:
+name: http
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/helm/values.dev.yml
+Content:
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/helm/values.prod.yml
+Content:
+app:
+defaultImage: sib-reg-001.sib.evraz.com:5012/evraz-9887-prod/emi-9887-aggregation-service
+envs:
+SPRING_PROFILES_ACTIVE: "prod"
+HOST_NAME: "api.oms.evraz.market"
+
+deployments:
+aggregation-service:
+replicas: 2
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/deployment/helm/values.test.yml
+Content:
+app:

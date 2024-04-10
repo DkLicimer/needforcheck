@@ -1,0 +1,412 @@
+﻿eventType {}, orderErpGuid: {}, orderReserve: {}, transactionId: {}""",
+eventType, orderErpGuid, orderReserve, transactionId);
+return;
+}
+
+final var deliveryList = starfishOrderEnricher.getAllDeliveryDataIfExist(orderErpGuid);
+final var delivery = starfishOrderEnricher.getDeliveryDataIfExist(deliveryList);
+
+log.info("""
+Handled OrderReserveEvent.
+Type: {}. For order id: {}. orderReserve: {}. TransactionId {}
+""", eventType, orderErpGuid, orderReserve, transactionId);
+
+final var order = orderRepo.getByErpGuid(orderErpGuid);
+final var orderAttributes = orderAttributeRepo.findByErpOrderGuid(orderErpGuid);
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+
+if (isNull(order)) {
+log.info("""
+Missing order with order erpGuid = {}.\040
+Do not update in Starfish24. Waiting for order...
+""", orderErpGuid);
+return;
+}
+if (StringUtils.isBlank(order.getSfOrderId())) {
+log.info("Starfish orderId not found for erpGuid {}", orderErpGuid);
+// TODO:: Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð¿Ð¾ clientOrderId, ÐµÑÐ»Ð¸ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ -> ÑÐ¾Ð·Ð´Ð°ÐµÐ¼ Ð·Ð°ÐºÐ°Ð·
+final var clientOrderId = sfOrderMapper.buildClientOrderId(order);
+
+log.info("Search for starfish orderId by clientOrderId {} for order.erpGuid {}", clientOrderId, orderErpGuid);
+final var optSfOrder = sfOrderService.getShortOrderInfoByClientOrderId(clientOrderId);
+
+processingWithResultFromSf(optSfOrder, event, orderErpGuid, order, delivery, orderAttributes, clientOrderId, deliveryList);
+} else {
+final var sfOrderId = order.getSfOrderId();
+log.info("Starfish order id was found ({}) for erpGuid {} with", sfOrderId, orderErpGuid);
+
+var orderCreateExtendedDto = sfOrderMapper.mapToCreateDto(order, deliveryList); // Ð¤Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·
+
+enrichAndUpdateStarfishOrderData(
+event, sfOrderId, orderCreateExtendedDto,
+orderAttributes, deliveryAttributes,
+delivery, orderErpGuid, order, deliveryList);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/handlers/ReloadOrderEventHandler.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.handlers;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.event.ReloadOrderEvent;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.concurrent.Executor;
+
+@Component
+@Slf4j
+public class ReloadOrderEventHandler extends BaseEventHandler {
+
+public ReloadOrderEventHandler(StarfishOrderEnricher starfishOrderEnricher,
+ProductService productService, OrderService sfOrderService,
+OrderRepository orderRepo, OrderTransactionRepository orderTransactionRepo,
+DeliveryTransactionRepository deliveryTransactionRepo, ErpDeliveryRepository deliveryRepo,
+SfOrderMapper sfOrderMapper, OrderAttributeRepository orderAttributeRepo,
+DeliveryAttributeRepository deliveryAttributeRepo,
+@Qualifier("asyncSecurityCtxTaskExecutor") Executor executor) {
+super(starfishOrderEnricher, productService, sfOrderService, orderRepo, orderTransactionRepo, deliveryTransactionRepo,
+deliveryRepo, orderAttributeRepo, deliveryAttributeRepo, sfOrderMapper, executor);
+}
+
+@EventListener(classes = ReloadOrderEvent.class)
+public void onApplicationEvent(ReloadOrderEvent event) {
+log.info("Handled ReloadOrderEvent. For erpOrder id: {}", event.getOrderErpGuid());
+
+// ÐžÐ±Ð½Ð¾Ð²Ð»ÑÐµÐ¼ ÑƒÑÐ»ÑƒÐ³Ð¸
+productService.updateCustomerServiceCatalogForOrderErpGuid(event.getOrderErpGuid());
+
+createOrUpdateFullOrderInSF(event);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/handlers/SendCreateOrderEventHandler.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.handlers;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.event.SendOrderCreateEvent;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.concurrent.Executor;
+
+@Component
+@Slf4j
+public class SendCreateOrderEventHandler extends BaseEventHandler {
+
+public SendCreateOrderEventHandler(StarfishOrderEnricher starfishOrderEnricher,
+ProductService productService, OrderService sfOrderService,
+OrderRepository orderRepo, OrderTransactionRepository orderTransactionRepo,
+DeliveryTransactionRepository deliveryTransactionRepo, ErpDeliveryRepository deliveryRepo,
+SfOrderMapper sfOrderMapper, OrderAttributeRepository orderAttributeRepo,
+DeliveryAttributeRepository deliveryAttributeRepo,
+@Qualifier("asyncSecurityCtxTaskExecutor") Executor executor) {
+super(starfishOrderEnricher, productService, sfOrderService, orderRepo, orderTransactionRepo, deliveryTransactionRepo,
+deliveryRepo, orderAttributeRepo, deliveryAttributeRepo, sfOrderMapper, executor);
+}
+
+@EventListener(classes = SendOrderCreateEvent.class)
+public void handleEvent(SendOrderCreateEvent event) {
+final var orderErpGuid = event.getOrderErpGuid();
+final var eventTransactionId = event.getTransactionId();
+
+if (scheduledUpdateEnabled) {
+log.info("""
+Scheduled create/update order enabled.
+Skip handling SendOrderCreateEvent for
+orderErpGuid: {}, transactionId: {}""",
+orderErpGuid, eventTransactionId);
+return;
+}
+
+log.info("Handled SendOrderCreateEvent. For order id: {}. TransactionId: {}",
+orderErpGuid, eventTransactionId);
+
+final var order = orderRepo.getByErpGuid(orderErpGuid);
+final var orderAttributes = orderAttributeRepo.findByErpOrderGuid(orderErpGuid);
+final var deliveryList = starfishOrderEnricher.getAllDeliveryDataIfExist(orderErpGuid);
+final var delivery = starfishOrderEnricher.getDeliveryDataIfExist(deliveryList);
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+
+// TODO:: collect delivery additional attributes if exists
+// TODO:: enrich order and map to SF24 order
+
+// Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° Ð¿Ð¾ clientOrderId, ÐµÑÐ»Ð¸ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ -> ÑÐ¾Ð·Ð´Ð°ÐµÐ¼ Ð·Ð°ÐºÐ°Ð·
+final var clientOrderId = sfOrderMapper.buildClientOrderId(order);
+
+final var optSfOrder = sfOrderService.getShortOrderInfoByClientOrderId(clientOrderId);
+if (optSfOrder.isPresent()) {
+log.info("Starfish order found by clientOrderId {} for order.erpGuid {}", clientOrderId, orderErpGuid);
+final var sfOrderId = optSfOrder.get().getId();
+orderRepo.setStarfishOrderId(order.getErpGuid(), sfOrderId);
+var sfFullOrder = sfOrderMapper.mapToCreateDto(order, deliveryList); // Ð¤Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·
+
+enrichAndUpdateStarfishOrderData(
+event, sfOrderId, sfFullOrder,
+orderAttributes, deliveryAttributes,
+delivery, orderErpGuid, order, deliveryList);
+} else {
+log.warn("Order not found by clientOrderId {}. Try to create..", clientOrderId);
+createOrderAndCloseOrderTransaction(
+event, order,
+orderAttributes, deliveryAttributes,
+delivery, deliveryList);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/handlers/SendUpdateOrderEventHandler.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.handlers;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import ru.liga.evraz.aggregation.adapter.http.out.service.SfOrderMapper;
+import ru.liga.evraz.aggregation.application.event.SendOrderUpdateEvent;
+import ru.liga.evraz.aggregation.application.service.StarfishOrderEnricher;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.DeliveryTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+
+import java.util.concurrent.Executor;
+
+@Component
+@Slf4j
+public class SendUpdateOrderEventHandler extends BaseEventHandler {
+
+public SendUpdateOrderEventHandler(StarfishOrderEnricher starfishOrderEnricher,
+ProductService productService, OrderService sfOrderService,
+OrderRepository orderRepo, OrderTransactionRepository orderTransactionRepo,
+DeliveryTransactionRepository deliveryTransactionRepo, ErpDeliveryRepository deliveryRepo,
+SfOrderMapper sfOrderMapper, OrderAttributeRepository orderAttributeRepo,
+DeliveryAttributeRepository deliveryAttributeRepo,
+@Qualifier("asyncSecurityCtxTaskExecutor") Executor executor) {
+super(starfishOrderEnricher, productService, sfOrderService, orderRepo, orderTransactionRepo, deliveryTransactionRepo,
+deliveryRepo, orderAttributeRepo, deliveryAttributeRepo, sfOrderMapper, executor);
+}
+
+@EventListener(classes = SendOrderUpdateEvent.class)
+public void onApplicationEvent(SendOrderUpdateEvent event) {
+final var transactionId = event.getTransactionId();
+final var orderErpGuid = event.getOrderErpGuid();
+
+if (scheduledUpdateEnabled) {
+log.info("""
+Scheduled create/update order enabled.
+Skip handling SendOrderCreateEvent for
+orderErpGuid: {}, transactionId: {}""",
+orderErpGuid, transactionId);
+return;
+}
+
+log.info("Handled SendOrderUpdateEvent. For erpOrder id: {}. TransactionId: {}",
+event.getOrderErpGuid(), event.getTransactionId());
+
+final var erpOrder = orderRepo.getByErpGuid(orderErpGuid);
+final var orderAttributes = orderAttributeRepo.findByErpOrderGuid(orderErpGuid);
+final var deliveryList = starfishOrderEnricher.getAllDeliveryDataIfExist(orderErpGuid);
+final var delivery = starfishOrderEnricher.getDeliveryDataIfExist(deliveryList);
+final var deliveryAttributes = getDeliveryAttributesForDelivery(delivery);
+
+// TODO:: collect erpOrder additional attributes if exists
+// TODO:: collect delivery additional attributes if exists
+// TODO:: enrich erpOrder and map to SF24 erpOrder
+
+var starfishOrderId = erpOrder.getSfOrderId();
+
+if (StringUtils.isBlank(starfishOrderId)) {
+log.info("Starfish orderId not found for erpGuid {}", orderErpGuid);
+// TODO:: collect delivery additional attributes if exists
+// TODO:: enrich erpOrder and map to SF24 erpOrder
+
+// Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð½Ð°Ð»Ð¸Ñ‡Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° Ð¿Ð¾ clientOrderId, ÐµÑÐ»Ð¸ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ -> ÑÐ¾Ð·Ð´Ð°ÐµÐ¼ Ð·Ð°ÐºÐ°Ð·
+final var clientOrderId = sfOrderMapper.buildClientOrderId(erpOrder);
+
+log.info("Search for starfish orderId by clientOrderId {} for order.erpGuid {}", clientOrderId, orderErpGuid);
+final var optSfOrder = sfOrderService.getShortOrderInfoByClientOrderId(clientOrderId);
+if (optSfOrder.isPresent()) {
+log.info("Starfish order found by clientOrderId {} for order.erpGuid {}", clientOrderId, orderErpGuid);
+final var sfOrderId = optSfOrder.get().getId();
+orderRepo.setStarfishOrderId(erpOrder.getErpGuid(), sfOrderId);
+var sfFullOrder = sfOrderMapper.mapToCreateDto(erpOrder, deliveryList); // Ð¤Ð¾Ñ€Ð¼Ð¸Ñ€ÑƒÐµÐ¼ Ð¿Ð¾Ð»Ð½Ñ‹Ð¹ Ð·Ð°ÐºÐ°Ð·
+
+enrichAndUpdateStarfishOrderData(
+event, sfOrderId, sfFullOrder,
+orderAttributes, deliveryAttributes,
+delivery, orderErpGuid, erpOrder, deliveryList);
+} else {
+log.warn("Order not found by clientOrderId {}. Try to create..", clientOrderId);
+createOrderAndCloseOrderTransaction(
+event, erpOrder,
+orderAttributes, deliveryAttributes,
+delivery, deliveryList);
+}
+} else {
+log.info("Starfish order id was found ({}) for erpGuid {} with", starfishOrderId, orderErpGuid);
+final var sfFullOrder = sfOrderMapper.mapToCreateDto(erpOrder, deliveryList);
+
+enrichAndUpdateStarfishOrderData(
+event, starfishOrderId, sfFullOrder,
+orderAttributes, deliveryAttributes,
+delivery, orderErpGuid, erpOrder, deliveryList);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/BpmFeignClient.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.ProcessVariableDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributeDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.config.FeignClientConfig;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+
+import java.util.List;
+import javax.validation.Valid;
+
+@FeignClient(name = "${feign.starfish.bpm.name}", configuration = {FeignClientConfig.class})
+public interface BpmFeignClient {
+
+@PostMapping(value = "/variable/{orderId}/set")
+ControllerResult setProcessVariable(@PathVariable("orderId") String orderId,
+@RequestBody @Valid List<ProcessVariableDto> processVariables);
+
+@PostMapping(value = "/message/{messageId}/send")
+ControllerResult sendMessage(@PathVariable("messageId") String messageId,
+@RequestParam(name = "orderId", required = false) String orderId,
+@RequestHeader(name = "tenantId", required = false) String tenantId,
+@RequestBody List<CustomAttributeDto> customAttributes);
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/ErpTaskFeignClient.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CancelErpTaskRequest;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CancelErpTaskResponse;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CreateErpTaskRequest;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.CreateErpTaskResponse;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.config.FeignClientConfig;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@FeignClient(name = "${feign.erpAdapter.name}", configuration = {FeignClientConfig.class})
+public interface ErpTaskFeignClient {
+
+@PostMapping("/v1/task")
+ResponseEntity<CreateErpTaskResponse> sendErpTask(@RequestBody CreateErpTaskRequest erpTask);
+
+@PostMapping("/v1/task/cancel")
+ResponseEntity<CancelErpTaskResponse> cancelErpTask(@RequestBody CancelErpTaskRequest erpTask);
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/ErpTaskFeignWrapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task.*;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Service
+@Validated
+@RequiredArgsConstructor
+@Slf4j
+public class ErpTaskFeignWrapper {
+
+private final ErpTaskFeignClient feignClient;
+
+public Boolean sendErpTask(CreateErpTaskDto erpTask) {
+try {
+log.info("Try to send erp task to erp-adapter. Guid: {}, erpGuid: {}, commandGuid: {}", erpTask.getGuid(), erpTask.getErpGuid(), erpTask.getCommandGuid());
+ResponseEntity<CreateErpTaskResponse> response = feignClient.sendErpTask(new CreateErpTaskRequest(erpTask));
+return HttpStatus.OK.equals(response.getStatusCode())
+&& response.getBody() != null
+&& response.getBody().getSuccess();
+} catch (Exception e) {
+log.error("error during send erp task. Command guid: {}, erp guid: {}", erpTask.getCommandGuid(), erpTask.getErpGuid(), e);
+return false;
+}
+}
+
+public Boolean cancelErpTask(CancelErpTaskDto erpTask) {
+try {
+log.info("Try to send cancel erp task to erp-adapter. Guid: {}, commandGuid: {}", erpTask.getGuid(), erpTask.getCommandGuid());
+ResponseEntity<CancelErpTaskResponse> response = feignClient.cancelErpTask(new CancelErpTaskRequest(erpTask));
+return HttpStatus.OK.equals(response.getStatusCode())
+&& response.getBody() != null
+&& response.getBody().getSuccess();
+} catch (Exception e) {
+log.error("error during cancel erp task. Command guid: {}, task guid: {}", erpTask.getCommandGuid(), erpTask.getGuid(), e);
+return false;
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/feign/OrderFeignClient.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;

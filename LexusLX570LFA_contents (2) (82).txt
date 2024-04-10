@@ -1,0 +1,467 @@
+﻿import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import ru.liga.evraz.aggregation.domain.model.ReservationExtensionReason;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class OrderReserveRenewalCommand extends AbstractCommand {
+
+private LocalDate reservationRemovalDate;
+private ReservationExtensionReason reservationExtensionReason;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/OrderShipPermissionItemsCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class OrderShipPermissionItemsCommand extends AbstractCommand {
+
+private List<OrderItemShortData> orderItems;
+private String documentStatus;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/OrderSignPipelineCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+@Getter
+@Setter
+@Accessors(chain = true)
+public class OrderSignPipelineCommand extends AbstractCommand {
+
+private Boolean omsPipeline;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/shipping/request/ship/permission/ShippingRequestItemShortData.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Validated
+public class ShippingRequestItemShortData {
+
+@NotEmpty
+private String skuId;
+@Positive
+private Long positionCode;
+@NotEmpty
+@Pattern(regexp = "SHIP")
+@EqualsAndHashCode.Exclude
+private String skuStatus;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/model/command/shipping/request/ship/permission/ShippingRequestShipPermissionItemsCommand.java
+Content:
+package ru.liga.evraz.aggregation.domain.model.command.shipping.request.ship.permission;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.domain.model.command.AbstractCommand;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ShippingRequestShipPermissionItemsCommand extends AbstractCommand {
+
+private String shippingErpGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/exception/TemplateDomainException.java
+Content:
+package ru.liga.evraz.aggregation.domain.exception;
+
+public class TemplateDomainException extends RuntimeException {
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/enums/DeliveryMethod.java
+Content:
+package ru.liga.evraz.aggregation.domain.enums;
+
+public enum DeliveryMethod {
+
+PICKUP,
+UP_TO_CLIENT,
+RAILWAY_DELIVERY,
+CARRIER_TO_ADDRESS,
+SUPPLIER_TO_OUR_WAREHOUSE,
+CARRIER_TO_OUR_WAREHOUSE,
+CARRIER_TO_TRANSFER_POINT,
+OUR_DRIVER_FROM_SENDER_ADDRESS,
+DISCRETION_OF_THE_TRANSPORT_SERVICE,
+FROM_SENDER_DELIVERY_SERVICE_DETERMINES,
+INSTRUCTION_TO_FORWARDER_FROM_THE_WAREHOUSE,
+INSTRUCTION_TO_FORWARDER_TO_THE_WAREHOUSE,
+INSTRUCTION_TO_FORWARDER_AT_THE_POINT,
+DETERMINED_IN_THE_DIRECTION
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/domain/enums/ReservationReason.java
+Content:
+package ru.liga.evraz.aggregation.domain.enums;
+
+/**
+* ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° ÑÐ½ÑÑ‚Ð¸Ñ Ñ€ÐµÐ·ÐµÑ€Ð²Ð°.
+* Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+* ÐÐ²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ðµ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ:
+* â€¢  NO_REASON = Ð½ÐµÑ‚ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ñ (Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ)
+* ÐÐ²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ðµ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ð½Ðµ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾:
+* â€¢  TENDER_WON = Ð’Ñ‹Ð¸Ð³Ñ€Ð°Ð½ Ñ‚ÐµÐ½Ð´ÐµÑ€
+* â€¢  SPECIFICATION_SIGNED_LONG_LEAD_TIME = ÐŸÐ¾Ð´Ð¿Ð¸ÑÐ°Ð½Ð° ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ñ Ñ Ð´Ð»Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¼ ÑÑ€Ð¾ÐºÐ¾Ð¼ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸
+* â€¢  PAYMENT_RECEIVED_NO_SPECIFICATION = ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð±ÐµÐ· ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¸
+* â€¢  TENDER_PARTICIPATION = Ð£Ñ‡Ð°ÑÑ‚Ð¸Ðµ Ð² Ñ‚ÐµÐ½Ð´ÐµÑ€Ðµ
+* â€¢  TARGET_ORDER = Ð¦ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·
+* â€¢  METALLPROCESSING = ÐœÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ¸Ð½Ð³
+* â€¢  MRO = ÐœÐ Ðž
+* â€¢  RESERVATION_EXTENSION_PREPAYMENT = ÐŸÑ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð¿Ð¾ Ð¿Ñ€ÐµÐ´Ð¾Ð¿Ð»Ð°Ñ‚Ðµ
+* â€¢  CHANGING_PROVISION_STATUS = Ð”Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¸ ÑÐ¼ÐµÐ½Ðµ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸Ñ
+*/
+public enum ReservationReason {
+NO_REASON,
+TENDER_WON,
+SPECIFICATION_SIGNED_LONG_LEAD_TIME,
+PAYMENT_RECEIVED_NO_SPECIFICATION,
+TENDER_PARTICIPATION,
+TARGET_ORDER,
+METALLPROCESSING,
+MRO,
+RESERVATION_EXTENSION_PREPAYMENT,
+CHANGING_PROVISION_STATUS
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/common/CommonMapper.java
+Content:
+package ru.liga.evraz.aggregation.common;
+
+import org.mapstruct.Mapper;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Optional;
+
+@Mapper(componentModel = "spring")
+public interface CommonMapper {
+default OffsetDateTime map(LocalDateTime value) {
+return Optional.ofNullable(value)
+.map(datetime -> OffsetDateTime.of(datetime, ZoneOffset.of("+03:00"))) // todo:: fix
+.orElse(null);
+}
+
+default LocalDateTime map(OffsetDateTime source) {
+return Optional.ofNullable(source)
+.map(OffsetDateTime::toLocalDateTime)
+.orElse(null);
+}
+
+// To datetime with ZoneOffset.UTC
+default ZonedDateTime mapToZonedDateTime(LocalDateTime value) {
+return Optional.ofNullable(value)
+.map(datetime -> ZonedDateTime.of(datetime, ZoneId.of("Z")))
+.orElse(null);
+}
+
+default LocalDateTime map(ZonedDateTime value) {
+return Optional.ofNullable(value)
+.map(datetime -> value.withZoneSameInstant(ZoneId.of("Z")).toLocalDateTime())
+.orElse(null);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/common/KafkaUtil.java
+Content:
+package ru.liga.evraz.aggregation.common;
+
+import lombok.experimental.UtilityClass;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+@UtilityClass
+public class KafkaUtil {
+
+public <T> ProducerRecord<String, T> createRecord(String topic, T dto) {
+ProducerRecord<String, T> record = new ProducerRecord<>(topic, null, dto);
+SecurityContext securityContext = SecurityContextHolder.getContext();
+var token = securityContext.getAuthentication().getName();
+record.headers().add("Authorization", token.getBytes());
+return record;
+}
+
+public <K, T> ProducerRecord<K, T> createRecord(String topic, T dto, K key) {
+ProducerRecord<K, T> record = new ProducerRecord<>(topic, key, dto);
+SecurityContext securityContext = SecurityContextHolder.getContext();
+var token = securityContext.getAuthentication().getName();
+record.headers().add("Authorization", token.getBytes());
+return record;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/common/OrderUtil.java
+Content:
+package ru.liga.evraz.aggregation.common;
+
+import org.apache.commons.lang3.StringUtils;
+
+import static java.util.Objects.isNull;
+
+public final class OrderUtil {
+public static final String NON_NUMERIC_SYMBOL = "\\D";
+
+public static String formatPhoneNumber(String phoneNumber) {
+if (isNull(phoneNumber)) {
+return null;
+}
+String phone = phoneNumber
+.replace("(", "")
+.replace(")", "")
+.replace("+", "")
+.replace("-", "")
+.replace(" ", "");
+if (phone.startsWith("7") || phone.startsWith("8")) {
+phone = phone.substring(1);
+}
+return phone;
+}
+
+public static String cleanPhoneNumber(String phoneNumber) {
+if (StringUtils.isBlank(phoneNumber)) {
+return null;
+}
+return phoneNumber.replaceAll(NON_NUMERIC_SYMBOL, "");
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CommandStatusSendUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributeDto;
+import ru.liga.evraz.aggregation.application.cmd.CommandStatusCmd;
+import ru.liga.evraz.aggregation.application.config.CommandProperties;
+import ru.liga.evraz.aggregation.domain.model.command.AbstractCommand;
+import ru.liga.evraz.aggregation.domain.model.command.CommandStatusData;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+import ru.liga.evraz.aggregation.domain.repository.BpmService;
+import ru.liga.evraz.aggregation.domain.repository.CommandRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CommandStatusSendUseCase {
+
+@Value("${aggregation.order.omsPipeline.transaction.id.suffix:_omsPipeline}")
+private String omsPipelineTransactionIdSuffix;
+
+private static final String OMS_PIPELINE_CMD_TYPE = "ORDER_FULFILMENT_PIPELINE";
+
+private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+private final CommandRepository commandRepo;
+private final CommandProperties commandProperties;
+private final BpmService bpmService;
+
+private final OrderRepository orderRepo;
+
+public void process(@NotNull @Valid CommandStatusCmd cmd) {
+final var commandGuid = cmd.getCommandGuid();
+log.info("Received command status with commandGuid = {}", commandGuid);
+
+Optional<AbstractCommand> commandOpt = commandRepo.findByCommandGuid(commandGuid);
+if (commandOpt.isEmpty()) {
+log.error("Skip event. Command not found: {}", commandGuid);
+return;
+}
+final var command = commandOpt.get();
+
+// Do command status update
+final var orderId = command.getOrderId();
+final var status = cmd.getStatus();
+final var details = cmd.getDetails();
+commandRepo.updateErpCommandStatus(commandGuid, status, details);
+
+if (CmdStatus.OK.equals(status) && OMS_PIPELINE_CMD_TYPE.equalsIgnoreCase(command.getCommandType())) {
+updateOrderOmsPipelineFlag(orderId);
+}
+
+sendEventsToProcess(commandGuid, command, orderId, status);
+}
+
+private void updateOrderOmsPipelineFlag(String sfOrderId) {
+final var orderExists = orderRepo.existsByStarfishOrderId(sfOrderId);
+final var erpCommand = commandRepo.findLatestByOrderIdAndTypeWithPositiveErpStatus(
+sfOrderId, OMS_PIPELINE_CMD_TYPE);
+if (orderExists && erpCommand.isPresent()) {
+final var omsPipelineFlag = erpCommand.get().getOmsPipeline();
+orderRepo.setOmsPipelineFlag(sfOrderId, omsPipelineFlag);
+
+final var order = orderRepo.getByStarfishOrderId(sfOrderId);
+orderRepo.createOrderTransactionForOmsPipelineUpdate(order.getErpGuid(), omsPipelineTransactionIdSuffix);
+}
+}
+
+private void sendEventsToProcess(String commandGuid, AbstractCommand command, String orderId, CmdStatus status) {
+// Check command metadata, send message if metadata is present.
+final var commandType = command.getCommandType();
+final var commandMetaOpt = Optional.ofNullable(commandProperties.meta())
+.flatMap(commandsMeta -> Optional.ofNullable(commandsMeta.get(commandType)));
+
+if (commandMetaOpt.isEmpty()) {
+log.warn("Unknown metadata for commandType {}. Command guid {}, erpGuid: {}. Please check configuration..",
+commandType, command.getCommandGuid(), command.getErpGuid());
+return;
+}
+
+final var commandMeta = commandMetaOpt.get();
+
+final var messageId = commandMeta.messageType();
+final var attrName = commandMeta.attributeName();
+
+if (StringUtils.isBlank(messageId)) {
+log.info("""
+For commandType {} with commandGuid {}\040
+messageId is not present. Skip sending message to processes.
+""", commandType, command.getCommandGuid());
+return;
+}
+
+try {
+sendCommandStatusEvent(orderId);
+} catch (JsonProcessingException e) {
+log.error("Cant send message for order " + orderId + ". Error: " + e.getMessage(), e);
+}
+}
+
+private void sendCommandStatusEvent(String orderId) throws JsonProcessingException {
+List<CommandStatusData> commands = commandRepo.findLatestWithStatusForOrder(orderId);
+if (!commands.isEmpty()) {
+Map<String, CommandStatusData> commandsMap = commands.stream()
+.collect(Collectors.toMap(CommandStatusData::getCommandGuid, Function.identity()));
+
+CustomAttributeDto statusAttr = CustomAttributeDto.builder()
+.name("cmdStatus_latest")
+.value(OBJECT_MAPPER.writeValueAsString(commandsMap))
+.build();
+
+List<CustomAttributeDto> attrs = Collections.singletonList(statusAttr);
+
+try {
+log.info("Try to send MESSAGE_CMD_STATUS for orderId {} and attributes {}", orderId, attrs);
+bpmService.sendCommandStatus("MESSAGE_CMD_STATUS", orderId, null, attrs);
+} catch (Exception e) {
+log.error("Failed to send MESSAGE_CMD_STATUS for orderId " + orderId
++ " and attributes " + attrs
++ ". Error: " + e.getMessage(), e);
+}
+} else {
+log.warn("No active commands with status. Skip MESSAGE_CMD_STATUS for order {}", orderId);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateErpTaskCmdResult.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+public class CreateErpTaskCmdResult {
+private Boolean success;
+private String commandGuid;
+
+public static CreateErpTaskCmdResult success(String commandGuid) {
+return new CreateErpTaskCmdResult(true, commandGuid);
+}
+
+public static CreateErpTaskCmdResult error() {
+return new CreateErpTaskCmdResult(false, null);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateOrderReserveRenewalCmdUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;

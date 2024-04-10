@@ -1,0 +1,463 @@
+﻿log.info("Try to update deliveryAttribute with name {}, with erpDeliveryGuid {}, with positionCode {}",
+attributeName, erpDeliveryGuid, positionCode);
+return deliveryAttributeRepo.update(deliveryAttribute);
+}
+log.info("Try to create deliveryAttribute with name {}, with erpDeliveryGuid {}, with positionCode {}",
+attributeName, erpDeliveryGuid, positionCode);
+return deliveryAttributeRepo.create(deliveryAttribute);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateErpDeliveryUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateErpDeliveryCmd;
+import ru.liga.evraz.aggregation.application.converter.ErpDeliveryModelMapper;
+import ru.liga.evraz.aggregation.application.service.ErpDeliveryService;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.repository.ErpDeliveryRepository;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+/**
+* @author Anton Oleynikov {@literal <antonleynikov@gmail.com>}
+*/
+@Service
+@Validated
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateUpdateErpDeliveryUseCase {
+private final ErpDeliveryRepository erpDeliveryRepository;
+private final ErpDeliveryModelMapper erpDeliveryModelMapper;
+private final ErpDeliveryService erpDeliveryService;
+
+public ErpDelivery update(@Valid @NotNull CreateUpdateErpDeliveryCmd cmd) {
+var modelToSave = erpDeliveryModelMapper.map(cmd);
+erpDeliveryService.validateErpDelivery(modelToSave);
+var delivery = erpDeliveryRepository.createUpdate(modelToSave);
+//TODO: throw update event
+return delivery;
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateOrderAttributeUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderAttributeCmd;
+import ru.liga.evraz.aggregation.application.converter.OrderAttributeModelMapper;
+import ru.liga.evraz.aggregation.application.service.OrderAttributeService;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.repository.OrderAttributeRepository;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+
+import java.util.Objects;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+@Transactional
+@Slf4j
+public class CreateUpdateOrderAttributeUseCase {
+private final OrderAttributeService orderAttributeService;
+private final OrderRepository orderRepo;
+private final OrderAttributeRepository orderAttributeRepo;
+private final OrderAttributeModelMapper mapper;
+
+public OrderAttribute createUpdateOrderAttribute(@Valid @NotNull CreateUpdateOrderAttributeCmd cmd) {
+
+final var erpGuid = cmd.getErpOrderGuid();
+final var attributeName = cmd.getName();
+final var positionCode = cmd.getPositionCode();
+var orderAttribute = mapper.map(cmd);
+
+if (cmd.isDeleted()) {
+orderAttributeRepo.deleteByErpOrderGuidAndAttributeNameAndPositionCode(orderAttribute);
+return orderAttribute;
+}
+
+final var order = orderRepo.getByErpGuid(erpGuid);
+final var orderAttributeIsExist = orderAttributeRepo.findByErpOrderGuidAndNameAndPositionCode(erpGuid, attributeName, positionCode);
+
+orderAttributeService.validateAttributeByOrder(orderAttribute, order);
+
+if (Objects.nonNull(orderAttributeIsExist)) {
+orderAttribute.setId(orderAttributeIsExist.getId());
+return orderAttributeRepo.update(orderAttribute);
+}
+return orderAttributeRepo.create(orderAttribute);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateOrderReserveUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderReserveCmd;
+import ru.liga.evraz.aggregation.application.converter.OrderReserveModelMapper;
+import ru.liga.evraz.aggregation.domain.model.OrderReserve;
+import ru.liga.evraz.aggregation.domain.repository.OrderReserveRepository;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import static java.util.Objects.nonNull;
+
+@Service
+@Validated
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+@Transactional
+@Slf4j
+public class CreateUpdateOrderReserveUseCase {
+
+private final OrderReserveRepository orderReserveRepo;
+private final OrderReserveModelMapper mapper;
+
+public OrderReserve createUpdateOrderReserve(@Valid @NotNull CreateUpdateOrderReserveCmd cmd) {
+
+final var erpGuid = cmd.getErpOrderGuid();
+var orderReserve = mapper.map(cmd);
+
+final var oldOrderReserve = orderReserveRepo.getByErpOrderGuid(erpGuid);
+if (nonNull(oldOrderReserve)) {
+orderReserve.setId(oldOrderReserve.getId());
+return orderReserveRepo.update(orderReserve);
+} else {
+return orderReserveRepo.create(orderReserve);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateOrderUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateOrderCmd;
+import ru.liga.evraz.aggregation.application.converter.OrderModelMapper;
+import ru.liga.evraz.aggregation.application.converter.ProductSkuModelMapper;
+import ru.liga.evraz.aggregation.domain.model.Partner;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+import ru.liga.evraz.aggregation.domain.repository.OrderRepository;
+import ru.liga.evraz.aggregation.domain.repository.PartnerRepository;
+import ru.liga.evraz.aggregation.domain.repository.ProductService;
+import ru.liga.evraz.aggregation.domain.repository.ProductSkuRepository;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.isSkuItem;
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.isSkuService;
+
+@Service
+@Validated
+//@Transactional // TODO:: Ð’ÐµÑ€Ð¾ÑÑ‚Ð½Ð¾ ÑÑ‚Ð¾Ð¸Ñ‚ Ñ€Ð°ÑÐºÐ¸Ð´Ð°Ñ‚ÑŒ Ð½Ð° Ð¼ÐµÑ‚Ð¾Ð´Ñ‹,
+// Ð½Ð¾ Ð²Ð¾Ð·Ð½Ð¸ÐºÐ°ÐµÑ‚ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ð°, Ñ‡Ñ‚Ð¾ SF24 Ð¼Ð¾Ð¶ÐµÑ‚ Ð²ÐµÑ€Ð½ÑƒÑ‚ÑŒ Ð¾ÑˆÐ¸Ð±ÐºÑƒ Ð¿Ñ€Ð¸ ÑÑ‚Ð¾Ð¼ ÑÐ¾Ñ…Ñ€Ð°Ð½ÑÑ ÑÑƒÑ‰Ð½Ð¾ÑÑ‚Ð¸ Ñƒ ÑÐµÐ±Ñ
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateUpdateOrderUseCase {
+private final OrderRepository orderRepo;
+private final PartnerRepository partnerRepo;
+
+private final ProductSkuRepository productSkuRepo;
+private final ProductService productService;
+private final OrderModelMapper orderMapper;
+
+private final ProductSkuModelMapper productMapper;
+
+public Order createUpdateOrder(@Valid @NotNull CreateUpdateOrderCmd cmd) {
+cmd.validate();
+cmd.validateCustomerGuid();
+cmd.validateOrderPaidAndSpecificationApprovalRequired();
+
+final var newOrderData = orderMapper.map(cmd);
+final var newOrderItemDatas = newOrderData.getOrderItems();
+
+final var productItems = newOrderItemDatas.stream()
+.filter(item -> isSkuItem(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+final var serviceItems = newOrderItemDatas.stream()
+.filter(item -> isSkuService(item.getSkuType()))
+.collect(Collectors.toUnmodifiableSet());
+
+final var erpGuid = cmd.getErpGuid();
+
+createUpdatePartner(newOrderData.getPartner());
+
+if (orderRepo.existsByErpGuid(erpGuid)) {
+createUpdateProductsAndServices(cmd, true, productItems, serviceItems);
+return orderRepo.update(newOrderData);
+} else {
+createUpdateProductsAndServices(cmd, false, productItems, serviceItems);
+return orderRepo.create(newOrderData);
+}
+}
+
+public void createUpdatePartner(Partner partner) {
+partnerRepo.save(partner);
+}
+
+@Transactional
+public void createUpdateProductsAndServices(CreateUpdateOrderCmd cmd,
+boolean orderExists,
+Set<OrderItem> productItems,
+Set<OrderItem> serviceItems) {
+boolean needSendToStarfish = true;
+
+if (orderExists) {
+final var oldOrderItems = orderRepo.getByErpGuid(cmd.getErpGuid()).getOrderItems();
+final var newOrderItems = cmd.getOrderItems();
+
+needSendToStarfish = newOrderItems.stream()
+.anyMatch(newItem -> oldOrderItems.stream()
+.noneMatch(oldItem -> oldItem.equalsToUpdateInProduct(newItem)));
+log.info("CreateUpdateOrderUseCase. needSendToStarfish (products) = {}", needSendToStarfish);
+}
+
+final var productSkus = productMapper.map(cmd.getOrderItems());
+productSkus.forEach(
+pSku -> {
+if (productSkuRepo.existsById(pSku.getId())) {
+productSkuRepo.update(pSku);
+} else {
+productSkuRepo.create(pSku);
+}
+}
+);
+// new item
+if (CollectionUtils.isNotEmpty(productItems) && needSendToStarfish) {
+final var productSkuItems = productMapper.map(productItems);
+productService.createUpdateProductList(productSkuItems);
+}
+// TODO :: Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð¿Ð¾Ð½Ð°Ð´Ð¾Ð±Ð¸Ñ‚ÑÑ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´ÐµÑ€Ð½ÑƒÑ‚ÑŒ Ð¼ÐµÑ‚Ð¾Ð´ Ð¿Ð¾ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸ÑŽ Ñ†ÐµÐ½ Ð´Ð»Ñ ÑÐ¾Ð·Ð´Ð°Ð²Ð°ÐµÐ¼Ñ‹Ñ… Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ‚Ð¾Ð²
+
+// new itemService
+// Ð•ÑÐ»Ð¸ Ð½Ðµ Ð½ÑƒÐ¶Ð½Ð¾ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÑÑ‚ÑŒ Ð² SF Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÑƒ Ð½Ð° needSendToStarfish
+// (needSendToStarfish - ÑƒÑÐ»Ð¾Ð²Ð¸Ðµ Ð´Ð»Ñ Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐ¸ ÑƒÑÐ»ÑƒÐ³ Ð¿Ð¾Ð²Ñ‚Ð¾Ñ€Ð½Ð¾)
+if (CollectionUtils.isNotEmpty(serviceItems)) {
+final var productSkuItemServices = productMapper.mapServices(serviceItems, productItems);
+productService.createUpdateCustomerServiceList(productSkuItemServices);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateSubdivisionUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateSubdivisionCmd;
+import ru.liga.evraz.aggregation.application.converter.SubdivisionModelMapper;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+import ru.liga.evraz.aggregation.domain.repository.SubdivisionService;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Service
+@Validated
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAnyAuthority('INTEGRATION', 'SUPER', 'ADMIN')")
+public class CreateUpdateSubdivisionUseCase {
+private final SubdivisionService service;
+private final SubdivisionModelMapper mapper;
+
+public Subdivision update(@Valid @NotNull CreateUpdateSubdivisionCmd cmd) {
+final var subdivisionToUpdate = mapper.map(cmd);
+return service.update(subdivisionToUpdate);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateUserGroupUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateUserGroupCmd;
+import ru.liga.evraz.aggregation.application.converter.UserGroupModelMapper;
+import ru.liga.evraz.aggregation.domain.model.UserGroup;
+import ru.liga.evraz.aggregation.domain.repository.usergroup.UserGroupService;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAuthority('INTEGRATION')")
+public class CreateUpdateUserGroupUseCase {
+
+private final UserGroupModelMapper mapper;
+private final UserGroupService service;
+
+public UserGroup createUpdateUserGroup(@Valid @NotNull CreateUpdateUserGroupCmd cmd) {
+
+final var exists = service.existsByExtUserGroupId(cmd.getGroupId());
+
+final var outUserGroup = mapper.map(cmd);
+
+if (exists) {
+return service.update(outUserGroup);
+} else {
+return service.create(outUserGroup);
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/CreateUpdateWarehouseUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.liga.evraz.aggregation.application.cmd.CreateUpdateWarehouseCmd;
+import ru.liga.evraz.aggregation.application.converter.WarehouseModelMapper;
+import ru.liga.evraz.aggregation.application.exception.NotFoundException;
+import ru.liga.evraz.aggregation.domain.model.Subdivision;
+import ru.liga.evraz.aggregation.domain.model.Warehouse;
+import ru.liga.evraz.aggregation.domain.repository.SubdivisionService;
+import ru.liga.evraz.aggregation.domain.repository.WarehouseService;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+@PreAuthorize("hasAuthority('INTEGRATION')")
+public class CreateUpdateWarehouseUseCase {
+private final WarehouseModelMapper mapper;
+private final WarehouseService warehouseService;
+private final SubdivisionService subdivisionService;
+
+public Warehouse createUpdateWarehouse(@Valid @NotNull CreateUpdateWarehouseCmd cmd) {
+
+final var exists = warehouseService.existsById(cmd.getId());
+final var subdivisionExists = subdivisionService.existsById(cmd.getSubdivisionId());
+
+final Subdivision subdivision;
+
+if (subdivisionExists) {
+subdivision = subdivisionService.getById(cmd.getSubdivisionId());
+} else {
+final var subdivisionToCreate = Subdivision.builder()
+.subdivisionId(cmd.getSubdivisionId())
+.subdivisionName(cmd.getSubdivisionName())
+.timeZone(cmd.getTimeZone())
+.workDays(mapper.map(cmd.getWorkDays()))
+.deleted(false)
+.build();
+
+subdivision = subdivisionService.update(subdivisionToCreate);
+}
+
+final var newWarehouseData = mapper.map(cmd);
+newWarehouseData.setSubdivision(subdivision);
+
+if (exists) {
+final var foundWarehouse = warehouseService.getById(cmd.getId());
+return warehouseService.update(foundWarehouse.update(newWarehouseData));
+} else {
+return warehouseService.create(newWarehouseData);
+}
+}
+
+public Warehouse get(@NotEmpty String warehouseId) {
+final var existsById = warehouseService.existsById(warehouseId);
+
+if (existsById) {
+return warehouseService.getById(warehouseId);
+}
+
+throw new NotFoundException(String.format("Warehouse %s not found", warehouseId));
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/application/EventHandlerUseCase.java
+Content:
+package ru.liga.evraz.aggregation.application;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import ru.liga.evraz.aggregation.application.cmd.CamundaProcessVariablesCmd;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+import ru.liga.evraz.aggregation.domain.repository.BpmService;
+import ru.liga.evraz.aggregation.domain.repository.OrderService;
+
+@Slf4j
+@Service
+@Validated
+@RequiredArgsConstructor
+public class EventHandlerUseCase {
+
+private final OrderService orderService;
+private final BpmService bpmService;
+
+public ControllerResult updateProcessVariables(CamundaProcessVariablesCmd cmd) {
+final var sfOrderId = cmd.getOrderId();
+log.info("Start update order process variables for order with sfOrderId: {}", sfOrderId);
+final var orderCustomAttributes = orderService.getOrderCustomAttributes(sfOrderId);
+final var optSfOrder = orderService.getOrderByStarfishOrderId(sfOrderId);

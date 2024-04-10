@@ -1,0 +1,529 @@
+﻿"value": ""
+},
+{
+"name": "promissedDeliveryDate",
+"value": ""
+},
+{
+"name": "partnerGuid",
+"value": ""
+},
+{
+"name": "documentTimeZone",
+"value": ""
+},
+{
+"name": "dispatchWarehouseSlotBooked",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsNote",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoods",
+"value": ""
+},
+{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_request_with_OA_deleted_olurTaskSent.json
+Content:
+[
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "documentId"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "documentLink"
+},
+{
+"name": "contractType",
+"value": "FRAME_NON_STANDARD"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": "saleManagerResponsibleEmail@test.test"
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": "test_subdivision_name"
+},
+{
+"name": "erpGuid",
+"value": "test_erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "true"
+},
+{
+"name": "contractNumber",
+"value": "Ð’Ð -32-18-Ð¾Ð´"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": "ÐŸÑƒÐ¿ÐºÐ¸Ð½ Ð’Ð°ÑÐ¸Ð»Ð¸Ð¹ ÐŸÐµÑ‚Ñ€Ð¾Ð²Ð¸Ñ‡"
+},
+{
+"name": "erpPipeline",
+"value": "true"
+},
+{
+"name": "omsPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "ONE"
+},
+{
+"name": "shippingCountEnum",
+"value": "NO_ZNP"
+},
+{
+"name": "approvalProcessStatus",
+"value": "APPROVAL_PROCESS_IN_PROGRESS"
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "invoiceSent",
+"value": "true"
+},
+{
+"name": "paymentAmount",
+"value": "18900.57"
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": ""
+},
+{
+"name": "deliveryCarNumber",
+"value": ""
+},
+{
+"name": "deliveryDriverPhone",
+"value": ""
+},
+{
+"name": "transferred",
+"value": ""
+},
+{
+"name": "logisticManagerResponsibleId",
+"value": ""
+},
+{
+"name": "deliveryStatus",
+"value": ""
+},
+{
+"name": "deliveryDriverFullName",
+"value": ""
+},
+{
+"name": "paidQuantity",
+"value": ""
+},
+{
+"name": "licenseNumber",
+"value": ""
+},
+{
+"name": "deliveryPeriod",
+"value": ""
+},
+{
+"name": "pricesAgreed",
+"value": ""
+},
+{
+"name": "reservationRemovalDate",
+"value": ""
+},
+{
+"name": "reservationExtensionReason",
+"value": ""
+},
+{
+"name": "deliveryDocumentId",
+"value": ""
+},
+{
+"name": "deliveryDocumentLink",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFrom",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeTo",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeFromDescription",
+"value": ""
+},
+{
+"name": "carDeliveryDateTimeToDescription",
+"value": ""
+},
+{
+"name": "shippingDeliveryMethod",
+"value": ""
+},
+{
+"name": "shippingErpGuid",
+"value": ""
+},
+{
+"name": "shippingRecipientGuid",
+"value": ""
+},
+{
+"name": "deliveryTimeZone",
+"value": ""
+},
+{
+"name": "clientInn",
+"value": "test-client_inn"
+},
+{
+"name": "clientName",
+"value": "test-client_name"
+},
+{
+"name": "specificationApprovalRequired",
+"value": ""
+},
+{
+"name": "address",
+"value": ""
+},
+{
+"name": "promissedDeliveryDate",
+"value": ""
+},
+{
+"name": "partnerGuid",
+"value": ""
+},
+{
+"name": "documentTimeZone",
+"value": ""
+},
+{
+"name": "dispatchWarehouseSlotBooked",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsNote",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoods",
+"value": ""
+},
+{
+"name": "soleExecutiveGovernment",
+"value": ""
+},
+{
+"name": "clientDocumentAuthorityForReceiveGoodsRequired",
+"value": "true"
+},
+{
+"name": "requiredQuotation",
+"value": "false"
+},
+{
+"name": "requiredCall",
+"value": ""
+},
+{
+"name": "branching",
+"value": ""
+},
+{
+"name": "invoiceWithout",
+"value": "false"
+},
+{
+"name": "paymentLink",
+"value": ""
+}
+]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_custom_attributes_response.json
+Content:
+{
+"success": true,
+"message": "Custom attribute is created"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_shipping_request.json
+Content:
+{
+"trackingId": null,
+"returnCarrierOrderId": null,
+"returnTrackingId": null,
+"recipientFirstName": null,
+"recipientMiddleName": null,
+"recipientLastName": null,
+"deliveryCost": 0.0,
+"discount": null,
+"deliveryTypeId": "pickup_in_store",
+"fulfillmentTypeId": null,
+"carrierId": null,
+"carrierTariffId": null,
+"carrierOrderId": null,
+"promissedDeliveryDate": null,
+"estimatedDeliveryDate": null,
+"realDeliveryDate": null,
+"realDeliveryDateTime": null,
+"delayReasonId": null,
+"deliveryIntervalId": null,
+"deliveryIntervalFrom": null,
+"deliveryIntervalTo": null,
+"address": {
+"city": null,
+"street": null,
+"roomNumber": null,
+"entrance": null,
+"floor": null,
+"interphone": null,
+"zipcode": null,
+"building": null,
+"coordinates": null,
+"addressJoin": null,
+"country": null
+},
+"pickupPointId": null,
+"carrierPickupPointId": null,
+"targetDispatchWarehouseId": null,
+"pickupStoreId": null,
+"expirationDateTime": null,
+"carrierServices": null,
+"dispatchWarehouseId": null,
+"actualDeliveryCost": null,
+"dispatchDate": null,
+"dispatchTime": null,
+"logisticGroupId": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/custom_attributes/update_shipping_response.json
+Content:
+{
+"success": true,
+"message": "wseo ok",
+"result": "super"
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/external/order/create/order_deleted_create_request.json
+Content:
+{
+"success": null,
+"orderId": null,
+"clientOrderId": null,
+"marketing": null,
+"customAttributes": [
+{
+"name": "documentType",
+"value": "CLIENT_ORDER"
+},
+{
+"name": "documentId",
+"value": "documentId"
+},
+{
+"name": "orderType",
+"value": "false"
+},
+{
+"name": "orderTypeDescription",
+"value": "ÐÐµÑ†ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·"
+},
+{
+"name": "documentLink",
+"value": "documentLink"
+},
+{
+"name": "contractType",
+"value": "FRAME_NON_STANDARD"
+},
+{
+"name": "contractTypeDescription",
+"value": "Ð Ð°Ð¼Ð¾Ñ‡Ð½Ñ‹Ð¹ Ð½ÐµÑ‚Ð¸Ð¿Ð¾Ð²Ð¾Ð¹"
+},
+{
+"name": "saleManagerResponsibleEmail",
+"value": "saleManagerResponsibleEmail@test.test"
+},
+{
+"name": "documentStatus",
+"value": "TO_BE_AGREED"
+},
+{
+"name": "documentStatusDescription",
+"value": "ÐÐ° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ð¸"
+},
+{
+"name": "deliveryMethod",
+"value": "PICKUP_FROM_OUR_WAREHOUSE"
+},
+{
+"name": "subdivisionId",
+"value": "test_subdivision_id"
+},
+{
+"name": "subdivisionName",
+"value": ""
+},
+{
+"name": "erpGuid",
+"value": "test_erp_guid"
+},
+{
+"name": "deletedMark",
+"value": "false"
+},
+{
+"name": "active",
+"value": "false"
+},
+{
+"name": "contractNumber",
+"value": "Ð’Ð -32-18-Ð¾Ð´"
+},
+{
+"name": "saleManagerResponsibleName",
+"value": ""
+},
+{
+"name": "erpPipeline",
+"value": ""
+},
+{
+"name": "inPieces",
+"value": "false"
+},
+{
+"name": "agreement",
+"value": "PREPAYMENT"
+},
+{
+"name": "dispatchWarehouseCountEnum",
+"value": "ONE"
+},
+{
+"name": "paymentAmount",
+"value": ""
+},
+{
+"name": "orderPaidAssignmentDate",
+"value": ""
+},
+{
+"name": "olurTaskSent",
+"value": ""
+},
+{
+"name": "approvalProcessStatus",
+"value": ""
+},
+{
+"name": "invoiceCreated",
+"value": ""
+},
+{
+"name": "invoiceSent",
+"value": ""
+},
+{
+"name": "shippingCountEnum",
+"value": "NO_ZNP"
+},
+{
+"name": "deliveryStatus",
+"value": ""

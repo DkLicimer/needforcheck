@@ -1,0 +1,484 @@
+﻿exposure:
+include: '*'
+
+kubernetes:
+api:
+server: ${K8S_API_SERVER}
+endpoints: ${K8S_API_ENDPOINTS}
+token: ${K8S_API_TOKEN}
+
+logging:
+level:
+org.springframework.security: debug
+ru.liga.evraz.aggregation.adapter.http.out.feign: DEBUG
+root: INFO
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/application.yml
+Content:
+spring:
+main:
+banner-mode: off
+mvc:
+pathmatch:
+matching-strategy: ant_path_matcher
+kafka:
+producer:
+bootstrap-servers: localhost:29092
+client-id: ${spring.application.name}-${spring.profiles.active}
+consumer:
+bootstrap-servers: localhost:29092
+group-id: ${spring.application.name}-${spring.profiles.active}
+auto-offset-reset: earliest
+datasource:
+driver-class-name: org.postgresql.Driver
+hikari:
+connectionTimeout: 20000
+maximumPoolSize: 7
+minimum-idle: 2
+idle-timeout: 10000
+url: jdbc:postgresql://localhost:5433/postgres
+username: postgres
+password: LexusLX570LFA
+jpa:
+hibernate:
+ddl-auto: none
+liquibase:
+change-log: classpath:db/main-changelog.xml
+enabled: true
+url: ${spring.datasource.url}
+user: ${spring.datasource.username}
+password: ${spring.datasource.password}
+sleuth:
+scheduled:
+enabled: true
+async:
+enabled: true
+
+aggregation:
+order.omsPipeline.transaction.id.suffix: "_omsPipeline"
+migration:
+blackList:
+orderErpGuids:
+customer:
+sendByCustomerGuid: false
+kafka:
+concurrency: "5"
+order-reload:
+request:
+topic: "em-aggregation-test-reload-order"
+command-order-ship-permission:
+request:
+topic: "em-int-test-oms-erp-cmd-order-items_status_change-v1"
+command-shipping-request-ship-permission:
+request:
+topic: "em-int-test-oms-erp-cmd-shipment_permission-v1"
+command-sign-pipeline:
+request:
+topic: "em-int-test-oms-erp-cmd-oms_pipeline-v1"
+close-erp-order:
+request:
+topic: "em-int-test-oms-erp-cmd-order-cancellation-reason-v1"
+command-order-reserve-renewal:
+request:
+topic: "em-int-test-erp-oms-order-reserve-renewal-v1"
+
+cloud:
+token:
+'eyJhbGciOiJIUzUxMiJ9.eyJ0ZW5hbnRJZCI6ImNsb3VkIiwidXNlcklkIjoiY2xvdWQtY2xvdWQtMDEiLCJyb2xlIjoiU1VQRVIiLCJsb2dpbiI6ImNsb3VkIiwidmVyc2lvbiI6IjAiLCJhdXRoVHlwZSI6Im9tc0NyZWRlbnRpYWxzIiwiZXhwIjo3OTgzNzgxMjAwMDAwLCJzdWIiOiJjbG91ZC1jbG91ZC0wMSJ9.fhWLOY_h73kc36rGq0nLIj6PLFeUbZCFzh91gOIgTtQTn-11t14U9g72ZTQzCY-bRy6g0F4DvICtsYCaWqU8tA'
+#  {
+#    "tenantId": "cloud",
+#    "userId": "cloud-cloud-01",
+#    "role": "SUPER",
+#    "login": "cloud",
+#    "version": "0",
+#    "authType": "omsCredentials",
+#    "exp": 7983781200000,
+#    "sub": "cloud-cloud-01"
+#  }
+integrationToken:
+evraz_oms_dev: 'eyJhbGciOiJIUzUxMiJ9.eyJ0ZW5hbnRJZCI6ImV2cmF6X29tc19kZXYiLCJ1c2VySWQiOiJldnJhel9vbXNfZGV2LWV2cmF6LWRldi1pbnRlZ3JhdGlvbiIsInJvbGUiOiJJTlRFR1JBVElPTiIsImxvZ2luIjoiZXZyYXotZGV2LWludGVncmF0aW9uIiwidmVyc2lvbiI6IjAiLCJhdXRoVHlwZSI6Im9tc0NyZWRlbnRpYWxzIiwiZXhwIjo3OTgzNzgxMjAwMDAwLCJzdWIiOiJldnJhel9vbXNfZGV2LWV2cmF6LWRldi1pbnRlZ3JhdGlvbiJ9.HYrCPjxr2tmQHQUYkoSkUVmFc9KZX77RqPlWTRIVKCQcjdHLNdxMEC0RDDuDRPXlkPAUKVJ5iBJHfNLFX27TSw'
+#  {
+#    "tenantId": "evraz_oms_dev",
+#    "userId": "evraz_oms_dev-evraz_dev_int",
+#    "role": "INTEGRATION",
+#    "login": "evraz_dev_int",
+#    "version": 0,
+#    "authType": "omsCredentials",
+#    "exp": 4829119210,
+#    "sub": "evraz_oms_dev-evraz_dev_int"
+#  }
+
+feign:
+starfish:
+product:
+name: 'product'
+order:
+name: 'order'
+bpm:
+name: 'bpm'
+erpAdapter:
+name: 'erp-adapter'
+hystrix:
+enabled: false
+client:
+config:
+#      example-service:
+#        retryer: com.starfish24.config.feign.FeignRetryer
+default:
+connectTimeout: 10000
+readTimeout: 40000
+loggerLevel: basic
+
+validation:
+approvalProcessStatusValidValues:
+- APPROVAL_PROCESS_IN_PROGRESS
+- APPROVAL_PROCESS_COMPLETED_AGREED
+- APPROVAL_PROCESS_COMPLETED_NOT_AGREED
+
+command:
+meta:
+ORDER_SHIP_PERMISSION:
+messageType: MESSAGE_ORDER_SHIP_PERMISSION_STATUS_UPDATED
+messageDescription: ÐšÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð¾Ðº Ð·Ð°ÐºÐ°Ð·Ð° Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ" Ð² 1Ð¡
+attributeName: orderShipPermissionStatus
+SHIPPING_REQUEST_SHIP_PERMISSION:
+messageType: MESSAGE_SHIPPING_SHIP_PERMISSION_STATUS_UPDATEDx
+messageDescription: ÐšÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð¾Ðº (Ñ‚Ð¾Ð²Ð°Ñ€Ð½Ñ‹Ñ… Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹ Ð¸ ÑƒÑÐ»ÑƒÐ³) Ð—ÐÐŸ (Ð—Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ) Ð½Ð° "Ð¾Ñ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ" Ð² 1Ð¡
+attributeName: shippingShipPermissionStatus
+ORDER_RESERVE_RENEWAL:
+messageType: ""
+messageDescription: ""
+attributeName: ""
+ORDER_FULFILMENT_PIPELINE:
+messageType: ""
+messageDescription: ""
+attributeName: ""
+ERP_TASK_DRIVER_NOT_ARRIVED_CONTROL:
+messageType: MESSAGE_DRIVER_NOT_ARRIVED_CONTROL_STATUS_UPDATED
+messageDescription: ÐšÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°Ð´Ð°Ñ‡Ð¸ Ð½Ð° Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€Ð° Ð¢Ð­Ðž Ð² 1Ð¡ ÐµÑÐ»Ð¸ Ð¢Ðš Ð½Ðµ Ð¿Ñ€Ð¸ÐµÑ…Ð°Ð»Ð° Ð½Ð° Ð¿Ð¾Ð³Ñ€ÑƒÐ·ÐºÑƒ
+attributeName: driverNotArrivedControlStatus
+ERP_TASK_SIMPLE_CUTTING_CONTROL:
+messageType: MESSAGE_SIMPLE_CUTTING_CONTROL_STATUS_UPDATED
+messageDescription: ÐšÐ¾Ð¼Ð°Ð½Ð´Ð° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð½Ð° Ð¿Ñ€Ð¾ÑÑ‚ÑƒÑŽ Ñ€ÐµÐ·ÐºÑƒ Ð² 1Ð¡
+attributeName: simpleCuttingControlStatus
+
+discovery:
+restClient:
+connectTimeout: 10000
+readTimeout: 40000
+
+management:
+server:
+port: 1${server.port}
+endpoints:
+web:
+exposure:
+include: '*'
+
+logging:
+level:
+net.javacrumbs.shedlock: DEBUG
+
+
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/bootstrap.yml
+Content:
+server:
+port: 8080
+spring:
+application:
+name: aggregation-service
+cloud:
+config:
+uri: ${CONFIG_SERVER_ADDRESS}
+kubernetes:
+loadbalancer:
+mode: service
+---
+
+spring:
+config:
+activate:
+on-profile: local, local-staging, test
+cloud:
+kubernetes:
+enabled: false
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/docker-compose.yml
+Content:
+version: '3'
+
+services:
+
+postgres:
+image: postgres:latest
+container_name: my_postgres
+ports:
+- "5433:5432"
+environment:
+POSTGRES_DB: sf_aggregation
+POSTGRES_USER: postgres
+POSTGRES_PASSWORD: LexusLX570LFA
+volumes:
+- postgres_data:/var/lib/postgresql/data
+
+zookeeper:
+image: confluentinc/cp-zookeeper:latest
+environment:
+ZOOKEEPER_CLIENT_PORT: 2181
+ZOOKEEPER_TICK_TIME: 2000
+
+kafka:
+image: confluentinc/cp-kafka:latest
+depends_on:
+- zookeeper
+ports:
+- "29092:29092"
+environment:
+KAFKA_BROKER_ID: 1
+KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
+KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+mongo:
+container_name: mongodb
+image: mongo:latest
+restart: always
+ports:
+- 27017:27017
+environment:
+MONGO_INITDB_ROOT_USERNAME: mongo_admin
+MONGO_INITDB_ROOT_PASSWORD: mongo_password
+MONGO_INITDB_DATABASE: sf_aggregation
+
+camunda:
+image: camunda/camunda-bpm-platform:latest
+ports:
+- "8080:8080"
+environment:
+DB_DRIVER: org.postgresql.Driver
+DB_URL: jdbc:postgresql://postgres:5432/sf_aggregation
+DB_USERNAME: postgres
+DB_PASSWORD: LexusLX570LFA
+CAMUNDA_REST_ENABLED: true
+CAMUNDA_REST_AUTH_ENABLED: false
+CAMUNDA_ADMIN_USER_ID: demo
+CAMUNDA_ADMIN_USER_PASSWORD: demo
+CAMUNDA_CSRF_PREVENTION_ENABLED: false
+depends_on:
+- postgres
+
+
+clickhouse:
+image: yandex/clickhouse-server:latest
+ports:
+- "8123:8123"
+volumes:
+- clickhouse_data:/var/lib/clickhouse
+environment:
+- CLICKHOUSE_USER=default
+- CLICKHOUSE_PASSWORD=default
+- CLICKHOUSE_DB=default
+
+redis:
+image: redis:latest
+volumes:
+- ./redis.conf:/usr/local/etc/redis/redis.conf
+ports:
+- "6379:6379"
+
+#  prometheus:
+#    image: prom/prometheus:latest
+#    container_name: prometheus
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#
+#  grafana:
+#    image: grafana/grafana:latest
+#    container_name: grafana
+#    ports:
+#      - "3000:3000"
+#    depends_on:
+#      - prometheus
+
+volumes:
+postgres_data:
+driver: local
+clickhouse_data:
+driver: local
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/logback-spring.xml
+Content:
+<configuration>
+<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+<springProperty name="appName" source="spring.application.name" />
+
+<property name="LOG_FILE" value="${appName}"/>
+
+<springProfile name="!local, !local-staging, !test">
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+<providers>
+<timestamp/>
+<version/>
+<logLevel/>
+<message/>
+<loggerName/>
+<threadName/>
+<context/>
+<pattern>
+<omitEmptyFields>true</omitEmptyFields>
+<pattern>
+{
+"trace": {
+"service": "${appName}",
+"trace_id": "%X{traceId}",
+"span_id": "%X{spanId}",
+"parent_span_id": "%X{parentId}",
+"exportable": "%X{sampled}",
+"login": "%X{login}",
+"tenantId": "%X{tenantId}"
+}
+}
+</pattern>
+</pattern>
+<mdc>
+<excludeMdcKeyName>traceId</excludeMdcKeyName>
+<excludeMdcKeyName>spanId</excludeMdcKeyName>
+<excludeMdcKeyName>parentId</excludeMdcKeyName>
+<excludeMdcKeyName>spanExportable</excludeMdcKeyName>
+<excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+<excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+<excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
+<excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+</mdc>
+<stackTrace/>
+</providers>
+</encoder>
+</appender>
+</springProfile>
+
+<springProfile name="local, local-staging">
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<encoder>
+<pattern>%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+</encoder>
+</appender>
+
+<!--<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<file>/aggregation/logs/agg-local.log</file>
+<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+&lt;!&ndash; daily rollover. Make sure the path matches the one in the file element or else
+the rollover logs are placed in the working directory. &ndash;&gt;
+<fileNamePattern>/aggregation/logs/agg-local_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+
+<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+<maxFileSize>5MB</maxFileSize>
+</timeBasedFileNamingAndTriggeringPolicy>
+&lt;!&ndash; keep 30 days' worth of history &ndash;&gt;
+<maxHistory>30</maxHistory>
+</rollingPolicy>
+
+<encoder>
+<charset>UTF-8</charset>
+<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread, %X{X-B3-TraceId:-}, %X{X-B3-SpanId:-}, %X{X-Span-Export:-}] %-5level %logger{36} - %msg%n</pattern>
+</encoder>
+</appender>-->
+</springProfile>
+
+<root level="info">
+<appender-ref ref="STDOUT" />
+</root>
+
+<logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
+<level value="DEBUG" />
+</logger>
+<logger name="com.starfish24" level="DEBUG"/>
+
+</configuration>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/prometheus.yml
+Content:
+scrape_configs:
+
+#  - job_name: 'aggregation_service'
+#    metrics_path: '/actuator/prometheus'
+#    scrape_interval: 5s
+#    static_configs:
+#      - targets: [ 'host.docker.internal:18083' ]
+
+- job_name: 'bitrix_adapter'
+metrics_path: '/actuator/prometheus'
+scrape_interval: 5s
+static_configs:
+- targets: [ '127.0.0.1:18081' ]
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/main-changelog.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+http://www.liquibase.org/xml/ns/pro
+http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+<includeAll path="/migrations" relativeToChangelogFile="true"/>
+</databaseChangeLog>
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/resources/db/migrations/changelog-000-000-000.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<changeSet id="create_subdivision" author="yushevelev@phoenixit.ru">
+<preConditions onFail="MARK_RAN">
+<not>
+<tableExists tableName="subdivisionEntity"/>
+<tableExists tableName="work_day"/>
+<tableExists tableName="work_schedule"/>
+</not>
+</preConditions>
+<comment>Create subdivisionEntity related tables</comment>
+<createTable tableName="subdivision">
+<column name="subdivision_id" type="varchar(512)">
+<constraints primaryKey="true" primaryKeyName="subdivision_id_pk" nullable="false" />
+</column>
+<column name="subdivision_name" type="text"/>
+<column name="time_zone" type="varchar(100)">
+<constraints nullable="false"/>
+</column>
+<column name="deleted" type="boolean">
+<constraints nullable="false"/>
+</column>
+</createTable>
+
+<createTable tableName="work_day">
+<column name="work_day_id" type="bigint" autoIncrement="true">
+<constraints primaryKey="true" primaryKeyName="work_day_id_pk" nullable="false" />
+</column>
+<column name="name" type="varchar(10)">
+<constraints nullable="false"/>
+</column>
+<column name="subdivision_id" type="varchar(512)">
+<constraints
+nullable="false"
+foreignKeyName="work_day_to_subdivision_fk"
+referencedTableName="subdivision"
+referencedColumnNames="subdivision_id"/>
+</column>
+</createTable>
+
+<createTable tableName="work_schedule">
+<column name="work_schedule_id" type="bigint" autoIncrement="true">
+<constraints primaryKey="true" primaryKeyName="work_schedule_id_pk" nullable="false" />

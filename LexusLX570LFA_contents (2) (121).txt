@@ -1,0 +1,479 @@
+﻿Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚: Ñ‡Ñ‡:Ð¼Ð¼:ÑÑ
+Ð¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð»Ñ ÑÐ¿Ð¾ÑÐ¾Ð±Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ =Ð½Ð° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚Ð½Ð¾Ð¹ ÑÐ»ÑƒÐ¶Ð±Ñ‹.
+example: "16:30:00"
+address:
+type: string
+description: ÐÐ´Ñ€ÐµÑ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² ÑÐ²Ð¾Ð±Ð¾Ð´Ð½Ð¾Ð¹ Ñ„Ð¾Ñ€Ð¼Ðµ.
+example: "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ, Ð´29"
+warehouseId:
+type: string
+description: GUID ÑÐºÐ»Ð°Ð´Ð° Ð¸Ð· Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð¸Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° 1Ð¡.
+example: "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d2"
+dispatchWarehouseSlotBooked:
+type: boolean
+description: Ð¤Ð°ÐºÑ‚ Ð±Ñ€Ð¾Ð½Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ ÑÐ»Ð¾Ñ‚Ð¾Ð² Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ
+clientDocumentAuthorityForReceiveGoodsNote:
+type: string
+description: ÐŸÑ€Ð¸Ð¼ÐµÑ‡Ð°Ð½Ð¸Ðµ Ð´Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+example: "DOCUMENT_NOT_NEEDED"
+clientDocumentAuthorityForReceiveGoods:
+type: boolean
+description: ÐÐ°Ð»Ð¸Ñ‡Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° Ð´Ð¾Ð²ÐµÑ€ÐµÐ½Ð½Ð¾ÑÑ‚Ð¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°
+soleExecutiveGovernment:
+type: boolean
+description: Ð•Ð˜Ðž (ÐµÐ´Ð¸Ð½Ð¾Ð»Ð¸Ñ‡Ð½Ñ‹Ð¹ Ð¸ÑÐ¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ€Ð³Ð°Ð½) Ð¸Ð· ÐºÐ°Ñ€Ñ‚Ð¾Ñ‡ÐºÐ¸ ÐºÐ¾Ð½Ñ‚Ð°ÐºÑ‚Ð½Ð¾Ð³Ð¾ Ð»Ð¸Ñ†Ð° Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÐµÐ»Ñ Ð³Ñ€ÑƒÐ·Ð°.
+
+ErpOrderDelivery:
+type: object
+description: Ð—Ð°ÐºÐ°Ð·, Ð¿Ñ€Ð¸Ð²ÑÐ·Ð°Ð½Ð½Ñ‹Ð¹ Ðº Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐµ
+required:
+- erpOrderGuid
+- deliveryItems
+properties:
+erpOrderGuid:
+description: >
+Guid Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð² 1Ð¡
+type: string
+example: "	b34db9b3-27d6-4c85-a6e6-c15b7df73306"
+deliveryItems:
+description: >
+ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ
+type: array
+items:
+$ref: '#/ErpDeliveryItem'
+
+ErpDeliveryItem:
+type: object
+description: ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ñ Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ
+required:
+- positionCode
+- skuId
+- quantity
+properties:
+positionCode:
+description: >
+ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡
+type: integer
+format: int64
+example: 1
+orderPositionCode:
+description: >
+ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð¸Ð· Ð—Ð°ÐºÐ°Ð·Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð² 1Ð¡,
+Ñ ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ ÑÐ²ÑÐ·Ð°Ð½Ð° ÑÑ‚Ñ€Ð¾ÐºÐ° Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ (positionCode)
+ÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð° Ð½Ðµ Ð±ÑƒÐ´ÐµÑ‚ Ð´Ð»Ñ ÑÑ‚Ñ€Ð¾Ðº Ð¾Ñ‚Ð³Ñ€ÑƒÐ¶ÐµÐ½Ð½Ñ‹Ñ… ÑÐ²ÐµÑ€Ñ… Ð·Ð°ÐºÐ°Ð·Ð°
+type: integer
+format: int64
+example: 1
+skuId:
+description: >
+Ð£Ð½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ ÐºÐ¾Ð´ SKU (Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° + Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ°).
+GUID Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ GUID Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸
+type: string
+example: "1111111"
+quantity:
+description: >
+ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¸Ð· Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² 1Ð¡ (Ð¼Ð¾Ð¶ÐµÑ‚ Ð½Ðµ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°Ñ‚ÑŒ Ñ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾Ð¼ Ð¸Ð· Ð·Ð°ÐºÐ°Ð·Ð° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°)
+type: number
+format: double
+example: 0.98
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/erp.delivery.find.yaml
+Content:
+FindErpDeliveryResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿Ð¾Ð¸ÑÐº Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ ERP
+properties:
+payload:
+$ref: '#/FindErpDelivery'
+fault:
+$ref: './common.yaml#/Fault'
+
+FindErpDelivery:
+type: object
+description: Ð”Ð¾ÑÑ‚Ð°Ð²ÐºÐ°
+properties:
+deliveryDocumentDateTime:
+description: >
+Ð”Ð°Ñ‚Ð° Ð¸ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ð·Ð°ÑÐ²ÐºÐ¸ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ Ð² ERP
+type: string
+format: date-time
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+erpGuid:
+description: >
+GUID Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² ERP
+type: string
+example: "b34db9b3-27d6-4c85-a6e6-c15b7df73306"
+active:
+description: >
+Ð”Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚ Ð¿Ñ€Ð¾Ð²ÐµÐ´ÐµÐ½ Ð² 1Ð¡
+type: boolean
+example: true
+
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/erp.task.create.update.yaml
+Content:
+CreateErpTaskRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÑƒ Ð·Ð°Ð´Ð°Ð½Ð¸Ñ Ð² ERP.
+required:
+- payload
+properties:
+payload:
+$ref: '#/ErpTask'
+description: Ð¡Ð¾Ð´ÐµÑ€Ð¶Ð¸Ð¼Ð¾Ðµ Ð¾Ñ‚Ð²ÐµÑ‚Ð°
+
+CreateErpTaskResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°Ð´Ð°Ñ‡Ð¸ ERP
+properties:
+payload:
+type: object
+properties:
+success:
+type: boolean
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº ÑƒÑÐ¿ÐµÑˆÐ½Ð¾Ð³Ð¾ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ
+commandGuid:
+description: >
+Ð˜Ð” ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹
+type: string
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+ErpTask:
+type: object
+required:
+- title
+- documentErpGuid
+- documentType
+- deadline
+- taskType
+- orderId
+- instanceId
+properties:
+title:
+description: >
+ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°Ð´Ð°Ñ‡Ð¸
+type: string
+example: "Ð—Ð°Ð´Ð°Ð½Ð¸Ðµ Ð½Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð·ÐºÑƒ"
+description:
+description: >
+ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ð·Ð°Ð´Ð°Ñ‡Ð¸ - Ð´Ð¾Ð¿.Ð¾Ð¿Ð¸ÑÐ°Ð½Ð¸Ðµ
+type: string
+example: "ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ"
+documentErpGuid:
+description: >
+Guid Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°
+type: string
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+documentType:
+description: Ð¢Ð¸Ð¿ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°
+type: string
+enum:
+- ORDER
+- DELIVERY
+responsibleId:
+description: >
+Ð˜Ð” Ð¸ÑÐ¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»Ñ - ÐžÑ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹ Ð¼ÐµÐ½ÐµÐ´Ð¶ÐµÑ€
+type: string
+example: "Ð˜Ð”-5555"
+roleId:
+description: >
+Ð˜Ð´ Ñ€Ð¾Ð»Ð¸
+type: string
+example: "ÐŸÐŸ-543543543"
+subdivisionId:
+description: >
+Ð˜Ð´ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "Ð”Ð’-3423423432"
+deadline:
+description: >
+ÐšÑ€Ð°Ð¹Ð½Ð¸Ð¹ ÑÑ€Ð¾Ðº Ð¸ÑÐ¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ Ð·Ð°Ð´Ð°Ñ‡Ð¸
+type: string
+format: date-time
+# Example: additional annotation on field
+#x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = \"yyyy-MM-dd'T'hh:mm:ss.SSSXXX\")"
+example: "2023-12-01T16:06:06+03:00"
+taskType:
+description: Ð¢Ð¸Ð¿ Ð·Ð°Ð´Ð°Ñ‡Ð¸
+type: string
+enum:
+- TRANSPORT_CONTROL
+- DRIVER_NOT_ARRIVED_CONTROL
+- SIMPLE_CUTTING_CONTROL
+example: "TRANSPORT_CONTROL"
+orderId:
+description: >
+Ð˜Ð” Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMS
+type: string
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+instanceId:
+type: string
+description: Ð˜Ð” ÑÐºÐ·ÐµÐ¼Ð¿Ð»ÑÑ€Ð° Ð±Ð¸Ð·Ð½ÐµÑ-Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Camunda
+
+CancelErpTaskRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñƒ Ð·Ð°Ð´Ð°Ñ‡Ð¸ ERP
+required:
+- payload
+properties:
+payload:
+$ref: '#/CancelErpTask'
+description: Ð¡Ð¾Ð´ÐµÑ€Ð¶Ð¸Ð¼Ð¾Ðµ Ð¾Ñ‚Ð²ÐµÑ‚Ð°
+
+CancelErpTaskResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñƒ Ð·Ð°Ð´Ð°Ñ‡Ð¸ ERP
+properties:
+payload:
+type: object
+properties:
+success:
+description: ÐŸÑ€Ð¸Ð·Ð½Ð°Ðº ÑƒÑÐ¿ÐµÑˆÐ½Ð¾Ð³Ð¾ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ
+type: boolean
+commandGuids:
+type: array
+description: >
+Ð˜Ð” ÐºÐ¾Ð¼Ð°Ð½Ð´
+items:
+type: string
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+CancelErpTask:
+type: object
+required:
+- taskType
+- orderId
+- instanceId
+properties:
+taskType:
+description: Ð¢Ð¸Ð¿ Ð·Ð°Ð´Ð°Ñ‡Ð¸
+type: string
+enum:
+- TRANSPORT_CONTROL
+- DRIVER_NOT_ARRIVED_CONTROL
+- SIMPLE_CUTTING_CONTROL
+example: "TRANSPORT_CONTROL"
+orderId:
+description: >
+Ð˜Ð” Ð·Ð°ÐºÐ°Ð·Ð° Ð² OMS
+type: string
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+instanceId:
+type: string
+description: Ð˜Ð” ÑÐºÐ·ÐµÐ¼Ð¿Ð»ÑÑ€Ð° Ð±Ð¸Ð·Ð½ÐµÑ-Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Camunda
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/erp.task.status.create.update.yaml
+Content:
+CreateUpdateErpTaskStatusRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÑƒ Ð·Ð°Ð´Ð°Ð½Ð¸Ñ Ð² 1Ñ.
+properties:
+payload:
+$ref: '#/ErpTaskStatus'
+description: Ð¡Ð¾Ð´ÐµÑ€Ð¶Ð¸Ð¼Ð¾Ðµ Ð¾Ñ‚Ð²ÐµÑ‚Ð°
+
+CreateUpdateErpTaskStatusResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°Ð´Ð°Ñ‡Ð¸ 1C
+properties:
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+ErpTaskStatus:
+type: object
+properties:
+guid:
+type: string
+description: GUID -  Ð·Ð°Ð´Ð°Ñ‡Ð¸ Ð² ÐžÐœÐ¡
+example: "b41db9b3-27d6-4c85-a6e6-c15b7df73306"
+status:
+type: string
+description: |
+Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ¸ Ð·Ð°Ð´Ð°Ñ‡Ð¸ Ð² 1Ð¡.
+Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+1. CREATED - Ð¡Ð¾Ð·Ð´Ð°Ð½Ð°, 2. IN_PROGRESS - Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÑ‚ÑÑ, 3. COMPLETED - Ð—Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð°
+example: IN_PROGRESS
+decision:
+type: string
+description: Ð ÐµÑˆÐµÐ½Ð¸Ðµ Ð¿Ð¾ Ð·Ð°Ð´Ð°Ñ‡Ðµ.
+example: "Ñ€ÐµÑˆÐµÐ½Ð¾"
+responsible:
+$ref: '#/Responsible'
+
+Responsible:
+type: object
+description: |
+ÐžÑ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹.
+ÐœÐ¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð½Ðµ Ð·Ð°Ð¿Ð¾Ð»Ð½ÐµÐ½Ð½Ñ‹Ð¼ Ð±Ð»Ð¾Ðº Ð² ÑÐ»ÑƒÑ‡Ð°Ðµ,
+ÐºÐ¾Ð³Ð´Ð° Ð·Ð°Ð´Ð°Ñ‡Ð° Ð±Ñ‹Ð»Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð° Ð½Ð° Ð³Ñ€ÑƒÐ¿Ð¿Ñƒ Ð¸ Ð² ÑÑ‚Ð°Ñ‚ÑƒÑÐµ CREATED - Ð¡Ð¾Ð·Ð´Ð°Ð½Ð°,
+Ð½Ð¾ ÐµÑ‰Ðµ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹ Ð½Ðµ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½.
+properties:
+responsibleId:
+type: string
+description: Ð˜Ð´ Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ð³Ð¾
+responsibleFullName:
+type: string
+description: Ð¤Ð˜Ðž Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ð³Ð¾
+responsibleEmail:
+type: string
+description: Email Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²ÐµÐ½Ð½Ð¾Ð³Ð¾
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.attribute.create.update.yaml
+Content:
+CreateUpdateOrderAttributeRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð´Ð»Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð·Ð°ÐºÐ°Ð·Ð°
+required:
+- payload
+properties:
+payload:
+$ref: "#/OrderAttribute"
+
+CreateUpdateOrderAttributeResponse:
+description: Ð¢ÐµÐ»Ð¾ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð° Ð·Ð°ÐºÐ°Ð·Ð° Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+type: object
+properties:
+payload:
+$ref: '#/OrderAttribute'
+fault:
+$ref: './common.yaml#/Fault'
+
+OrderAttribute:
+type: object
+description: Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ð³Ð¾ Ð°Ñ‚Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð°
+required:
+- erpOrderGuid
+- name
+- deleted
+properties:
+erpOrderGuid:
+type: string
+description: GUID Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡ (Ð·Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð»Ð¸ Ð·Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°).
+positionCode:
+type: integer
+format: int64
+description: ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡.
+name:
+type: string
+description: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°. Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ - approvalProcessStatus, olurTaskSent,
+orderPaid, invoiceSent, metalProcessingStartTime, metalProcessingCompleted, paymentAmount, invoiceCreated
+value:
+type: string
+description: Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°.
+deleted:
+type: boolean
+description: false - Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ, ÐµÑÐ»Ð¸ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ Ð½Ðµ ÑƒÐ´Ð°Ð»ÐµÐ½ Ð² 1Ð¡,
+true - ÐµÑÐ»Ð¸ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ ÑƒÐ´Ð°Ð»ÐµÐ½ Ð² 1Ð¡.
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.attributes.get.yaml
+Content:
+GetOrderAttributesResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð·Ð°ÐºÐ°Ð·Ð° Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ñƒ
+properties:
+payload:
+$ref: '#/GetOrderAttributesPayload'
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+GetOrderAttributesPayload:
+type: object
+properties:
+documentStatusModifiedAt:
+type: string
+format: date-time
+description: Ð”Ð°Ñ‚Ñ‹ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² UTC
+example: "2023-09-27 11:19:18.000"
+additionalAttributes:
+$ref: "#/AdditionalAttributes"
+description: Ð”Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ðµ Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ñ‹ Ð·Ð°ÐºÐ°Ð·Ð°
+
+AdditionalAttributes:
+type: object
+properties:
+invoiceCreated:
+type: string
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.copy.link.yaml
+Content:
+GenerateCopyLinkResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ ÑÑÑ‹Ð»ÐºÐ¸ Ð½Ð° ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð°
+properties:
+payload:
+$ref: '#/GenerateCopyLinkPayload'
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+GenerateCopyLinkPayload:
+type: object
+properties:
+url:
+type: string
+description: Ð¡ÑÑ‹Ð»ÐºÐ° Ð½Ð° ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð°
+example: "https://example.com/"
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.create.update.yaml
+Content:
+CreateUpdateOrderRequest:
+type: object
+description: |
+ÐšÐ¾Ð½Ñ‚ÐµÐ¹Ð½ÐµÑ€ Ð´Ð»Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð·Ð°ÐºÐ°Ð·Ð°
+required:
+- payload
+properties:
+payload:
+$ref: "#/Order"
+
+CreateUpdateOrderResponse:
+description: |
+Ð¢ÐµÐ»Ð¾ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð·Ð°ÐºÐ°Ð·Ð° / Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+type: object
+properties:
+payload:
+description: |
+Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ / Ð·Ð°ÑÐ²ÐºÐµ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°
+$ref: '#/Order'
+fault:
+description: |
+Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+$ref: './common.yaml#/Fault'
+
+Order:
+description: |
+Ð”Ð°Ð½Ð½Ñ‹Ðµ Ð·Ð°ÐºÐ°Ð·Ð° Ð¸Ð»Ð¸ Ð·Ð°ÑÐ²ÐºÐ¸ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+type: object
+required:
+- documentType
+- documentId
+- documentDateTime
+- documentSource
+- documentLink
+- documentStatus
+- paymentMethod
+- deliveryMethod
+- clientGuid
+- clientType
+- clientName
+- customerFullName
+- subdivisionId
+- documentItems
+- erpGuid
+- deleted
+- deletedMark
+- active

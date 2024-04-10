@@ -1,0 +1,452 @@
+﻿- skuTypeName
+- skuType
+- quantity
+- measureUnit
+- price
+- currency
+- positionCost
+properties:
+positionCode:
+type: integer
+format: int64
+description: |
+ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ‡Ð½Ð¾Ð¹ Ñ‡Ð°ÑÑ‚Ð¸ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡.
+example: 1
+linkedSkuPositionCode:
+type: integer
+format: int64
+description: |
+ÐšÐ¾Ð´ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, Ðº ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð¿Ñ€Ð¸Ð²ÑÐ·Ð°Ð½Ð° ÑƒÑÐ»ÑƒÐ³Ð° ÐœÐŸ*.
+* ÐŸÐ°Ñ€Ð°Ð¼ÐµÑ‚Ñ€ Ð¾Ð±ÑÐ·Ð°Ñ‚ÐµÐ»ÐµÐ½ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ ÑƒÑÐ»ÑƒÐ³ ÐœÐŸ (skuType=MP_SERVICE).
+example: 1
+skuId:
+type: string
+description: |
+Ð£Ð½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ð¹ ÐºÐ¾Ð´ SKU (Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð° + Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ°).
+GUID Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ GUID Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸. (Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚: GUID_ÐÐžÐœÐ•ÐÐšÐ›ÐÐ¢Ð£Ð Ð«#GUID_Ð¥ÐÐ ÐÐšÐ¢Ð•Ð Ð˜Ð¡Ð¢Ð˜ÐšÐ˜_ÐÐžÐœÐ•ÐÐšÐ›ÐÐ¢Ð£Ð Ð«_1#..#GUID_Ð¥ÐÐ ÐÐšÐ¢Ð•Ð Ð˜Ð¡Ð¢Ð˜ÐšÐ˜_ÐÐžÐœÐ•ÐÐšÐ›ÐÐ¢Ð£Ð Ð«_N
+example: "3d17ce84-30b8-4a7d-8d9f-0c9b83b4b8d7#803068f2-5290-44f2-a93f-bed0478a3609"
+skuName:
+type: string
+description: |
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ñ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹
+example: "Ð›Ð¸ÑÑ‚ Ð¼ÐµÑ‚Ð°Ð»Ð»Ð° 2Ñ…4"
+skuTypeName:
+type: string
+description: |
+ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð²Ð¸Ð´Ð° Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹.
+Ð¡Ð¾ÑÑ‚Ð°Ð² Ð²Ð¸Ð´Ð¾Ð² Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ð½Ð° 30.11.2022 ÑƒÐºÐ°Ð·Ð°Ð½ Ð² Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ Ð’Ð¸Ð´Ñ‹ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ (https://cfl.evraz.com/pages/viewpage.action?pageId=65339958)
+example: "Ð£ÑÐ»ÑƒÐ³Ð¸ ÐœÐŸ Ñ Ð¸Ð½Ð´Ð¸Ð²Ð¸Ð´ÑƒÐ°Ð»ÑŒÐ½Ð¾Ð¹ Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¾Ð¹"
+skuType:
+type: string
+description: |
+Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸.
+
+Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ:
+
+ITEM = Ð¢Ð¾Ð²Ð°Ñ€;
+ITEM_GP = Ð“Ð¾Ñ‚Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð´ÑƒÐºÑ†Ð¸Ñ;
+MP_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° ÐœÐŸ;
+SIMPLE_CUTTING_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð¿Ñ€Ð¾ÑÑ‚Ð¾Ð¹ Ñ€ÐµÐ·ÐºÐ¸ (Ð·Ð° 15 Ð¼Ð¸Ð½ Ð´Ð¾ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸);
+DELIVERY_AUTO_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð°Ð²Ñ‚Ð¾;
+DELIVERY_RAILWAY_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¶/Ð´;
+DELIVERY_SEA_SERVICE = Ð£ÑÐ»ÑƒÐ³Ð° Ð´Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ Ð¼Ð¾Ñ€ÑÐºÐ°Ñ;
+OTHER_SERVICE = ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸.
+Ð•ÑÑ‚ÑŒ ÑƒÑÐ»ÑƒÐ³Ð° ÐŸÐµÑ€ÐµÐ²Ð°Ð»ÐºÐ°, ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð² OMS Ð½Ðµ Ð¾Ð±Ñ€Ð°Ð±Ð°Ñ‚Ñ‹Ð²Ð°ÐµÐ¼ (ÐŸÑ€Ð¾Ñ‡Ð¸Ðµ ÑƒÑÐ»ÑƒÐ³Ð¸)
+
+ÐÐ° ÑÑ‚Ð¾Ñ€Ð¾Ð½Ðµ 1Ð¡:
+
+Ð ÐµÐ³Ð¸ÑÑ‚Ñ€ ÑÐ²ÐµÐ´ÐµÐ½Ð¸Ð¹ (Ð²Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€, Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ð°, Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Ñ‚Ð¸Ð¿Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸), ÐµÑÐ»Ð¸ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¾Ð´Ð½Ð¾Ð·Ð½Ð°Ñ‡Ð½Ð¾ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÑŒ Ð¿Ð¾ Ð²Ð¸Ð´Ñƒ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð²Ð¸Ð´ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹, ÐµÑÐ»Ð¸ Ð½ÐµÑ‚, Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñƒ.
+Ð¡Ð¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸Ðº Ñ‚Ð¸Ð¿Ð¾Ð² Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸
+Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÑ‚ÑÑ Ð² ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ð¸ Ñ Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð¼ Ð¢Ð¸Ð¿ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹ Ð² Ð·Ð°ÐºÐ°Ð·Ðµ (https://cfl.evraz.com/pages/viewpage.action?pageId=69173742)
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"ITEM|ITEM_GP|MP_SERVICE|SIMPLE_CUTTING_SERVICE|DELIVERY_AUTO_SERVICE|DELIVERY_RAILWAY_SERVICE|DELIVERY_SEA_SERVICE|OTHER_SERVICE")
+example: "MP_SERVICE"
+skuStatus:
+type: string
+description: |
+Ð”Ð»Ñ documentType=CLIENT_REQUEST Ð½ÐµÑ‚ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð² ÑÑ‚Ñ€Ð¾Ðº Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð°.
+-----
+Ð¡Ñ‚Ð°Ñ‚ÑƒÑ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð² Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ðµ 1Ð¡.
+
+Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð²Ð°Ñ€Ð¸Ð°Ð½Ñ‚Ñ‹ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ documentType=CLIENT_ORDER:
+
+DO_NOT_PROVIDE = ÐÐµ Ð¾Ð±ÐµÑÐ¿ÐµÑ‡Ð¸Ð²Ð°Ñ‚ÑŒ;
+TO_PROVIDE = Ðš Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸ÑŽ;
+PROVIDE = ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ;
+PROVIDE_APART = ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾;
+RESERVE_IN_WAREHOUSE = Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ;
+RESERVE_IN_WAREHOUSE_APART = Ð ÐµÐ·ÐµÑ€Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾;
+SHIP = ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ;
+SHIP_APART = ÐžÑ‚Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ Ð¾Ð±Ð¾ÑÐ¾Ð±Ð»ÐµÐ½Ð½Ð¾.
+CANCELED = ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð°
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"DO_NOT_PROVIDE|TO_PROVIDE|PROVIDE|PROVIDE_APART|RESERVE_IN_WAREHOUSE|RESERVE_ON_DATE|SHIP|SHIP_APART|CANCELED")
+example: "TO_PROVIDE"
+quantity:
+type: number
+format: double
+description: ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¸Ð· Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡
+example: 0.98
+measureUnit:
+type: string
+description: |
+Ð•Ð´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ Ð¸Ð· Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° 1Ð¡*.
+* Ð’ 1Ð¡ Ð² Ð¾Ð´Ð½Ð¾Ð¼ Ð·Ð°ÐºÐ°Ð·Ðµ ÐµÑÑ‚ÑŒ Ð¿Ð¾Ð»Ñ Ð² ÑˆÑ‚ÑƒÐºÐ°Ñ…, Ð¼ÐµÑ‚Ñ€Ð°Ñ…, ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾+ÐµÐ´Ð¸Ð½Ð¸Ñ†Ð° Ð¸Ð·Ð¼ÐµÑ€ÐµÐ½Ð¸Ñ. ÐÐ° MVP1 Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÐ¼ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð¾Ð²+ÐµÐ´.Ð¸Ð·Ð¼.
+example: "Ñ‚"
+price:
+type: number
+format: double
+description: Ð¦ÐµÐ½Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð° Ñ ÐÐ”Ð¡
+example: "1000.01"
+currency:
+type: string
+description: |
+Ð’Ð°Ð»ÑŽÑ‚Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°
+example: "RU"
+positionCancellationReason:
+description: ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°.
+$ref: "#/positionCancellationReason"
+example: "NOT_AVAILABLE"
+warehouseId:
+type: string
+description: |
+ÐšÐ¾Ð´ ÑÐºÐ»Ð°Ð´Ð° Ð¸Ð· ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ° 1Ð¡
+example: "001230"
+provideFromOtherOrders:
+type: boolean
+description: |
+ÐžÐ±ÐµÑÐ¿ÐµÑ‡Ð¸Ñ‚ÑŒ Ð¸Ð· Ð´Ñ€ÑƒÐ³Ð¸Ñ… Ð·Ð°ÐºÐ°Ð·Ð¾Ð².
+example: false
+positionCost:
+type: number
+format: double
+description: Ð¡ÑƒÐ¼Ð¼Ð° Ð¿Ð¾ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð² 1Ð¡
+example: "1000.01"
+skuDateTime:
+type: string
+format: date-time
+description: Ð”Ð°Ñ‚Ð° Ð¸ Ð²Ñ€ÐµÐ¼Ñ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ (Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ) Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð² 1Ð¡. |
+Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚ Ð² UTC. yyy-MM-ddTHH:mm:ss.SSSXXX
+x-field-extra-annotation: >-
+@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
+example: "2022-11-16T20:27:51.704746+07:00"
+skuComment:
+type: string
+description: ÐšÐ¾Ð¼Ð¼ÐµÐ½Ñ‚Ð°Ñ€Ð¸Ð¹ Ðº Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°
+productVariantAttribute:
+type: string
+description: Ð¥Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ° Ð½Ð¾Ð¼ÐµÐ½ÐºÐ»Ð°Ñ‚ÑƒÑ€Ñ‹
+discount:
+type: number
+format: double
+description: Ð Ð°Ð·Ð¼ÐµÑ€ ÑÐºÐ¸Ð´ÐºÐ¸ (Ð´Ð»Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð·Ð°ÐºÐ°Ð·Ð°)
+example: "1000.01"
+
+documentCancellationReason:
+type: string
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"NO_REASON|RETURN_TO_DEPOSITOR|COMPLETED|TASK_HIGH_VOLUME|INTERESTED_IN_LOADING_KATYUSHAE|PRICE_MONITORING" +
+"|NOT_OUR_RANGE|BAD_LENGTH|BAD_PRICE|BAD_METAL_PRICE|BAD_PROCESSING_PRICE|NOT_FIT|NOT_AVAILABLE|PART_NOT_AVAILABLE" +
+"|NO_PAYMENT|NO_RESPONSE_FROM_CLIENT|NO_RESPONSE_FROM_MANAGER|IMPOSSIBLE_MANUFACTURING|SHIPPED|CLIENT_REJECTION" +
+"|CANCELED|NO_LONGER_NEEDED|ORDER_RECEATED|DIFFERENT_REASONS|TEST_ORDER|GOZ")
+example: "NO_REASON"
+
+positionCancellationReason:
+type: string
+x-field-extra-annotation: >-
+@javax.validation.constraints.Pattern(regexp =
+"NO_REASON|CLOSED_BY_DEADLINE|EXPENSIVE|TECHNICAL_TRANSFER|NEED_FIXATION|REJECTION_MEASURED_GOODS" +
+"|NOT_AVAILABLE|CLIENT_REJECTION|TRANSFER_TO_ANOTHER_ORDER|SHIPPED|BAD_METAL_PRICE|BAD_PROCESSING_PRICE" +
+"|NOT_FIT|NO_RESPONSE_FROM_CLIENT|IMPOSSIBLE_MANUFACTURING|NO_LONGER_NEEDED|NO_ITEM_TO_COMPLETE_ORDER" +
+"|NO_TRANSPORT|GOZ")
+example: "NO_REASON"
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.document.status.modified.at.get.yaml
+Content:
+GetOrderDocumentStatusModifiedAtResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð´Ð°Ñ‚Ñ‹ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ñƒ
+properties:
+payload:
+$ref: '#/GetOrderDocumentStatusModifiedAtPayload'
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+GetOrderDocumentStatusModifiedAtPayload:
+type: object
+required:
+- documentStatusModifiedAt
+properties:
+documentStatusModifiedAt:
+type: string
+format: date-time
+description: Ð”Ð°Ñ‚Ñ‹ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² UTC
+example: "2023-09-27 11:19:18.000"
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.reload.yaml
+Content:
+OrdersReloadRequest:
+type: object
+properties:
+file:
+type: string
+description: Ð¤Ð°Ð¹Ð» Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ð° csv ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‰Ð¸Ð¹ ÑÐ¿Ð¸ÑÐ¾Ðº id Ð·Ð°ÐºÐ°Ð·Ð¾Ð² Ð´Ð»Ñ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐ¸ Ð² SF
+format: binary
+
+OrdersReloadResponse:
+type: object
+properties:
+payload:
+type: array
+items:
+type: string
+description: Ð¡Ð¿Ð¸ÑÐ¾Ðº id Ð·Ð°ÐºÐ°Ð·Ð¾Ð² Ð½Ð°Ð¹Ð´ÐµÐ½Ð½Ñ‹Ñ… Ð² Ð‘Ð” Ð¸ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð½Ñ‹Ñ… Ð² SF
+fault:
+$ref: './common.yaml#/Fault'
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/order.reserve.create.update.yaml
+Content:
+CreateUpdateOrderReserveRequest:
+type: object
+description: |
+ÐšÐ¾Ð½Ñ‚ÐµÐ¹Ð½ÐµÑ€ Ð´Ð»Ñ Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‡Ð¸ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+required:
+- payload
+properties:
+payload:
+$ref: "#/OrderReserve"
+
+CreateUpdateOrderReserveResponse:
+description: |
+Ð¢ÐµÐ»Ð¾ Ð¾Ñ‚Ð²ÐµÑ‚Ð° Ð½Ð° Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‡Ñƒ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+type: object
+properties:
+payload:
+description: |
+Ð”Ð°Ð½Ð½Ñ‹Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ
+$ref: '#/OrderReserve'
+fault:
+description: |
+Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+$ref: './common.yaml#/Fault'
+
+OrderReserve:
+description: |
+Ð”Ð°Ð½Ð½Ñ‹Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð¸Ð· 1C:ERP Ð² ÐžÐœÐ¡
+type: object
+required:
+- erpGuid
+- active
+properties:
+erpGuid:
+type: string
+description: |
+GUID Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð² 1Ð¡ (Ð—Ð°ÑÐ²ÐºÐ° ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð° Ð¸Ð»Ð¸ Ð·Ð°ÐºÐ°Ð· ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°)
+example: "b34db9b3-27d6-4c85-a6e6-c15b7df73306"
+active:
+type: boolean
+description: |
+Ð¡Ñ‚Ð°Ñ‚ÑƒÑ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð² 1Ð¡
+example: false
+reservationRemovalDate:
+type: string
+format: date
+description: |
+Ð”Ð°Ñ‚Ð° ÑÐ½ÑÑ‚Ð¸Ñ Ñ€ÐµÐ·ÐµÑ€Ð²Ð°
+Ð¤Ð¾Ñ€Ð¼Ð°Ñ‚: yyyy-MM-dd
+Ð”Ð°Ñ‚Ð° Ð¾ÐºÐ¾Ð½Ñ‡Ð°Ð½Ð¸Ñ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ñ…Ñ€Ð°Ð½Ð¸Ñ‚ÑÑ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÐºÐ°Ðº Ð”Ð°Ñ‚Ð°, Ð±ÐµÐ· Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸.
+x-field-extra-annotation: >-
+@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+example: "2022-11-16"
+reservationExtensionReason:
+type: string
+description: |
+ÐŸÑ€Ð¸Ñ‡Ð¸Ð½Ð° ÑÐ½ÑÑ‚Ð¸Ñ Ñ€ÐµÐ·ÐµÑ€Ð²Ð°
+ÐÐ²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ðµ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ.
+â€¢	NO_REASON = Ð½ÐµÑ‚ Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ñ‹ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ñ (Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ)
+ÐÐ²Ñ‚Ð¾Ð¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ðµ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ð½Ðµ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾:
+â€¢	TENDER_WON = Ð’Ñ‹Ð¸Ð³Ñ€Ð°Ð½ Ñ‚ÐµÐ½Ð´ÐµÑ€;
+â€¢	SPECIFICATION_SIGNED_LONG_LEAD_TIME = ÐŸÐ¾Ð´Ð¿Ð¸ÑÐ°Ð½Ð° ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ñ Ñ Ð´Ð»Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¼ ÑÑ€Ð¾ÐºÐ¾Ð¼ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸;
+â€¢	PAYMENT_RECEIVED_NO_SPECIFICATION = ÐŸÐ¾Ð»ÑƒÑ‡ÐµÐ½Ð° Ð¾Ð¿Ð»Ð°Ñ‚Ð° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ Ð±ÐµÐ· ÑÐ¿ÐµÑ†Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¸;
+â€¢	TENDER_PARTICIPATION = Ð£Ñ‡Ð°ÑÑ‚Ð¸Ðµ Ð² Ñ‚ÐµÐ½Ð´ÐµÑ€Ðµ;
+â€¢	TARGET_ORDER = Ð¦ÐµÐ»ÐµÐ²Ð¾Ð¹ Ð·Ð°ÐºÐ°Ð·;
+â€¢	METALLPROCESSING = ÐœÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ¸Ð½Ð³;
+â€¢	MRO = ÐœÐ Ðž;
+â€¢	RESERVATION_EXTENSION_PREPAYMENT = ÐŸÑ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð¿Ð¾ Ð¿Ñ€ÐµÐ´Ð¾Ð¿Ð»Ð°Ñ‚Ðµ;
+â€¢	CHANGING_PROVISION_STATUS = Ð”Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¸ ÑÐ¼ÐµÐ½Ðµ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸Ñ.
+example: "TENDER_WON"
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/subdivision.create.update.yaml
+Content:
+CreateUpdateSubdivisionRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¡ÐºÐ»Ð°Ð´Ð° Ð´Ð»Ñ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ.
+required:
+- subdivisionId
+- timeZone
+- wordDays
+- deleted
+properties:
+subdivisionId:
+description: >
+ID Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "M-1232-TEST-2"
+subdivisionName:
+description: >
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST"
+timeZone:
+description: Ð¢Ð°Ð¹Ð¼Ð·Ð¾Ð½Ð°
+type: string
+example: "UTC+3"
+workDays:
+description: Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ðµ Ð´Ð½Ð¸
+type: array
+items:
+$ref: './work.schedule.yaml#/DaySchedule'
+deleted:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: false
+
+CreateUpdateSubdivisionResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¡ÐºÐ»Ð°Ð´Ð° Ðº ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸ÑŽ
+properties:
+subdivisionId:
+description: >
+ID Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "M-1232-TEST-2"
+subdivisionName:
+description: >
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST"
+timeZone:
+description: Ð¢Ð°Ð¹Ð¼Ð·Ð¾Ð½Ð°
+type: string
+example: "UTC+3"
+workDays:
+description: Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ðµ Ð´Ð½Ð¸
+type: array
+items:
+$ref: './work.schedule.yaml#/DaySchedule'
+deleted:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'M-1232-TEST'
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/subdivision.get.yaml
+Content:
+GetSubdivisionResponse:
+type: object
+description: ÐžÑ‚Ð²ÐµÑ‚ Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ/Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¡ÐºÐ»Ð°Ð´Ð° Ðº ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸ÑŽ
+properties:
+payload:
+description: Ð¢ÐµÐ»Ð¾ Ð¾Ñ‚Ð²ÐµÑ‚Ð°
+$ref: '#/Subdivision'
+fault:
+$ref: './common.yaml#/Fault'
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¾ÑˆÐ¸Ð±ÐºÐµ
+
+Subdivision:
+type: object
+description: Ð˜Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾Ð± Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ð¸
+properties:
+subdivisionId:
+description: >
+ID Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "M-1232-TEST-2"
+subdivisionName:
+description: >
+ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1-TEST"
+timeZone:
+description: Ð¢Ð°Ð¹Ð¼Ð·Ð¾Ð½Ð°
+type: string
+example: "UTC+3"
+workDays:
+description: Ñ€Ð°Ð±Ð¾Ñ‡Ð¸Ðµ Ð´Ð½Ð¸
+type: array
+items:
+$ref: './work.schedule.yaml#/DaySchedule'
+deleted:
+description: Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ
+type: string
+example: 'M-1232-TEST'
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/openapi/yaml/http/user.group.create.update.yaml
+Content:
+CreateUpdateUserGroupRequest:
+type: object
+description: Ð¢ÐµÐ»Ð¾ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ° Ð½Ð° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð“Ñ€ÑƒÐ¿Ð¿Ñ‹ ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹.
+required:
+- userGroupId
+- userGroupName
+- userGroupParticipants
+properties:
+userGroupId:
+description: >
+(roleId+unitId) ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐ¾ÑÑ‚Ð°Ð²Ð½Ð¾Ðµ Ð¿Ð¾Ð»Ñ: Ð˜Ð” Ð Ð¾Ð»Ð¸ + Ð˜Ð” Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ
+
+Ð¾Ð¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€ ÑÐºÐ»ÐµÐ¸Ð²Ð°Ð½Ð¸Ñ Ð½Ð° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ 1Ð¡
+type: string
+example: "M-1232_N-2222"
+userGroupName:
+description: >
+(roleName+unitName) ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐ¾ÑÑ‚Ð°Ð²Ð½Ð¾Ðµ Ð¿Ð¾Ð»Ñ: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð Ð¾Ð»Ð¸ + ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ
+
+Ð¾Ð¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€ ÑÐºÐ»ÐµÐ¸Ð²Ð°Ð½Ð¸Ñ Ð½Ð° ÑƒÑÐ¼Ð¾Ñ‚Ñ€ÐµÐ½Ð¸Ðµ 1Ð¡
+type: string
+example: "Ñ€ÑƒÐºÐ¾Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ ÑÐ½Ð°Ð±Ð¶ÐµÐ½Ñ†ÐµÐ² ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1"
+userGroupParticipants:
+description: >
+Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+type: array
+items:
+$ref: "#/UserGroupParticipant"
+format: int64
+
+UserGroupParticipant:
+type: object
+description: Ð£Ñ‡Ð°ÑÑ‚Ð½Ð¸Ðº Ð“Ñ€ÑƒÐ¿Ð¿Ñ‹ ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+required:
+- personId
+- personFullName
+- email
+- unitId
+- roleId
+properties:
+personId:
+description: Ð˜Ð” Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ
+type: string
+example: "Ðš-1111"
+personFullName:
+description: Ð¤Ð˜Ðž ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ°
+type: string
+example: "Ð˜Ð²Ð°Ð½ Ð˜Ð²Ð°Ð½Ð¾Ð²Ð¸Ñ‡ Ð˜Ð²Ð°Ð½Ð¾Ð²"
+email:
+description: Email ÑÐ¾Ñ‚Ñ€ÑƒÐ´Ð½Ð¸ÐºÐ°
+type: string
+example: "ivanov@mail.ru"
+unitId:
+description: Ð˜Ð” Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ
+type: string
+example: "M-1232"
+unitName:
+description: ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ
+type: string
+example: "ÐŸÐ¾Ð´Ñ€Ð°Ð·Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ â„–1"
+roleId:
+description: Ð˜Ð” Ñ€Ð¾Ð»Ð¸/Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹

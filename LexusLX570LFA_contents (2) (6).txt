@@ -1,0 +1,501 @@
+﻿@REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+@REM ----------------------------------------------------------------------------
+
+@REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
+@echo off
+@REM set title of command window
+title %0
+@REM enable echoing by setting MAVEN_BATCH_ECHO to 'on'
+@if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
+
+@REM set %HOME% to equivalent of $HOME
+if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
+
+@REM Execute a user defined script before this one
+if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
+@REM check for pre script, once with legacy .bat ending and once with .cmd ending
+if exist "%USERPROFILE%\mavenrc_pre.bat" call "%USERPROFILE%\mavenrc_pre.bat" %*
+if exist "%USERPROFILE%\mavenrc_pre.cmd" call "%USERPROFILE%\mavenrc_pre.cmd" %*
+:skipRcPre
+
+@setlocal
+
+set ERROR_CODE=0
+
+@REM To isolate internal variables from possible post scripts, we use another setlocal
+@setlocal
+
+@REM ==== START VALIDATION ====
+if not "%JAVA_HOME%" == "" goto OkJHome
+
+echo.
+echo Error: JAVA_HOME not found in your environment. >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation. >&2
+echo.
+goto error
+
+:OkJHome
+if exist "%JAVA_HOME%\bin\java.exe" goto init
+
+echo.
+echo Error: JAVA_HOME is set to an invalid directory. >&2
+echo JAVA_HOME = "%JAVA_HOME%" >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation. >&2
+echo.
+goto error
+
+@REM ==== END VALIDATION ====
+
+:init
+
+@REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
+@REM Fallback to current working directory if not found.
+
+set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
+IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
+
+set EXEC_DIR=%CD%
+set WDIR=%EXEC_DIR%
+:findBaseDir
+IF EXIST "%WDIR%"\.mvn goto baseDirFound
+cd ..
+IF "%WDIR%"=="%CD%" goto baseDirNotFound
+set WDIR=%CD%
+goto findBaseDir
+
+:baseDirFound
+set MAVEN_PROJECTBASEDIR=%WDIR%
+cd "%EXEC_DIR%"
+goto endDetectBaseDir
+
+:baseDirNotFound
+set MAVEN_PROJECTBASEDIR=%EXEC_DIR%
+cd "%EXEC_DIR%"
+
+:endDetectBaseDir
+
+IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
+
+@setlocal EnableExtensions EnableDelayedExpansion
+for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
+@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
+
+:endReadAdditionalConfig
+
+SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
+set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
+set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+
+set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+
+FOR /F "usebackq tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties") DO (
+IF "%%A"=="wrapperUrl" SET DOWNLOAD_URL=%%B
+)
+
+@REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
+@REM This allows using the maven wrapper in projects that prohibit checking in binary data.
+if exist %WRAPPER_JAR% (
+if "%MVNW_VERBOSE%" == "true" (
+echo Found %WRAPPER_JAR%
+)
+) else (
+if not "%MVNW_REPOURL%" == "" (
+SET DOWNLOAD_URL="%MVNW_REPOURL%/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+)
+if "%MVNW_VERBOSE%" == "true" (
+echo Couldn't find %WRAPPER_JAR%, downloading it ...
+echo Downloading from: %DOWNLOAD_URL%
+)
+
+powershell -Command "&{"^
+		"$webclient = new-object System.Net.WebClient;"^
+		"if (-not ([string]::IsNullOrEmpty('%MVNW_USERNAME%') -and [string]::IsNullOrEmpty('%MVNW_PASSWORD%'))) {"^
+		"$webclient.Credentials = new-object System.Net.NetworkCredential('%MVNW_USERNAME%', '%MVNW_PASSWORD%');"^
+		"}"^
+		"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $webclient.DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"^
+		"}"
+if "%MVNW_VERBOSE%" == "true" (
+echo Finished downloading %WRAPPER_JAR%
+)
+)
+@REM End of extension
+
+@REM Provide a "standardized" way to retrieve the CLI args that will
+@REM work with both Windows and non-Windows executions.
+set MAVEN_CMD_LINE_ARGS=%*
+
+%MAVEN_JAVA_EXE% ^
+%JVM_CONFIG_MAVEN_PROPS% ^
+%MAVEN_OPTS% ^
+%MAVEN_DEBUG_OPTS% ^
+- classpath %WRAPPER_JAR% ^
+"-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
+%WRAPPER_LAUNCHER% %MAVEN_CONFIG% %*
+if ERRORLEVEL 1 goto error
+goto end
+
+:error
+set ERROR_CODE=1
+
+:end
+@endlocal & set ERROR_CODE=%ERROR_CODE%
+
+if not "%MAVEN_SKIP_RC%"=="" goto skipRcPost
+@REM check for post script, once with legacy .bat ending and once with .cmd ending
+if exist "%USERPROFILE%\mavenrc_post.bat" call "%USERPROFILE%\mavenrc_post.bat"
+if exist "%USERPROFILE%\mavenrc_post.cmd" call "%USERPROFILE%\mavenrc_post.cmd"
+:skipRcPost
+
+@REM pause the script if MAVEN_BATCH_PAUSE is set to 'on'
+if "%MAVEN_BATCH_PAUSE%"=="on" pause
+
+if "%MAVEN_TERMINATE_CMD%"=="on" exit %ERROR_CODE%
+
+cmd /C exit /B %ERROR_CODE%
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/pom.xml
+Content:
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<groupId>ru.liga.evraz</groupId>
+<artifactId>aggregation-service</artifactId>
+<version>0.1.0</version>
+<name>aggregation-service</name>
+<description>aggregation-service. Ð¡ÐµÑ€Ð²Ð¸Ñ Ð°Ð³Ñ€ÐµÐ³Ð°Ñ†Ð¸Ð¸ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð²Ð½ÐµÑˆÐ½Ð¸Ñ… ÑÐ¸ÑÑ‚ÐµÐ¼</description>
+
+<properties>
+<java.version>17</java.version>
+<spring-cloud.version>2021.0.3</spring-cloud.version>
+<spring-cloud-sleuth.version>3.1.0</spring-cloud-sleuth.version>
+<lombok.version>1.18.22</lombok.version>
+<spring-boot.version>2.6.3</spring-boot.version>
+<spring.kafka.version>2.8.2</spring.kafka.version>
+<nimbus-jose-jwt.version>9.19</nimbus-jose-jwt.version>
+<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+<junit.version>5.8.2</junit.version>
+<testcontainers.version>1.16.3</testcontainers.version>
+<message-broker-starter.version>0.1.0</message-broker-starter.version>
+
+<local.discovery.version>0.2</local.discovery.version>
+<org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
+
+<javax-annotation.version>1.3.2</javax-annotation.version>
+<javax-validation.version>2.0.1.Final</javax-validation.version>
+<jackson-version>2.14.1</jackson-version>
+<jackson-databind-nullable-version>0.2.4</jackson-databind-nullable-version>
+
+<google.findbugs.version>3.0.1</google.findbugs.version>
+
+<shedlock.version>5.2.0</shedlock.version>
+<spring.data.relational.version>3.0.0</spring.data.relational.version>
+<springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
+<liquibase.version>4.17.0</liquibase.version>
+
+<springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
+<openapi-generator-plugin.version>6.0.0</openapi-generator-plugin.version>
+
+<maven.surefire-plugin.version>2.22.2</maven.surefire-plugin.version>
+<maven.jacoco-plugin.version>0.8.8</maven.jacoco-plugin.version>
+
+<!--<logback.version>1.4.3</logback.version>-->
+<logstash-encoder.version>7.2</logstash-encoder.version>
+<apache.commons.math3.version>3.6.1</apache.commons.math3.version>
+</properties>
+
+<dependencyManagement>
+<dependencies>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-dependencies</artifactId>
+<version>${spring-cloud.version}</version>
+<type>pom</type>
+<scope>import</scope>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-dependencies</artifactId>
+<version>${spring-boot.version}</version>
+<type>pom</type>
+<scope>import</scope>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-sleuth</artifactId>
+<version>${spring-cloud-sleuth.version}</version>
+<type>pom</type>
+<scope>import</scope>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-kubernetes-dependencies</artifactId>
+<version>2.1.0</version>
+<type>pom</type>
+<scope>import</scope>
+</dependency>
+</dependencies>
+</dependencyManagement>
+
+<dependencies>
+<dependency>
+<groupId>org.apache.commons</groupId>
+<artifactId>commons-math3</artifactId>
+<version>${apache.commons.math3.version}</version>
+</dependency>
+
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+<dependency>
+<groupId>io.micrometer</groupId>
+<artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-bootstrap</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-sleuth</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-kubernetes-fabric8-all</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-starter-kubernetes-fabric8</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.cloud</groupId>
+<artifactId>spring-cloud-kubernetes-fabric8-loadbalancer</artifactId>
+</dependency>
+<dependency>
+<groupId>javax.validation</groupId>
+<artifactId>validation-api</artifactId>
+<version>${javax-validation.version}</version>
+</dependency>
+<dependency>
+<groupId>javax.annotation</groupId>
+<artifactId>javax.annotation-api</artifactId>
+<version>${javax-annotation.version}</version>
+</dependency>
+<dependency>
+<groupId>org.springframework.kafka</groupId>
+<artifactId>spring-kafka</artifactId>
+<version>${spring.kafka.version}</version>
+</dependency>
+<dependency>
+<groupId>org.projectlombok</groupId>
+<artifactId>lombok</artifactId>
+<optional>true</optional>
+</dependency>
+<dependency>
+<groupId>com.nimbusds</groupId>
+<artifactId>nimbus-jose-jwt</artifactId>
+<version>${nimbus-jose-jwt.version}</version>
+</dependency>
+<dependency>
+<groupId>io.projectreactor.kafka</groupId>
+<artifactId>reactor-kafka</artifactId>
+<version>1.3.9</version>
+</dependency>
+
+<!-- Log -->
+<dependency>
+<groupId>net.logstash.logback</groupId>
+<artifactId>logstash-logback-encoder</artifactId>
+<version>${logstash-encoder.version}</version>
+</dependency>
+
+<!-- Data -->
+<dependency>
+<groupId>net.javacrumbs.shedlock</groupId>
+<artifactId>shedlock-spring</artifactId>
+<version>${shedlock.version}</version>
+</dependency>
+<dependency>
+<groupId>net.javacrumbs.shedlock</groupId>
+<artifactId>shedlock-provider-jdbc-template</artifactId>
+<version>${shedlock.version}</version>
+</dependency>
+<dependency>
+<groupId>org.postgresql</groupId>
+<artifactId>postgresql</artifactId>
+</dependency>
+<dependency>
+<groupId>org.liquibase</groupId>
+<artifactId>liquibase-core</artifactId>
+<version>${liquibase.version}</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.liquibase/liquibase-maven-plugin -->
+<dependency>
+<groupId>org.liquibase</groupId>
+<artifactId>liquibase-maven-plugin</artifactId>
+<version>4.17.0</version>
+</dependency>
+
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+<groupId>org.springframework.data</groupId>
+<artifactId>spring-data-relational</artifactId>
+<version>${spring.data.relational.version}</version>
+</dependency>
+
+<!--Message broker starter-->
+<dependency>
+<groupId>ru.liga.evraz.starter</groupId>
+<artifactId>message-broker-starter</artifactId>
+<version>${message-broker-starter.version}</version>
+</dependency>
+
+<!-- Testing -->
+<dependency>
+<groupId>com.squareup.okhttp3</groupId>
+<artifactId>mockwebserver</artifactId>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.junit.jupiter</groupId>
+<artifactId>junit-jupiter-api</artifactId>
+<version>${junit.version}</version>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.junit.vintage</groupId>
+<artifactId>junit-vintage-engine</artifactId>
+<version>${junit.version}</version>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.testcontainers</groupId>
+<artifactId>junit-jupiter</artifactId>
+<version>${testcontainers.version}</version>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.testcontainers</groupId>
+<artifactId>postgresql</artifactId>
+<scope>test</scope>
+</dependency>
+<dependency>
+<groupId>org.testcontainers</groupId>
+<artifactId>kafka</artifactId>
+<version>${testcontainers.version}</version>
+<scope>test</scope>
+<exclusions>
+<exclusion>
+<groupId>junit</groupId>
+<artifactId>junit</artifactId>
+</exclusion>
+</exclusions>
+</dependency>
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-test</artifactId>
+<scope>test</scope>
+<exclusions>
+<exclusion>
+<groupId>org.junit</groupId>
+<artifactId>junit</artifactId>
+</exclusion>
+</exclusions>
+</dependency>
+<dependency>
+<groupId>org.springframework.security</groupId>
+<artifactId>spring-security-test</artifactId>
+<scope>test</scope>
+</dependency>
+
+<!-- JSON -->
+<!--<dependency>
+<groupId>com.fasterxml.jackson.dataformat</groupId>
+<artifactId>jackson-dataformat-xml</artifactId>
+</dependency>-->
+<dependency>
+<groupId>com.fasterxml.jackson.datatype</groupId>
+<artifactId>jackson-datatype-jsr310</artifactId>
+<version>${jackson-version}</version>
+</dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-core</artifactId>
+<version>${jackson-version}</version>
+</dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-annotations</artifactId>
+<version>${jackson-version}</version>
+</dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>${jackson-version}</version>
+</dependency>
+<dependency>
+<groupId>org.openapitools</groupId>
+<artifactId>jackson-databind-nullable</artifactId>
+<version>${jackson-databind-nullable-version}</version>
+</dependency>
+<!--	Java 8 Datatypes	-->
+<dependency>
+<groupId>com.fasterxml.jackson.datatype</groupId>
+<artifactId>jackson-datatype-jdk8</artifactId>
+<version>${jackson-version}</version>
+</dependency>
+<dependency> <!-- For openapi javax.validation.* annotations -->
+<groupId>com.google.code.findbugs</groupId>
+<artifactId>annotations</artifactId>
+<version>${google.findbugs.version}</version>
+</dependency>
+
+<dependency>
+<groupId>org.mapstruct</groupId>
+<artifactId>mapstruct</artifactId>
+<version>${org.mapstruct.version}</version>
+</dependency>
+<dependency>
+<groupId>io.springfox</groupId>
+<artifactId>springfox-boot-starter</artifactId>
+<version>${springfox.boot.starter.version}</version>
+</dependency>
+</dependencies>
+
+<profiles>
+<profile>
+<id>local</id>
+<activation>
+<activeByDefault>true</activeByDefault>
+</activation>

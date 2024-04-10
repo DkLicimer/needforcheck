@@ -1,0 +1,519 @@
+﻿private LocalDateTime modifiedAt;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+
+@Override
+public String getId() {
+return transactionId;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/transaction/OrderTransactionEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.transaction;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Builder
+@Table(name = "order_transaction")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderTransactionEntity implements Persistable<String> {
+
+@Id
+@Column(name = "transaction_id", nullable = false)
+private String transactionId;
+
+@Column(name = "erp_guid", nullable = false)
+@Getter
+private String erpGuid;
+
+@Column(name = "should_send", nullable = false)
+private Boolean shouldSend;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+@Getter
+private LocalDateTime modifiedAt;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+
+@Override
+public String getId() {
+return transactionId;
+}
+
+public OrderTransactionEntity setShouldSend(boolean shouldSend) {
+this.shouldSend = shouldSend;
+return this;
+}
+
+public Boolean getShouldSend() {
+return shouldSend;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/task/ErpTaskDocumentType.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.task;
+
+public enum ErpTaskDocumentType {
+ORDER,
+DELIVERY
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/task/ErpTaskSourceCode.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.task;
+
+public enum ErpTaskSourceCode {
+OMS
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/task/ErpTaskType.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.task;
+
+import lombok.Getter;
+
+@Getter
+public enum ErpTaskType {
+TRANSPORT_CONTROL("CAR_NOT_FOUND"),
+DRIVER_NOT_ARRIVED_CONTROL("CAR_NOT_ARRIVED_FOR_LOADING"),
+SIMPLE_CUTTING_CONTROL("SIMPLE_CUTTING");
+
+private final String erpValue;
+
+ErpTaskType(String erpValue) {
+this.erpValue = erpValue;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/product/ProductSkuEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.product;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Data
+@Table(name = "product_sku")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProductSkuEntity implements Persistable<String> {
+
+@Id
+private String id;
+
+@Column(name = "name")
+private String name;
+
+@Column(name = "type")
+private String type;
+
+@Column(name = "type_name")
+private String typeName;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return this.newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/partner/PartnerEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.partner;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import ru.liga.evraz.aggregation.adapter.db.entity.order.OrderEntity;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Table(name = "partner")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class PartnerEntity implements Persistable<String> {
+@Id
+@Column(name = "id", nullable = false)
+private String clientGuid;
+@Column(name = "type", nullable = false)
+private String clientType;
+@Column(name = "inn")
+private String clientInn;
+@Column(name = "name", nullable = false)
+private String clientName;
+
+@OneToMany(mappedBy = "partner")
+private List<OrderEntity> orders;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@Override
+public String getId() {
+return clientGuid;
+}
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/order/OrderEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.order;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+import org.hibernate.annotations.NamedNativeQuery;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import ru.liga.evraz.aggregation.adapter.db.entity.partner.PartnerEntity;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EntityResult;
+import javax.persistence.FetchType;
+import javax.persistence.FieldResult;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@Table(name = "order_entity")
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@NamedNativeQuery(name = "OrderDistinctGuidsForNotSentTransactions",
+query = """
+select * from order_entity
+where erp_guid in (
+select distinct erp_guid from (
+select oe.erp_guid
+from order_entity oe
+left join order_transaction ot on oe.erp_guid = ot.erp_guid
+where ot.should_send = :shouldSend
+and ot.modified_at <= :now
+order by ot.modified_at) a
+limit :orderLimit)
+""",
+resultSetMapping = "OrderDistinctGuidsForNotSentTransactionsMapping")
+@SqlResultSetMapping(name = "OrderDistinctGuidsForNotSentTransactionsMapping",
+entities = {
+@EntityResult(entityClass = OrderEntity.OrderBaseEntity.class,
+fields = {
+@FieldResult(name = "id", column = "id"),
+@FieldResult(name = "erpGuid", column = "erp_guid")
+})
+}
+)
+public class OrderEntity implements Persistable<String> {
+@Id
+private String id;
+
+@Column(name = "document_type", nullable = false)
+private String documentType;
+
+private String baseErpGuid;
+
+@Column(name = "document_id", nullable = false)
+private String documentId;
+
+@Column(name = "document_date_time", nullable = false)
+private LocalDateTime documentDateTime;
+
+@Column(name = "document_source", nullable = false)
+private String documentSource;
+
+private Boolean orderType;
+
+@Column(name = "document_link", nullable = false)
+private String documentLink;
+
+@Column(name = "contract_type")
+private String contractType;
+
+@Column(name = "sale_manager_responsible_id")
+private String saleManagerResponsibleId;
+
+@Column(name = "sale_manager_responsible_email")
+private String saleManagerResponsibleEmail;
+
+@Column(name = "document_status", nullable = false)
+private String documentStatus;
+
+@Column(name = "document_status_modified_at", nullable = false)
+private LocalDateTime documentStatusModifiedAt;
+
+@Column(name = "document_cancellation_reason")
+private String documentCancellationReason;
+
+@Column(name = "payment_method")
+private String paymentMethod;
+
+@Column(name = "agreement")
+private String agreement;
+
+@Column(name = "delivery_method", nullable = false)
+private String deliveryMethod;
+
+@Column(name = "recipient_full_name", nullable = false)
+private String recipientFullName;
+
+@Column(name = "recipient_phone", nullable = false)
+private String recipientPhone;
+
+@Column(name = "recipient_email", nullable = false)
+private String recipientEmail;
+
+@ManyToOne
+@JoinColumn(name = "partner_guid", nullable = false)
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+private PartnerEntity partner;
+
+@Column(name = "customer_full_name", nullable = false)
+private String customerFullName;
+
+@Column(name = "customer_phone")
+private String customerPhone;
+
+@Column(name = "customer_email")
+private String customerEmail;
+
+@Column(name = "subdivision_id", nullable = false)
+private String subdivisionId;
+
+@Column(name = "erp_guid", nullable = false)
+private String erpGuid;
+
+@Column(name = "deleted", nullable = false)
+private boolean deleted;
+
+@Column(name = "deletedMark", nullable = false)
+private boolean deletedMark;
+
+@Column(name = "active", nullable = false)
+private boolean active;
+
+@Column(name = "sf_order_id")
+private String sfOrderId;
+
+@Column(name = "created_at", nullable = false, updatable = false)
+@CreatedDate
+private LocalDateTime createdAt;
+
+@Column(name = "modified_at")
+@LastModifiedDate
+private LocalDateTime modifiedAt;
+
+@OneToMany(mappedBy = "order", orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+@EqualsAndHashCode.Exclude
+private Set<OrderItemEntity> orderItems = new HashSet<>();
+
+@Column(name = "total_cost")
+private Double totalCost;
+
+@Column(name = "contract_number")
+private String contractNumber;
+
+@Column(name = "sale_manager_responsible_name")
+private String saleManagerResponsibleName;
+
+@Column(name = "customer_comment")
+private String customerComment;
+
+@Column(name = "erp_pipeline")
+private Boolean erpPipeline;
+
+@Column(name = "oms_pipeline")
+private Boolean omsPipeline;
+
+@Column(name = "in_pieces")
+private boolean inPieces;
+
+@Column(name = "delivery_period")
+private Integer deliveryPeriod;
+
+@Column(name = "prices_agreed")
+private Boolean pricesAgreed;
+
+@Column(name = "customer_guid")
+private String customerGuid;
+
+@Column(name = "order_paid")
+private Boolean orderPaid;
+
+@Column(name = "order_paid_assignment_date")
+private LocalDateTime orderPaidAssignmentDate;
+
+@Column(name = "specification_approval_required")
+private Boolean specificationApprovalRequired;
+
+@Column(name = "items_price")
+private Double itemsPrice;
+
+@Column(name = "items_discount_price")
+private Double itemsDiscountPrice;
+
+@Column(name = "items_service_discount_price")
+private Double itemsServiceDiscountPrice;
+
+@Column(name = "discount_value")
+private Double discountValue;
+
+@Column(name = "erp_partner_guid")
+private String partnerGuid;
+
+@Column(name = "document_time_zone")
+private String documentTimeZone;
+
+@Column(name = "required_quotation")
+private Boolean requiredQuotation;
+
+@Column(name = "required_call")
+private Boolean requiredCall;
+
+@Column(name = "branching")
+private Boolean branching;
+
+@Column(name = "address")
+private String address;
+
+@Column(name = "invoice_without")
+private Boolean invoiceWithout;
+
+@Column(name = "payment_link")
+private String paymentLink;
+
+@Transient
+private transient boolean newEntity;
+
+@Override
+public boolean isNew() {
+return newEntity;
+}
+
+@Entity
+@Getter
+@NoArgsConstructor
+public static class OrderBaseEntity {
+@Id
+private String id;
+private String erpGuid;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/db/entity/order/OrderItemEntity.java
+Content:
+package ru.liga.evraz.aggregation.adapter.db.entity.order;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;

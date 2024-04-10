@@ -1,0 +1,411 @@
+﻿(warehouseId ÐµÑÑ‚ÑŒ Ð½Ð° Ð²ÑÐµÑ… Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑÑ… Ð¸ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°ÐµÑ‚)
+final var isAllItemsWarehouseIdNotEmpty = orderItems.stream()
+.map(i -> getAttributeValueByAttributeName(i.getCustomAttributes(),
+WAREHOUSE_ID))
+.allMatch(StringUtils::isNotEmpty);
+final var set = orderItems.stream()
+.map(itemDto -> getAttributeValueByAttributeName(itemDto.getCustomAttributes(),
+WAREHOUSE_ID))
+.filter(Objects::nonNull)
+.collect(Collectors.toSet());
+
+if (set.size() == 1 && isAllItemsWarehouseIdNotEmpty) {
+return dtoBuilder.value(CountEnum.ONE.toString()).build();
+}
+
+return dtoBuilder.value(CountEnum.MANY.toString()).build();
+}
+
+private static void enrichPositionCustomAttributesWithMetalProcessingOrderAttributes(
+Set<OrderAttribute> metalProcessingOrderAttributes,
+List<CustomAttributesDto> customAttributes, boolean isItem) {
+
+final var positionCode = getAttributeValueByAttributeName(customAttributes, POSITION_CODE);
+if (positionCode != null) {
+Set<OrderAttribute> metalProcessingOrderAttributesForPosition = metalProcessingOrderAttributes.stream()
+.filter(oa -> Long.valueOf(positionCode).equals(oa.getPositionCode()))
+.collect(Collectors.toSet());
+
+if (CollectionUtils.isNotEmpty(metalProcessingOrderAttributesForPosition)) {
+for (final var moa : MP_ORDER_ATTRIBUTES) {
+var metalProcessingAttributeValue = metalProcessingOrderAttributesForPosition.stream()
+.filter(a -> moa.equals(a.getName())).findFirst().map(OrderAttribute::getValue).orElse(EMPTY);
+
+boolean isMetalProcessingStartTimeAttr = MP_START_TIME.equals(moa);
+final var mpAttributes = new ArrayList<CustomAttributesDto>();
+if (!isMetalProcessingStartTimeAttr) {
+mpAttributes.add(CustomAttributesDto.builder()
+.name(moa)
+.value(metalProcessingAttributeValue)
+.build());
+} else {
+final var mpStartTime = CustomAttributesDto.builder()
+.name(MP_START_TIME)
+.value(metalProcessingAttributeValue)
+.build();
+final var mpStartTimeDesc = CustomAttributesDto.builder()
+.name(MP_START_TIME_DESCRIPTION)
+.value(buildMetalProcessingStartTimeDescription(metalProcessingAttributeValue).getValue())
+.build();
+mpAttributes.addAll(List.of(mpStartTime, mpStartTimeDesc));
+}
+customAttributes.addAll(mpAttributes);
+}
+} else {
+customAttributes.addAll(MP_POSITION_EMPTY_CA_VALUES_LIST);
+}
+} else {
+log.warn("Empty positionCode for one of MP attribute");
+}
+}
+
+private static Set<OrderAttribute> filterForMetalProcessingOrderAttributes(List<OrderAttribute> orderAttributes) {
+return orderAttributes.stream()
+.filter(oa -> MP_ORDER_ATTRIBUTES.contains(oa.getName()))
+.collect(Collectors.toSet());
+}
+
+private static CalculationInputDataDto buildMetalProcessingStartTimeDescription(
+String metalProcessingStartTimeValue) {
+
+final var calculationInputDataDtoBuilder = CalculationInputDataDto.builder()
+.name(MP_START_TIME_DESCRIPTION);
+
+if (StringUtils.isNotBlank(metalProcessingStartTimeValue)) {
+ZonedDateTime zdt = ZonedDateTime.parse(metalProcessingStartTimeValue);
+final var metalProcessingStartTimeDescription = DateTimeFormatter.ofPattern(HUMAN_DATE_WITH_TIME)
+.format(zdt);
+calculationInputDataDtoBuilder.value(metalProcessingStartTimeDescription);
+} else {
+calculationInputDataDtoBuilder.value(EMPTY);
+}
+
+return calculationInputDataDtoBuilder.build();
+}
+
+@Builder(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+private static class ItemShippingInfo {
+private Boolean allWithoutShipping;
+private String sameShippingErpGuid;
+private List<String> allShippingGuids;
+
+public Boolean isAllInSameShipping() {
+return sameShippingErpGuid != null;
+}
+
+public static ItemShippingInfo of(List<ItemDto> items) {
+boolean allWithoutShipping = true;
+String sameShippingErpGuid = null;
+List<String> allShippingGuids = new ArrayList<>();
+
+for (ItemDto item : items) {
+String guid = getAttributeValueByAttributeName(item.getCustomAttributes(), ItemCA.SHIPPING_ERP_GUID.getCode());
+allShippingGuids.add("ItemProductId: " + item.getProductId() + ", guid: " + guid);
+if (StringUtils.isNotBlank(guid)) {
+allWithoutShipping = false;
+
+if (sameShippingErpGuid == null) {
+sameShippingErpGuid = guid;
+} else {
+if (!sameShippingErpGuid.equals(guid)) {
+sameShippingErpGuid = null;
+break;
+}
+}
+}
+}
+
+return ItemShippingInfo.builder()
+.allWithoutShipping(allWithoutShipping)
+.sameShippingErpGuid(sameShippingErpGuid)
+.allShippingGuids(allShippingGuids)
+.build();
+}
+}
+
+public static void addOrUpdateAttributeByName(List<CustomAttributesDto> sfOrderCustomAttributes,
+CustomAttributesDto attribute, String attributeName) {
+final var containsAttribute = sfOrderCustomAttributes.stream()
+.anyMatch(cad -> attributeName.equals(cad.getName())); //Ð£Ð¶Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½ ÐšÐ
+
+if (containsAttribute) {
+for (CustomAttributesDto ca : sfOrderCustomAttributes) {
+if (attributeName.equals(ca.getName())) {
+ca.setValue(attribute.getValue() != null ? attribute.getValue() : EMPTY); // ÐžÐ±Ð½Ð¾Ð²Ð»ÑÐµÐ¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ ÐšÐ attributeName
+return;
+}
+}
+} else { // Ð˜ÑÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´ÑƒÐ±Ð»Ð¸ÐºÐ°Ñ‚Ð¾Ð²
+sfOrderCustomAttributes.add(attribute);
+}
+}
+
+public static void addClientDocumentAuthorityForReceiveGoodsRequiredAttrIfNotExists(OrderCreateExtendedDto sfOrder, List<CustomAttributesDto> orderCustomAttributes,
+ErpDelivery delivery) {
+if (!isAttributeWithNameExists(orderCustomAttributes, CLIENT_DOCUMENT_AUTHORITY_FOR_RECEIVE_GOODS_REQUIRED)) {
+final var clientDocumentAuthorityForReceiveGoodsRequired = calculateClientDocumentAuthorityForReceiveGoodsRequired(sfOrder, delivery);
+orderCustomAttributes.add(clientDocumentAuthorityForReceiveGoodsRequired);
+}
+}
+
+private static CustomAttributesDto calculateClientDocumentAuthorityForReceiveGoodsRequired(OrderCreateExtendedDto sfOrder, ErpDelivery delivery) {
+final boolean authorityNoteRequired;
+if (isNull(delivery)) {
+authorityNoteRequired = Boolean.TRUE;
+log.info("""
+ClientDocumentAuthorityForReceiveGoodsRequired calculation result: {}.
+Delivery is null.
+DocumentId: {}, erpGuid: {}""",
+authorityNoteRequired, getAttributeValueByAttributeName(sfOrder.getCustomAttributes(), DOCUMENT_ID), sfOrder.getOrderErpGuid());
+} else {
+final var note = delivery.getClientDocumentAuthorityForReceiveGoodsNote();
+final var seg = delivery.getSoleExecutiveGovernment();
+authorityNoteRequired = isAuthorityNoteRequired(seg, note);
+log.info("""
+ClientDocumentAuthorityForReceiveGoodsRequired calculation result: {}.
+clientDocumentAuthorityForReceiveGoodsNote: {}, soleExecutiveGovernment: {},
+documentId: {}, erpGuid: {}, deliveryDocumentId: {}, deliveryErpGuid: {}""",
+authorityNoteRequired, note, seg, getAttributeValueByAttributeName(sfOrder.getCustomAttributes(), DOCUMENT_ID),
+sfOrder.getOrderErpGuid(), delivery.getDeliveryDocumentId(), delivery.getErpGuid());
+}
+
+final var attributeBuilder = CustomAttributesDto.builder()
+.name(CLIENT_DOCUMENT_AUTHORITY_FOR_RECEIVE_GOODS_REQUIRED)
+.value(String.valueOf(authorityNoteRequired));
+return attributeBuilder.build();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfBpmService.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.ProcessVariableDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributeDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.adapter.http.out.feign.BpmFeignClient;
+import ru.liga.evraz.aggregation.domain.model.common.ControllerResult;
+import ru.liga.evraz.aggregation.domain.repository.BpmService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+class SfBpmService implements BpmService {
+
+private final SfCustomAttributesMapper mapper;
+private final BpmFeignClient bpmFeignClient;
+
+@Override
+public ControllerResult updateProcessVariables(String sfOrderId, Optional<OrderSearchDto> optSfOrder, List<CustomAttributesDto> customAttributes) {
+
+final var processVariables = new ArrayList<ProcessVariableDto>();
+final var attributesForSend = customAttributes.stream()
+.filter(attr -> Objects.equals("carDeliveryDateTimeFrom", attr.getName()))
+.collect(Collectors.toList());
+
+// TODO: Ð¿ÐµÑ€ÐµÑ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ ÐºÐ°Ðº Ð±ÑƒÐ´ÐµÑ‚ Ñ€Ð°ÑÑˆÐ¸Ñ€ÑÑ‚ÑŒÑÑ ÑÐ¿Ð¸ÑÐ¾Ðº ÐºÐ°ÑÑ‚Ð¾Ð¼Ð½Ñ‹Ñ… Ð°Ñ‚Ñ€Ð¸Ð±ÑƒÑ‚Ð¾Ð² Ð´Ð»Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ° Ð¿Ð¾ Ð·Ð°ÐºÐ°Ð·Ñƒ
+log.info("Try to update process for starfish24 orderId {} with isPaid, statusId, carDeliveryDateTimeFrom", sfOrderId);
+
+fillOrderProcessVariables(processVariables, optSfOrder, attributesForSend);
+
+log.info("Try to send list process variables {}", processVariables);
+final var result = bpmFeignClient.setProcessVariable(sfOrderId, processVariables);
+
+if (!Objects.equals(result.isSuccess(), Boolean.TRUE)) {
+log.warn("Not successful, result is: {}, message: {}", result.getResult(),
+result.getMessage());
+}
+return result;
+}
+
+@Override
+public void sendCommandStatus(String messageId, String orderId, String tenantId,
+List<CustomAttributeDto> customAttributes) {
+log.info("Try to send message {} to bpm-service with orderId {} and customAttributes {}",
+messageId, orderId, customAttributes);
+bpmFeignClient.sendMessage(messageId, orderId, tenantId, customAttributes);
+}
+
+private void fillOrderProcessVariables(List<ProcessVariableDto> processVariables, Optional<OrderSearchDto> optSfOrder, List<CustomAttributesDto> attributesForSend) {
+if (CollectionUtils.isNotEmpty(attributesForSend)) {
+processVariables.addAll(mapper.map(attributesForSend));
+} else {
+log.warn("Cant get attribute: carDeliveryDateTimeFrom. Attribute not found");
+}
+if (optSfOrder.isPresent()) {
+addOrderFieldToProcessVariables(processVariables, "isPaid", optSfOrder.get().getIsPaid());
+addOrderFieldToProcessVariables(processVariables, "statusId", optSfOrder.get().getStatusId());
+} else {
+log.warn("Cant get attributes: isPaid, statusId. Order not found");
+}
+}
+
+private <T> void addOrderFieldToProcessVariables(List<ProcessVariableDto> processVariables, String varName, T varValue) {
+if (!isNull(varValue)) {
+processVariables.add(ProcessVariableDto.builder()
+.name(varName)
+.value(varValue.toString())
+.type(varValue.getClass().getSimpleName())
+.build());
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfCustomAttributesMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import org.mapstruct.Mapper;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.ProcessVariableDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+interface SfCustomAttributesMapper {
+
+default List<ProcessVariableDto> map(List<CustomAttributesDto> attributesDtoList) {
+return attributesDtoList.stream().map(attr -> ProcessVariableDto.builder()
+.name(attr.getName())
+.value(attr.getValue())
+.type("String")
+.build())
+.collect(Collectors.toList());
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/SfOrderMapper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.LegalEntityDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address.AddressDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer.CustomerDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerServiceCalculation.ServiceProductDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderDetails;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderSearchDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderUpdateDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.orderCalculation.CalculationInputDataDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.shipping.ShippingDto;
+import ru.liga.evraz.aggregation.common.CommonMapper;
+import ru.liga.evraz.aggregation.domain.enums.DeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.Partner;
+import ru.liga.evraz.aggregation.domain.model.order.Order;
+import ru.liga.evraz.aggregation.domain.model.order.OrderItem;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CancellationReason;
+import ru.liga.evraz.aggregation.domain.model.order.enums.ErpDeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.order.enums.OrderContractType;
+import ru.liga.evraz.aggregation.domain.model.order.enums.SfDeliveryMethod;
+import ru.liga.evraz.aggregation.domain.model.product.MeasureUnit;
+import ru.liga.evraz.aggregation.domain.model.product.SkuStatus;
+import ru.liga.evraz.aggregation.domain.model.product.SkuType;
+import ru.liga.evraz.aggregation.sf.ItemCA;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.ValidationException;
+
+import static java.util.Collections.singletonList;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.trim;
+import static ru.liga.evraz.aggregation.adapter.http.out.TimeFormat.DATE_FORMAT_BY_DOT;
+import static ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto.CustomAttributeSource.ORDER;
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.SERVICE_SKU;
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.isSkuItem;
+import static ru.liga.evraz.aggregation.domain.model.product.SkuType.isSkuService;
+
+@Mapper(componentModel = "spring", uses = CommonMapper.class)
+@Slf4j
+// TODO:: Ð¿Ñ€Ð¸Ñ‡ÐµÑÐ°Ñ‚ÑŒ Ð¼Ð°Ð¿Ð¿Ð¸Ð½Ð³ (Ð½Ð°Ð¿Ñ€Ð¸Ð¼ÐµÑ€ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð¼ÐµÐ¶ÑƒÑ‚Ð¾Ñ‡Ð½Ñ‹Ðµ Ð´Ñ‚Ð¾)
+public abstract class SfOrderMapper {
+private static final Map<ErpDeliveryMethod, SfDeliveryMethod> ORDER_TO_SF_DELIVERY_MAPPING = Map.of(
+ErpDeliveryMethod.PICKUP_FROM_OUR_WAREHOUSE, SfDeliveryMethod.PICKUP_IN_STORE,
+ErpDeliveryMethod.DELIVERY_BY_RAILWAY_TRANSPORT, SfDeliveryMethod.DELIVERY_RAILWAY_SERVICE,
+ErpDeliveryMethod.DESCRIPTION_OF_THE_TRANSPORT_SERVICE, SfDeliveryMethod.DELIVERY_AUTO_SERVICE
+);
+
+private static final Map<DeliveryMethod, SfDeliveryMethod> DELIVERY_TO_SF_DELIVERY_MAPPING = Map.of(
+DeliveryMethod.PICKUP, SfDeliveryMethod.PICKUP_IN_STORE,
+DeliveryMethod.RAILWAY_DELIVERY, SfDeliveryMethod.DELIVERY_RAILWAY_SERVICE,
+DeliveryMethod.DISCRETION_OF_THE_TRANSPORT_SERVICE, SfDeliveryMethod.DELIVERY_AUTO_SERVICE
+);
+
+@Mapping(source = "legalEntityId", target = "evrazLegalEntityId")
+@Mapping(source = "customerType", target = "evrazCustomerType")
+@Mapping(source = "sourceId", target = "evrazSourceId")
+public abstract OrderUpdateDto mapOrderUpdateDto(OrderDetails orderDetails);
+
+public OrderCreateExtendedDto mapToCreateDto(Order source, List<ErpDelivery> erpDeliveries) {
+if (source != null) {
+
+return OrderCreateExtendedDto.builder()
+.customAttributes(mapOrderCustomAttributes(source))
+.deleted(source.isDeleted())
+.items(mapOrderItems(source.getOrderItems()))
+.itemServices(mapOrderItemServices(source.getOrderItems())) // TODO:: Ð¼Ð°Ð¿Ð¿Ð¸Ð½Ð³ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚, Ð¼Ð¾Ð³ÑƒÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼Ñ‹
+.orderDetails(mapOrderDetail(source))
+.customer(mapCustomerDto(source.getPartner(), source.getCustomerGuid(),
+source.getCustomerFullName(), source.getCustomerEmail(), source.getCustomerPhone()))
+.shipping(mapToShippingDto(source, erpDeliveries))
+.orderErpGuid(source.getErpGuid())
+.legalEntity(mapLegalEntity(source))
+.build();
+}
+// cancellationReasonId ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°ÐµÑ‚ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ñ‹Ð¼ API. documentCancellationReason -> order.cancellationReason
+// TODO:: agreement - Ð½ÐµÑ‚ Ð¼Ð°Ð¿Ð¿Ð¸Ð½Ð³Ð°
+// TODO:: baseErpGuid - Ð½ÐµÑ‚ Ð¼Ð°Ð¿Ð¿Ð¸Ð½Ð³Ð°
+
+return null;
+}
+
+public OrderDetails mapOrderDetail(Order source) {
+final String clientOrderId = buildClientOrderId(source);
+final var cancellationReason = Optional.ofNullable(source.getDocumentCancellationReason())
+.map(CancellationReason::name)
+.orElse(null);
+

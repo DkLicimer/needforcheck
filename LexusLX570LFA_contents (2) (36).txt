@@ -1,0 +1,474 @@
+﻿"name": "olurTaskSent",
+"value": null,
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/delete/response/delete_order_attribute_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "delete_test_guid",
+"positionCode": 1,
+"name": "for_delete",
+"value": null,
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/delete/request/delete_metalProcessingStartTime_order_attribute_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": null,
+"name": "metalProcessingStartTime",
+"deleted": true
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/delete/request/delete_olurTaskSent_order_attribute_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": null,
+"name": "olurTaskSent",
+"deleted": true
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/delete/request/delete_order_attribute_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "delete_test_guid",
+"positionCode": 1,
+"name": "for_delete",
+"deleted": true
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_invalid_metal_processing_start_time_response.json
+Content:
+{
+"fault": {
+"code": "BAD_REQUEST",
+"details": "Unparsable date-time. Order attribute (name: metalProcessingStartTime, value: 2022-11-16T25:27:51.704-04:00, positionCode: 5)"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_attribute_boolean_value_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "boolean_test_guid",
+"positionCode": 2,
+"name": "test_order_attribute_name",
+"value": "true",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_attribute_date_value_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "date_test_guid",
+"positionCode": 2,
+"name": "test_order_attribute_name",
+"value": "2022-11-16T20:27:51.704+00:00",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_attribute_duplicate_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-15T20:27:51.704+00:00",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_attribute_number_value_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "number_test_guid",
+"positionCode": 2,
+"name": "test_order_attribute_name",
+"value": "18900.45",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_attribute_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "approvalProcessStatus",
+"value": "APPROVAL_PROCESS_IN_PROGRESS",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_attribute_sku_type_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-16T20:27:51.704+00:00",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_order_paid_assignment_date_attr_invalid_response.json
+Content:
+{
+"fault": {
+"code": "BAD_REQUEST",
+"details": "Unparsable date-time. Order attribute (name: orderPaidAssignmentDate, value: 2024-02-30)"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/response/create_valid_metal_processing_start_time_response.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-16T23:27:51.704-04:00",
+"deleted": null
+},
+"fault": null
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_invalid_metal_processing_start_time_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-16T25:27:51.704-04:00",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_attribute_boolean_value_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "boolean_test_guid",
+"positionCode": 2,
+"name": "test_order_attribute_name",
+"value": true,
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_attribute_date_value_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "date_test_guid",
+"positionCode": 2,
+"name": "test_order_attribute_name",
+"value": "2022-11-16T20:27:51.704+00:00",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_attribute_duplicate_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-15T20:27:51.704+00:00",
+"deleted": false,
+"modifiedAt": "2022-11-15T20:27:51.704+00:00"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_attribute_number_value_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "number_test_guid",
+"positionCode": 2,
+"name": "test_order_attribute_name",
+"value": 18900.45,
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_attribute_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "approvalProcessStatus",
+"value": "APPROVAL_PROCESS_IN_PROGRESS",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_attribute_sku_type_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-16T20:27:51.704+00:00",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_order_paid_assignment_date_attr_invalid_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"name": "orderPaidAssignmentDate",
+"value": "2024-02-30",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order_attribute/create/request/create_valid_metal_processing_start_time_request.json
+Content:
+{
+"payload": {
+"erpOrderGuid": "test_erp_guid",
+"positionCode": 5,
+"name": "metalProcessingStartTime",
+"value": "2022-11-16T23:27:51.704-04:00",
+"deleted": false
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/update/already_exists_request.json
+Content:
+{
+"payload": {
+"clientGuid": "test-client_guid",
+"clientType": "ENTITY",
+"clientInn": "test-client_inn",
+"clientName": "test-client_name",
+"documentType": "CLIENT_ORDER",
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T17:24:50.000000+07:00",
+"documentSource": "ERP",
+"documentCancellationReason": "NO_REASON",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": null,
+"pricesAgreed": true,
+"recipientFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"recipientPhone": "+7 (111) 111-11-11",
+"recipientEmail": "recipientEmail@test.test",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "",
+"customerEmail": null,
+"subdivisionId": "test_subdivision_id",
+"customerGuid": "test-customer_guid",
+"orderPaid": false,
+"orderPaidAssignmentDate": "2023-12-27T17:24:50.000000+02:00",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM",
+"skuStatus": "TO_PROVIDE",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 484025.50,
+"discount": null
+},
+{
+"positionCode": 2,
+"linkedSkuPositionCode": 1,
+"skuId": "test_service_sku_id",
+"skuName": "test_service_sku_name",
+"skuTypeName": "ÐœÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ¸Ð½Ð³",
+"skuType": "MP_SERVICE",
+"skuStatus": "SHIP",
+"quantity": 0.666,
+"measureUnit": "Ñ‚",
+"price": 2200,
+"currency": "RUB",
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 1465.20,
+"discount": null
+}
+],
+"erpGuid": "test_erp_guid",
+"deleted": true,
+"deletedMark": false,
+"active": false,
+"totalCost": 485490.70,
+"inPieces": false,
+"contractNumber": "121212",
+"partnerGuid": "order-partner-guid",
+"documentTimeZone": "UTC +07",
+"requiredQuotation": true,
+"requiredCall": false,
+"branching": true,
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ,  Ð´29",
+"invoiceWithout": false,
+"paymentLink": "http://example.com"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/update/already_exists_request_for_OA.json
+Content:
+{
+"payload": {
+"clientGuid": "test-client_guid",
+"clientType": "ENTITY",
+"clientInn": "test-client_inn",
+"clientName": "test-client_name",
+"documentType": "CLIENT_ORDER",
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T17:24:50.000000+07:00",
+"documentSource": "ERP",
+"documentCancellationReason": "NO_REASON",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",
+"deliveryMethod": "PICKUP_FROM_OUR_WAREHOUSE",
+"deliveryPeriod": null,
+"pricesAgreed": true,
+"recipientFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"recipientPhone": "+7 (111) 111-11-11",
+"recipientEmail": "recipientEmail@test.test",
+"customerFullName": "Ð”Ð°Ð½Ð¸Ð» 41",
+"customerPhone": "+7 (111) 111-11-11",
+"customerEmail": "customerEmail@test.test",
+"subdivisionId": "test_subdivision_id",
+"customerGuid": "test-customer_guid",
+"orderPaid": true,
+"orderPaidAssignmentDate": "2023-12-27T17:24:50.000000+02:00",
+"specificationApprovalRequired": false,
+"itemsPrice": null,
+"itemsDiscountPrice": null,
+"itemsServiceDiscountPrice": null,
+"discountValue": null,
+"documentItems": [
+{
+"positionCode": 1,
+"skuId": "test_sku_id",
+"skuName": "test_sku_name",
+"skuTypeName": "LS_Ð¢Ð Ð£Ð‘Ð«_ÐŸÐ ÐžÐ¤Ð˜Ð›Ð¬ÐÐ«Ð•",
+"skuType": "ITEM_GP",
+"skuStatus": "TO_PROVIDE",
+"quantity": 3.023,
+"measureUnit": "Ñ‚",
+"price": 160114.29,
+"currency": "RUB",
+"warehouseId": "",
+"provideFromOtherOrders": true,
+"positionCost": 484025.50,
+"discount": null
+},
+{
+"positionCode": 2,
+"linkedSkuPositionCode": 1,
+"skuId": "test_service_sku_id",
+"skuName": "test_service_sku_name",
+"skuTypeName": "ÐœÐµÑ‚Ð°Ð»Ð»Ð¾Ð¿Ñ€Ð¾Ñ†ÐµÑÑÐ¸Ð½Ð³",
+"skuType": "MP_SERVICE",
+"skuStatus": "SHIP",
+"quantity": 0.666,
+"measureUnit": "Ñ‚",
+"price": 2200,
+"currency": "RUB",
+"warehouseId": "0f857a2d-1959-11e4-80bf-f0921c005714",
+"provideFromOtherOrders": true,
+"positionCost": 1465.20,
+"discount": null
+}
+],
+"erpGuid": "test_erp_guid",
+"deleted": true,
+"deletedMark": false,
+"active": false,
+"totalCost": 485490.70,
+"inPieces": false,
+"contractNumber": "121212",
+"partnerGuid": "order_partner_guid",
+"documentTimeZone": "UTC +07",
+"requiredQuotation": true,
+"requiredCall": false,
+"branching": true,
+"address": "Ð³. ÐœÐ¾ÑÐºÐ²Ð°, 9-Ñ ÐŸÐ°Ñ€ÐºÐ¾Ð²Ð°Ñ,  Ð´29",
+"invoiceWithout": false,
+"paymentLink": "http://example.com"
+}
+}
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/resources/api/order/update/already_exists_response.json
+Content:
+{
+"payload": {
+"documentType": "CLIENT_ORDER",
+"baseErpGuid": null,
+"documentId": "documentId",
+"documentDateTime": "2022-12-27T10:24:50.000000Z",
+"documentSource": "ERP",
+"orderType": false,
+"documentLink": "documentLink",
+"contractType": "FRAME_NON_STANDARD",
+"saleManagerResponsibleId": "test_saleManagerResponsibleId",
+"saleManagerResponsibleEmail": "saleManagerResponsibleEmail@test.test",
+"documentStatus": "TO_BE_AGREED",
+"documentCancellationReason": "NO_REASON",
+"paymentMethod": "PAYMENT_ON_ACCOUNT",
+"agreement": "PREPAYMENT",

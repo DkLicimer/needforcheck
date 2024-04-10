@@ -1,0 +1,488 @@
+﻿this(
+itemDto.getId(),
+itemDto.getExternalId(),
+itemDto.getDateTimeCreated(),
+itemDto.getCreatedDateTime(),
+itemDto.getStatusId(),
+itemDto.getTitle(),
+itemDto.getProductId(),
+itemDto.getType(),
+itemDto.getLink(),
+itemDto.getQuantity(),
+itemDto.getPrice(),
+itemDto.getDiscount(),
+itemDto.getTax(),
+itemDto.getPicture(),
+itemDto.getWeight(),
+itemDto.getPickedweight(),
+itemDto.getDatamatrixCode(),
+itemDto.getDeleted(),
+itemDto.getLoyaltyPointsEarn(),
+itemDto.getLoyaltyPointsBurn(),
+itemDto.getLoyaltyPointsReturned(),
+itemDto.getCustomAttributes(),
+itemDto.getDiscountPrice(),
+itemDto.getPositionCode()
+);
+}
+
+public List<ItemDto> splitItemByQuantityOne() {
+List<ItemDto> itemDtos = new LinkedList<>();
+for (int count = 0; count < quantity; count++) {
+ItemDto itemDto = new ItemDto(this);
+itemDto.setQuantity(1L);
+itemDtos.add(itemDto);
+}
+return itemDtos;
+}
+
+public ShortItem getShortItemInfo() {
+String measureUnit = StringUtils.EMPTY;
+if (this.customAttributes != null) {
+measureUnit = this.customAttributes
+.stream()
+.filter(ca -> Objects.equals(ca.getName(), ItemCA.MEASURE_UNIT.getCode()))
+.findFirst()
+.map(CustomAttributesDto::getValue)
+.orElse(StringUtils.EMPTY);
+}
+
+return ShortItem.builder()
+.skuId(this.productId)
+.quantity(Double.valueOf(this.quantity))
+.weight(this.getWeight())
+.positionCode(this.customAttributes.stream()
+.filter(ca -> ItemCA.POSITION_CODE.getCode().equalsIgnoreCase(ca.getName()))
+.findFirst()
+.map(CustomAttributesDto::getValue)
+.filter(StringUtils::isNotBlank)
+.map(Integer::parseInt)
+.orElse(null))
+.weight(this.weight)
+.weightItem(MeasureUnit.getByValue(measureUnit).isWeight())
+.build();
+}
+
+@Builder
+@Getter
+public static class ShortItem {
+private String skuId;
+private Integer positionCode;
+private Double quantity;
+private Double weight;
+private boolean weightItem;
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/item/ItemServiceDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.adapter.http.out.TimeFormat;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerService.CustomerServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerServiceCalculation.ServiceProductDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.orderCalculation.CalculationInputDataDto;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ItemServiceDto {
+
+private String id;
+private String statusId;
+@JsonFormat(pattern = TimeFormat.ISO_DATE_TIME_UTC_OFFSET, timezone = "GMT")
+private ZonedDateTime createdDateTime;
+private String title;
+private String customerServiceId;
+private CustomerServiceDto customerService;
+private String link;
+private Integer quantity;
+private Double price;
+private Double discount;
+private Double tax;
+private String picture;
+private boolean deleted;
+private Double loyaltyPointsEarn;
+private Double loyaltyPointsBurn;
+private Boolean loyaltyPointsReturned;
+private String comment;
+private String productId;
+private List<CustomAttributesDto> customAttributes;
+private List<CalculationInputDataDto> calculationInputData;
+private List<ServiceProductDto> products;
+private BigDecimal discountPrice;
+
+public ItemServiceDto(ItemServiceDto itemserviceDto) {
+this(
+itemserviceDto.getId(),
+itemserviceDto.getStatusId(),
+itemserviceDto.getCreatedDateTime(),
+itemserviceDto.getTitle(),
+itemserviceDto.getCustomerServiceId(),
+itemserviceDto.getCustomerService(),
+itemserviceDto.getLink(),
+itemserviceDto.getQuantity(),
+itemserviceDto.getPrice(),
+itemserviceDto.getDiscount(),
+itemserviceDto.getTax(),
+itemserviceDto.getPicture(),
+itemserviceDto.isDeleted(),
+itemserviceDto.getLoyaltyPointsEarn(),
+itemserviceDto.getLoyaltyPointsBurn(),
+itemserviceDto.getLoyaltyPointsReturned(),
+itemserviceDto.getComment(),
+itemserviceDto.getProductId(),
+itemserviceDto.getCustomAttributes(),
+itemserviceDto.getCalculationInputData(),
+itemserviceDto.getProducts(),
+itemserviceDto.getDiscountPrice()
+);
+}
+
+public List<ItemServiceDto> splitItemByQuantityOne() {
+List<ItemServiceDto> itemServiceDtos = new LinkedList<>();
+for (int count = 0; count < quantity; count++) {
+ItemServiceDto itemserviceDto = new ItemServiceDto(this);
+itemserviceDto.setQuantity(1);
+if (Objects.nonNull(this.getPrice()) && Objects.nonNull(this.getQuantity())) {
+itemserviceDto.setPrice(this.getPrice() / this.getQuantity());
+}
+if (Objects.nonNull(this.getDiscount()) && Objects.nonNull(this.getQuantity())) {
+itemserviceDto.setDiscount(this.getDiscount() / this.getQuantity());
+}
+itemServiceDtos.add(itemserviceDto);
+}
+return itemServiceDtos;
+}
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/customerServiceCalculation/ServiceProductDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerServiceCalculation;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ServiceProductDto {
+private String id;
+private Integer quantity;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/customerService/CustomerServiceDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customerService;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CalculationInputFieldDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CategoryListDto;
+
+import java.util.List;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+//@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class CustomerServiceDto extends CategoryListDto {
+private String id;
+private String name;
+private String description;
+private boolean productRelated;
+private List<String> barcode;
+private String supplierId;
+private String picture;
+private List<String> category;
+private String logisticGroupId;
+private String calculatorEngine;
+private List<CalculationInputFieldDto> calculationInputFields;
+private boolean anyProductsRelated;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/customer/CustomerDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.customer;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Set;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CustomerDto {
+private String id;
+private String firstName;
+private String middleName;
+private String lastName;
+private List<String> phones;
+private List<String> emails;
+private String type;
+private Set<String> subscriptions;
+private Set<String> statuses;
+private Set<String> tags;
+private String customerType;
+private String organizationName;
+private String organizationINN;
+private String legalAddress;
+private String actualAddress;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/AddressDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AddressDto {
+private CityDto city;
+private StreetDto street;
+private String roomNumber;
+private String entrance;
+private String floor;
+private String interphone;
+private String zipcode;
+private BuildingDto building;
+private CoordinateDto coordinates;
+private String addressJoin;
+private CountryDto country;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/BuildingDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BuildingDto {
+private String building;
+private String housing;
+private String fiasId;
+private String externalBuildingId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/CityDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CityDto {
+private String name;
+private String fullName;
+private String cityGoldenRecordId;
+private RegionDto region;
+private String fiasId;
+private String carrierCityId;
+private String externalCityId;
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/CoordinateDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CoordinateDto {
+private Double latitude;
+private Double longitude;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/CountryDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CountryDto {
+@JsonAlias("isoCode")
+private String id;
+private String name;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/RegionDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RegionDto {
+private String name;
+@JsonAlias({"id"})
+private String regionId;
+private String fiasId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/sf24/address/StreetDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.address;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class StreetDto {
+private String name;
+private String fiasId;
+private String externalStreetId;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/CancelErpTaskDto.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;
+
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CancelErpTaskDto {
+@JsonProperty("guid")
+private String guid;
+
+@JsonProperty("status")
+private String status;
+
+@JsonProperty("decision")
+private String decision;
+
+@JsonProperty("commandGuid")
+private String commandGuid;
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/CancelErpTaskRequest.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class CancelErpTaskRequest {
+private CancelErpTaskDto payload;
+
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/dto/erp/task/CancelErpTaskResponse.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.dto.erp.task;

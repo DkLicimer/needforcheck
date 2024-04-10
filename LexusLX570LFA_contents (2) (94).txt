@@ -1,0 +1,411 @@
+﻿import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import static ru.liga.evraz.aggregation.adapter.http.out.TimeFormat.DATE_TIME_ISO_EXTENDED_WITH_OFFSET_NO_Z_FORMAT;
+
+public class ErpZonedDateTimeSerializer extends JsonSerializer<ZonedDateTime> {
+private static final DateTimeFormatter FORMATTER = DateTimeFormatter
+.ofPattern(DATE_TIME_ISO_EXTENDED_WITH_OFFSET_NO_Z_FORMAT)
+.withZone(ZoneId.of("UTC"));
+
+@Override
+public void serialize(ZonedDateTime value,
+JsonGenerator jsonGenerator,
+SerializerProvider serializerProvider) throws IOException {
+if (value != null) {
+jsonGenerator.writeString(FORMATTER.format(value));
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/TimeFormat.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out;
+
+public class TimeFormat {
+public static final String DATE_TIME_ISO_EXTENDED_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS"; // 2020-01-05T00:00:00.000
+public static final String DATE_TIME_ISO_EXTENDED_WITH_OFFSET_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"; // 2020-01-05T00:00:00.000+03:00
+public static final String DATE_TIME_ISO_EXTENDED_WITH_OFFSET_NO_Z_FORMAT = "yyyy-MM-dd'T'HH:mm:ssxxx"; // 2020-01-05T01:02:30+00:00
+public static final String DATE_TIME_ISO_FORMAT = "yyyy-MM-dd HH:mm:ss";
+public static final String DATE_FORMAT = "yyyy-MM-dd";
+public static final String DATE_FORMAT_BY_DOT = "dd.MM.yyyy";
+public static final String DATE_TIME_ISO_EXTEND_WITH_GMT_TIMEZONE = "yyyy-MM-dd'Z'HH:mm:ss";
+public static final String TIME_FORMAT = "HH:mm";
+public static final String HUMAN_DATE_WITH_TIME = "dd.MM.yyyy HH:mm:ss";
+public static final String ISO_DATE_TIME_UTC_OFFSET = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/DeliveryAttributeHelper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.domain.model.DeliveryAttribute;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+public class DeliveryAttributeHelper {
+
+private static final String SHIPPED_QUANTITY = "shippedQuantity";
+private static final Set<String> DELIVERY_ATTRIBUTES = Set.of("logisticManagerResponsibleId",
+"deliveryDriverFullName", "deliveryDriverPhone", "deliveryCarNumber", "deliveryStatus", "transferred", "licenseNumber", "paidQuantity");
+
+private static final List<CustomAttributesDto> DELIVERY_ATTRIBUTES_EMPTY_VALUES_LIST = DELIVERY_ATTRIBUTES.stream()
+.map(oa -> CustomAttributesDto.builder()
+.name(oa)
+.value(EMPTY)
+.build())
+.toList();
+
+public static List<CustomAttributesDto> getCustomAttributesFromDeliveryAttributes(List<DeliveryAttribute> deliveryAttributeList) {
+if (CollectionUtils.isEmpty(deliveryAttributeList)) {
+return DELIVERY_ATTRIBUTES_EMPTY_VALUES_LIST;
+}
+
+final var shouldBeEmptySet = new HashSet<>(DELIVERY_ATTRIBUTES);
+
+final var result = deliveryAttributeList.stream()
+.filter(deliveryAttribute -> DELIVERY_ATTRIBUTES.contains(deliveryAttribute.getName()))
+.map(da -> {
+shouldBeEmptySet.remove(da.getName());
+return CustomAttributesDto.builder()
+.name(da.getName())
+.value(da.getValue())
+.build();
+})
+.collect(Collectors.toList());
+
+if (CollectionUtils.isNotEmpty(shouldBeEmptySet)) {
+for (String deliveryAttributeNameForEmptyValue : shouldBeEmptySet) {
+result.add(CustomAttributesDto.builder()
+.name(deliveryAttributeNameForEmptyValue)
+.value(EMPTY)
+.build());
+}
+}
+return result;
+}
+
+public static void addShippedQuantityToItems(
+OrderCreateExtendedDto sfOrder, List<DeliveryAttribute> deliveryAttributes) {
+final var shippedQuantities = deliveryAttributes.stream()
+.filter(attr -> attr.getName().equalsIgnoreCase(SHIPPED_QUANTITY)).collect(
+Collectors.toMap(DeliveryAttribute::getPositionCode, Function.identity()));
+final var emptyItemShippedQuantity = CustomAttributesDto.builder()
+.name(SHIPPED_QUANTITY)
+.value(EMPTY).build();
+if (MapUtils.isEmpty(shippedQuantities)) {
+for (ItemDto item : sfOrder.getItems()) {
+item.getCustomAttributes().add(emptyItemShippedQuantity);
+}
+} else {
+for (ItemDto item : sfOrder.getItems()) {
+final var positionCode = item.getPositionCode();
+final var shippedQuantity = shippedQuantities.get(positionCode);
+if (nonNull(shippedQuantity)) {
+final var itemShippedQuantity = CustomAttributesDto.builder()
+.name(SHIPPED_QUANTITY)
+.value(shippedQuantity.getValue())
+.build();
+item.getCustomAttributes().add(itemShippedQuantity);
+} else {
+item.getCustomAttributes().add(emptyItemShippedQuantity);
+}
+}
+}
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/main/java/ru/liga/evraz/aggregation/adapter/http/out/service/OrderAttributeHelper.java
+Content:
+package ru.liga.evraz.aggregation.adapter.http.out.service;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.math3.util.Precision;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.CustomAttributesDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.item.ItemServiceDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.order.OrderCreateExtendedDto;
+import ru.liga.evraz.aggregation.adapter.http.out.dto.sf24.orderCalculation.CalculationInputDataDto;
+import ru.liga.evraz.aggregation.domain.model.DeliveryItem;
+import ru.liga.evraz.aggregation.domain.model.DeliveryOrder;
+import ru.liga.evraz.aggregation.domain.model.ErpDelivery;
+import ru.liga.evraz.aggregation.domain.model.OrderAttribute;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CountEnum;
+import ru.liga.evraz.aggregation.domain.model.product.SkuStatus;
+import ru.liga.evraz.aggregation.domain.model.product.SkuType;
+import ru.liga.evraz.aggregation.sf.ItemCA;
+
+import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static ru.liga.evraz.aggregation.adapter.db.entity.delivery.ClientDocumentAuthorityNote.isAuthorityNoteRequired;
+import static ru.liga.evraz.aggregation.adapter.http.out.TimeFormat.HUMAN_DATE_WITH_TIME;
+
+@Slf4j
+public class OrderAttributeHelper {
+private static final String SKU_TYPE = "skuType";
+private static final String MP_START_TIME = "metalProcessingStartTime";
+private static final String MP_START_TIME_DESCRIPTION = "metalProcessingStartTimeDescription";
+private static final String MP_COMPLETED = "metalProcessingCompleted";
+private static final String WAREHOUSE_ID = "warehouseId";
+private static final String DISPATCH_WAREHOUSE_COUNT_ENUM = "dispatchWarehouseCountEnum";
+private static final String CLIENT_DOCUMENT_AUTHORITY_FOR_RECEIVE_GOODS_REQUIRED = "clientDocumentAuthorityForReceiveGoodsRequired";
+private static final String POSITION_CODE = "positionCode";
+private static final String SHIPPING_COUNT_ENUM = "shippingCountEnum";
+private static final String ERP_GUID = "erpGuid";
+private static final String POSITION_CANCELLATION_REASON = "positionCancellationReason";
+private static final String MEASURE_UNIT = "measureUnit";
+private static final Set<String> ORDER_CUSTOM_ATTRIBUTES_ADDITIONAL_WO_PAID_ASSIGNMENT_DATE = Set.of("approvalProcessStatus", "olurTaskSent", "invoiceSent", "paymentAmount", "invoiceCreated");
+private static final String DOCUMENT_ID = "documentId";
+
+private static final List<CustomAttributesDto> ORDER_CUSTOM_ATTRIBUTES_EMPTY_VALUES_LIST_WO_PAID_ASSIGNMENT_DATE = ORDER_CUSTOM_ATTRIBUTES_ADDITIONAL_WO_PAID_ASSIGNMENT_DATE.stream()
+.map(oa -> CustomAttributesDto.builder()
+.name(oa)
+.value(EMPTY)
+.build())
+.toList();
+
+private static final List<CustomAttributesDto> MP_POSITION_EMPTY_CA_VALUES_LIST = List.of(
+MP_COMPLETED, MP_START_TIME, MP_START_TIME_DESCRIPTION).stream()
+.map(oa -> CustomAttributesDto.builder()
+.name(oa)
+.value(EMPTY)
+.build())
+.toList();
+
+private static final Set<String> MP_ORDER_ATTRIBUTES = Set.of(MP_START_TIME, MP_COMPLETED);
+
+public static List<CustomAttributesDto> getAdditionalOrderCustomAttributesFromOrderAttributes(
+List<OrderAttribute> orderAttributeList) {
+Set<String> orderCustomAttributesAdditional = new HashSet<>(ORDER_CUSTOM_ATTRIBUTES_ADDITIONAL_WO_PAID_ASSIGNMENT_DATE);
+if (CollectionUtils.isNotEmpty(orderAttributeList)) {
+final var shouldBeEmptySet = new HashSet<>(orderCustomAttributesAdditional);
+final var result = orderAttributeList.stream()
+.filter(orderAttribute -> orderCustomAttributesAdditional.contains(orderAttribute.getName()))
+.map(oa -> {
+shouldBeEmptySet.remove(oa.getName());
+return CustomAttributesDto.builder()
+.name(oa.getName())
+.value(oa.getValue())
+.build();
+})
+.collect(Collectors.toList());
+
+if (CollectionUtils.isNotEmpty(shouldBeEmptySet)) {
+for (String orderAttributeNameForEmptyValue : shouldBeEmptySet) {
+result.add(CustomAttributesDto.builder()
+.name(orderAttributeNameForEmptyValue)
+.value(EMPTY)
+.build());
+}
+}
+return result;
+}
+
+return ORDER_CUSTOM_ATTRIBUTES_EMPTY_VALUES_LIST_WO_PAID_ASSIGNMENT_DATE;
+}
+
+public static void enrichItemsWithMetalProcessingInfo(List<ItemDto> items, List<OrderAttribute> orderAttributes) {
+final var metalProcessingOrderAttributes = filterForMetalProcessingOrderAttributes(orderAttributes);
+
+if (CollectionUtils.isNotEmpty(items)) {
+for (final var item : items) {
+final var customAttributes = item.getCustomAttributes();
+final var skuType = getAttributeValueByAttributeName(customAttributes, SKU_TYPE);
+
+if (SkuType.ITEM_GP.name().equalsIgnoreCase(skuType)) {
+enrichPositionCustomAttributesWithMetalProcessingOrderAttributes(
+metalProcessingOrderAttributes, customAttributes, true);
+}
+}
+}
+}
+
+public static void enrichItemServicesWithMetalProcessingInfo(List<ItemServiceDto> itemServices,
+List<OrderAttribute> orderAttributes) {
+final var metalProcessingOrderAttributes = filterForMetalProcessingOrderAttributes(orderAttributes);
+
+if (CollectionUtils.isNotEmpty(itemServices)) {
+for (final var itemService : itemServices) {
+final var customAttributes = itemService.getCustomAttributes();
+final var skuType = getAttributeValueByAttributeName(customAttributes, SKU_TYPE);
+
+if (SkuType.MP_SERVICE.name().equalsIgnoreCase(skuType)) {
+enrichPositionCustomAttributesWithMetalProcessingOrderAttributes(metalProcessingOrderAttributes, customAttributes, false);
+enrichItemServiceWithMetalProcessingDescriptionInfo(itemService);
+}
+}
+}
+}
+
+private static void enrichItemServiceWithMetalProcessingDescriptionInfo(
+ItemServiceDto itemService) {
+final var calculationInputData = itemService.getCalculationInputData();
+final var metalProcessingStartTimeValue = getAttributeValueByAttributeName(
+itemService.getCustomAttributes(), MP_START_TIME);
+
+final var startTimeDescription = buildMetalProcessingStartTimeDescription(
+metalProcessingStartTimeValue);
+calculationInputData.add(startTimeDescription);
+
+}
+
+public static void addDispatchWarehouseCountAttrIfNotExists(OrderCreateExtendedDto orderCreateExtendedDto, List<CustomAttributesDto> orderCustomAttributes) {
+if (!isAttributeWithNameExists(orderCustomAttributes, DISPATCH_WAREHOUSE_COUNT_ENUM)) {
+final var dispatchWarehouseCountEnumAttr = calculateDispatchWarehouseCount(orderCreateExtendedDto);
+orderCustomAttributes.add(dispatchWarehouseCountEnumAttr);
+}
+}
+
+private static boolean isAttributeWithNameExists(List<CustomAttributesDto> customAttributes, String attributeName) {
+return customAttributes.stream()
+.anyMatch(ca -> attributeName.equals(ca.getName()));
+
+}
+
+public static CustomAttributesDto calculateShippingCount(OrderCreateExtendedDto order, List<ErpDelivery> deliveryList) {
+return CustomAttributesDto.builder()
+.name(SHIPPING_COUNT_ENUM)
+.value(calculateShippingCountValue(order, deliveryList).toString())
+.build();
+}
+
+private static CountEnum calculateShippingCountValue(OrderCreateExtendedDto order, List<ErpDelivery> deliveryList) {
+//Ð’ÑÐµ Ñ‚Ð¾Ð²Ð°Ñ€Ñ‹ Ð½ÐµÐ°ÐºÑ‚Ð¸Ð²Ð½Ñ‹
+List<ItemDto> activeItems = order.getItems().stream()
+.filter(OrderAttributeHelper::isValidItemForDelivery)
+.toList();
+if (CollectionUtils.isEmpty(activeItems)) {
+log.info("No active products for order {}, return NONE", order.getOrderErpGuid());
+return CountEnum.NONE;
+}
+
+ItemShippingInfo itemShippingInfo = ItemShippingInfo.of(activeItems);
+
+if (itemShippingInfo.allWithoutShipping) {
+log.info("No delivery for active products. Order {}, items {}, return NO_ZNP", order.getOrderErpGuid(), StringUtils.join(itemShippingInfo.getAllShippingGuids(), "; "));
+return CountEnum.NO_ZNP;
+}
+
+if (itemShippingInfo.isAllInSameShipping()) {
+log.info("All active products in same delivery. Order {}, items {}", order.getOrderErpGuid(), StringUtils.join(itemShippingInfo.getAllShippingGuids(), "; "));
+if (quantityLessOrEquals(order.getOrderErpGuid(), itemShippingInfo.getSameShippingErpGuid(), activeItems, deliveryList)) {
+log.info("Quantity match. Order {}, return ONE", order.getOrderErpGuid());
+return CountEnum.ONE;
+}
+}
+
+log.info("Order {}, by default return MANY", order.getOrderErpGuid());
+return CountEnum.MANY;
+}
+
+private static boolean quantityLessOrEquals(String orderErpGuid, String deliveryErpGuid, List<ItemDto> activeItems, List<ErpDelivery> deliveryList) {
+List<DeliveryItem> deliveryItems = findDeliveryItemsForErpGuid(orderErpGuid, deliveryErpGuid, deliveryList);
+
+for (ItemDto activeItem : activeItems) {
+ItemDto.ShortItem itemInfo = activeItem.getShortItemInfo();
+DeliveryItem delivery = findInDeliveryItem(itemInfo.getPositionCode(), itemInfo.getSkuId(), deliveryItems);
+if (delivery == null) {
+return false;
+}
+
+Double itemQuantity = itemInfo.isWeightItem() ? itemInfo.getWeight() : itemInfo.getQuantity();
+
+if (Precision.compareTo(itemQuantity, delivery.getQuantity(), 0.000001d) > 0) {
+log.info("Quantity dont match. OrderErpGuid: {}, deliveryErpGuid: {}, itemProductId: {}", orderErpGuid, delivery, activeItem.getProductId());
+return false;
+}
+}
+
+return true;
+}
+
+private static List<DeliveryItem> findDeliveryItemsForErpGuid(String orderErpGuid, String deliveryErpGuid, List<ErpDelivery> deliveries) {
+List<DeliveryOrder> deliveryOrders = Optional.ofNullable(deliveries)
+.orElseGet(Collections::emptyList)
+.stream()
+.filter(delivery -> delivery.getErpGuid().equals(deliveryErpGuid))
+.findFirst()
+.map(ErpDelivery::getOrders)
+.orElse(Collections.emptyList());
+
+return deliveryOrders.stream()
+.filter(a -> orderErpGuid.equals(a.getErpOrderGuid()))
+.findFirst()
+.map(DeliveryOrder::getDeliveryItems)
+.orElseGet(Collections::emptyList);
+
+}
+
+private static DeliveryItem findInDeliveryItem(Integer positionCode, String skuId, List<DeliveryItem> deliveryItems) {
+return deliveryItems.stream()
+.filter(deliveryItem -> deliveryItem.getOrderPositionCode() != null
+&& deliveryItem.getOrderPositionCode().equals(positionCode)
+&& deliveryItem.getSkuId().equals(skuId))
+.findFirst()
+.orElse(null);
+}
+
+private static boolean isValidItemForDelivery(@NotNull ItemDto item) {
+final var skuStatusValue = getAttributeValueByAttributeName(
+item.getCustomAttributes(), ItemCA.SKU_STATUS.getCode());
+final var positionCancellationReason = getAttributeValueByAttributeName(
+item.getCustomAttributes(), POSITION_CANCELLATION_REASON);
+return StringUtils.isEmpty(positionCancellationReason)
+&& !Objects.equals(SkuStatus.CANCELED.name(), skuStatusValue)
+&& !Objects.equals(SkuStatus.DO_NOT_PROVIDE.name(), skuStatusValue);
+}
+
+private static String getAttributeValueByAttributeName(
+@NotNull List<CustomAttributesDto> customAttributes, String attributeName) {
+return customAttributes.stream()
+.filter(ca -> Objects.equals(ca.getName(), attributeName))
+.findFirst()
+.map(CustomAttributesDto::getValue)
+.orElse(StringUtils.EMPTY);
+}
+
+public static CustomAttributesDto calculateDispatchWarehouseCount(OrderCreateExtendedDto order) {
+final var dtoBuilder = CustomAttributesDto.builder()
+.name(DISPATCH_WAREHOUSE_COUNT_ENUM);
+final var orderItems = order.getItems().stream().filter(OrderAttributeHelper::isValidItemForDelivery).toList();
+final var isAllItemsWarehouseIdEmpty = orderItems.stream()
+.map(i -> getAttributeValueByAttributeName(i.getCustomAttributes(),
+WAREHOUSE_ID))
+.allMatch(StringUtils::isEmpty);
+if (isAllItemsWarehouseIdEmpty) {
+return dtoBuilder.value(CountEnum.NONE.toString()).build();
+}
+//ONE - ÐžÐ´Ð½Ð° Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ°. ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ‚Ð¾Ð²Ð°Ñ€Ð° Ð¸Ð· Ð·Ð°ÐºÐ°Ð·Ð° Ð¸ Ð—ÐÐŸ Ð´Ð¾Ð»Ð¶Ð½Ñ‹ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°Ñ‚ÑŒ 

@@ -1,0 +1,437 @@
+﻿import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import ru.liga.evraz.aggregation.adapter.db.CommandJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.OrderTransactionJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.OrderUuidGenerator;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.domain.model.order.enums.CmdStatus;
+import ru.liga.evraz.aggregation.domain.repository.OrderTransactionRepository;
+
+import java.net.URI;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.config.path.BpmPath.BPM_SEND_MESSAGE;
+
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐ¸ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð² Ð¿Ñ€Ð¾Ñ†ÐµÑÑ ÐšÐ°Ð¼ÑƒÐ½Ð´Ñ‹")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CommandStatusSentTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order/truncate_order_entities.sql";
+private static final String DB_FILL = "/db/order/fill_erp_command.sql";
+
+private static final String ORDER_TRANSACTION_UUID = "test_transaction_uuid";
+
+@Autowired
+private OrderTransactionJpaRepository orderTransactionJpaRepo;
+@Autowired
+private OrderTransactionRepository orderTransactionRepo;
+@MockBean
+private OrderUuidGenerator orderTransactionUuidGenerator;
+
+@Autowired
+private CommandJpaRepository commandJpaRepository;
+
+@Value("classpath:api/command/send_command_status/request.json")
+private Resource request;
+@Value("classpath:api/command/send_command_status/order_fulfilment_pipeline.json")
+private Resource orderFulfilmentPipelineRequest;
+@Value("classpath:api/command/send_command_status/order_fulfilment_pipeline_error.json")
+private Resource orderFulfilmentPipelineErrorStatusRequest;
+@Value("classpath:external/command/bpm/send_message_request.json")
+private Resource bpmnReq;
+@Value("classpath:external/command/bpm/send_message_response.json")
+private Resource bpmnRes;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ ORDER_SHIP_PERMISSION")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD)
+})
+public void success() {
+final var uuid = "111-commandGuid";
+
+final var pathsToExpectedResources = Map.of(
+BPM_SEND_MESSAGE, Pair.of(bpmnReq, bpmnRes)
+);
+
+initBpmScenario(
+pathsToExpectedResources,
+Map.of("messageId", "MESSAGE_ORDER_SHIP_PERMISSION_STATUS_UPDATED",
+"orderId", "111-orderId")
+);
+
+customPostScenarioFromResource("/v1/command/cmd-status", request, null, true, 204);
+
+
+final var entity = commandJpaRepository.findByCommandGuid(uuid).get();
+
+Assertions.assertAll(
+() -> assertThat(entity.getErpStatus()).isEqualTo(CmdStatus.OK),
+() -> assertThat(entity.getErpDetails()).isEqualTo("some details")
+);
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ ORDER_FULFILMENT_PIPELINE")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD)
+})
+public void successOrderFulfilmentPipelineCmd() {
+final var uuid = "222-commandGuid";
+
+Mockito.when(orderTransactionUuidGenerator.generateUuid()).thenReturn(ORDER_TRANSACTION_UUID);
+
+customPostScenarioFromResource("/v1/command/cmd-status", orderFulfilmentPipelineRequest, null, true, 204);
+
+final var entity = commandJpaRepository.findByCommandGuid(uuid).get();
+
+Assertions.assertAll(
+() -> assertThat(entity.getErpStatus()).isEqualTo(CmdStatus.OK),
+() -> assertThat(entity.getErpDetails()).isEqualTo("some details")
+);
+
+final var createdTransaction = orderTransactionJpaRepo.findByTransactionId(ORDER_TRANSACTION_UUID + "_omsPipeline");
+
+Assertions.assertAll(
+() -> assertThat(createdTransaction).isNotNull()
+);
+}
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ ÑÑ‚Ð°Ñ‚ÑƒÑÐ° ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ ORDER_FULFILMENT_PIPELINE ÑÐ¾ ÑÑ‚Ð°Ñ‚ÑƒÑÐ¾Ð¼ ERROR")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD)
+})
+public void successOrderFulfilmentPipelineWithErrorStatusCmd() {
+final var uuid = "222-commandGuid";
+
+Mockito.when(orderTransactionUuidGenerator.generateUuid()).thenReturn(ORDER_TRANSACTION_UUID);
+
+customPostScenarioFromResource("/v1/command/cmd-status", orderFulfilmentPipelineErrorStatusRequest, null, true, 204);
+
+final var entity = commandJpaRepository.findByCommandGuid(uuid).get();
+
+Assertions.assertAll(
+() -> assertThat(entity.getErpStatus()).isEqualTo(CmdStatus.ERROR),
+() -> assertThat(entity.getErpDetails()).isEqualTo("test error in details")
+);
+
+final var createdTransaction = orderTransactionJpaRepo.findByTransactionId(ORDER_TRANSACTION_UUID + "_omsPipeline");
+
+Assertions.assertAll(
+() -> assertThat(createdTransaction).isNull()
+);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/command/CreateOrderReserveRenewalTest.java
+Content:
+package ru.liga.evraz.aggregation.module.command;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import reactor.core.Disposable;
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverRecord;
+import ru.liga.evraz.aggregation.adapter.db.CommandJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.CommandUuidGenerator;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.domain.model.OrderReserveRenewalDto;
+import ru.liga.evraz.aggregation.domain.model.ReservationExtensionReason;
+import ru.liga.evraz.aggregation.util.KafkaUtils;
+
+import java.time.LocalDate;
+import java.util.concurrent.CompletableFuture;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.util.ResourceUtils.getResourceAsString;
+
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð¿Ñ€Ð¾Ð´Ð»ÐµÐ½Ð¸Ñ Ñ€ÐµÐ·ÐµÑ€Ð²Ð° Ð² ERP")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CreateOrderReserveRenewalTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order/truncate_order_entities.sql";
+private static final String DB_FILL = "/db/order/order_created.sql";
+
+@Autowired
+private CommandJpaRepository commandJpaRepository;
+@Autowired
+private KafkaProperties kafkaProperties;
+@Autowired
+private ObjectMapper om;
+@MockBean
+private CommandUuidGenerator commandUuidGenerator;
+
+@Value("classpath:api/command/order_reserve_renewal/request.json")
+private Resource request;
+@Value("classpath:api/command/order_reserve_renewal/response.json")
+private Resource response;
+@Value("classpath:api/command/order_reserve_renewal/request_order_not_found.json")
+private Resource orderNotFoundRequest;
+@Value("classpath:api/command/order_reserve_renewal/response_order_not_found.json")
+private Resource orderNotFoundResponse;
+@Value("classpath:kafka/response/order_reserve_renewal.json")
+private Resource successMessage;
+@Value("classpath:kafka/response/order_reserve_renewal_key.json")
+private Resource successKey;
+
+private final CompletableFuture<ReceiverRecord<CommandGuidKey, OrderReserveRenewalDto>> future = new CompletableFuture<>();
+
+@Value("${aggregation.kafka.command-order-reserve-renewal.request.topic}")
+private String topic;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createOrderReserveRenewalCommand() {
+final var uuid = "commandGuid";
+when(commandUuidGenerator.generateUuid()).thenReturn(uuid);
+
+customPostScenarioFromResource("/v1/command/order-reserve-renewal", request, response, true, 200);
+
+Thread.sleep(1000); // Ð±ÐµÐ· Ñ‚Ð°Ð¹Ð¼Ð°ÑƒÑ‚Ð° Ð½Ðµ ÑƒÑÐ¿ÐµÐ²Ð°ÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ð² Ð‘Ð”
+
+KafkaReceiver<CommandGuidKey, OrderReserveRenewalDto> receiver = KafkaUtils.createOrderReserveRenewalReceiver(
+kafkaProperties, topic);
+final var disposable = receiver.receive().doOnEach(r -> future.complete(r.get())).subscribe();
+
+ReceiverRecord<CommandGuidKey, OrderReserveRenewalDto> sendMessageResultReceiverRecord = future.get();
+final var key = sendMessageResultReceiverRecord.key();
+final var value = sendMessageResultReceiverRecord.value();
+var resultKey = om.writeValueAsString(key);
+var resultMessage = om.writeValueAsString(value);
+JSONAssert.assertEquals(getResourceAsString(successKey), resultKey, true);
+JSONAssert.assertEquals(getResourceAsString(successMessage), resultMessage, true);
+
+final var entity = commandJpaRepository.findByCommandGuid(uuid).get();
+
+Assertions.assertAll(
+() -> assertThat(entity.getOrderId()).isEqualTo("test_starfish24_erp_guid"),
+() -> assertThat(entity.getCommandType()).isEqualTo("ORDER_RESERVE_RENEWAL"),
+() -> assertThat(entity.getReservationRemovalDate()).isEqualTo(LocalDate.of(2023, 12, 31)),
+() -> assertThat(entity.getReservationExtensionReason()).isEqualTo(ReservationExtensionReason.RESERVATION_EXTENSION_PREPAYMENT),
+() -> assertThat(entity.isSendStatus()).isEqualTo(true)
+);
+
+disposable.dispose();
+}
+
+@Test
+@DisplayName("Ð—Ð°ÐºÐ°Ð· Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½ Ð¿Ð¾ ID Ð·Ð°ÐºÐ°Ð·Ð° Ð¸Ð· Starfish24")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void notFoundOrder() {
+final var uuid = "commandGuid";
+when(commandUuidGenerator.generateUuid()).thenReturn(uuid);
+
+customPostScenarioFromResource("/v1/command/order-reserve-renewal", orderNotFoundRequest, orderNotFoundResponse, true, 404);
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/command/CreateOrderShipPermissionTest.java
+Content:
+package ru.liga.evraz.aggregation.module.command;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import reactor.core.Disposable;
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverRecord;
+import ru.liga.evraz.aggregation.adapter.db.CommandJpaRepository;
+import ru.liga.evraz.aggregation.adapter.db.CommandUuidGenerator;
+import ru.liga.evraz.aggregation.adapter.kafka.CommandGuidKey;
+import ru.liga.evraz.aggregation.base.BaseIntegrationTest;
+import ru.liga.evraz.aggregation.domain.model.OrderShipPermissionDto;
+import ru.liga.evraz.aggregation.domain.model.command.OrderItemShortData;
+import ru.liga.evraz.aggregation.util.KafkaUtils;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static ru.liga.evraz.aggregation.util.ResourceUtils.getResourceAsString;
+
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient(timeout = "5s")
+@DisplayName("Ð¢ÐµÑÑ‚ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð¿Ð¾ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¸ÑŽ Ð¾Ñ‚Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ð´Ð»Ñ Erp")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class CreateOrderShipPermissionTest extends BaseIntegrationTest {
+
+private static final String DB_CLEANER = "/db/order/truncate_order_entities.sql";
+private static final String DB_FILL = "/db/cmd/order_ship_permission/fill-for-order-ship-permission.sql";
+
+@Autowired
+private CommandJpaRepository commandJpaRepository;
+@Autowired
+private KafkaProperties kafkaProperties;
+@Autowired
+private ObjectMapper om;
+@MockBean
+private CommandUuidGenerator commandUuidGenerator;
+
+@Value("classpath:api/command/order_ship_permission_items/request.json")
+private Resource request;
+@Value("classpath:api/command/order_ship_permission_items/response.json")
+private Resource response;
+@Value("classpath:kafka/response/order_ship_permission_response.json")
+private Resource successMessage;
+@Value("classpath:kafka/response/order_ship_permission_kafka_key.json")
+private Resource successKey;
+
+private final CompletableFuture<ReceiverRecord<CommandGuidKey, OrderShipPermissionDto>> future = new CompletableFuture<>();
+
+@Value("${aggregation.kafka.command-order-ship-permission.request.topic}")
+private String topic;
+
+@Test
+@DisplayName("Ð£ÑÐ¿ÐµÑˆÐ½Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹")
+@SneakyThrows
+@SqlGroup({
+@Sql(value = DB_CLEANER, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_FILL, executionPhase = BEFORE_TEST_METHOD),
+@Sql(value = DB_CLEANER, executionPhase = AFTER_TEST_METHOD),
+})
+public void createOrderShipPermissionCommand() {
+final var uuid = "commandGuid";
+when(commandUuidGenerator.generateUuid()).thenReturn(uuid);
+
+customPostScenarioFromResource("/v1/command/order-ship-permission", request, response, true, 200);
+
+Thread.sleep(1000); // Ð±ÐµÐ· Ñ‚Ð°Ð¹Ð¼Ð°ÑƒÑ‚Ð° Ð½Ðµ ÑƒÑÐ¿ÐµÐ²Ð°ÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð·Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ð² Ð‘Ð”
+
+KafkaReceiver<CommandGuidKey, OrderShipPermissionDto> receiver = KafkaUtils.createOrderShipPermissionReceiver(
+kafkaProperties, topic);
+final var disposable = receiver.receive().doOnEach(r -> future.complete(r.get())).subscribe();
+
+ReceiverRecord<CommandGuidKey, OrderShipPermissionDto> sendMessageResultReceiverRecord = future.get();
+final var key = sendMessageResultReceiverRecord.key();
+final var value = getDtoWithSortedDocumentItems(sendMessageResultReceiverRecord.value());
+var resultKey = om.writeValueAsString(key);
+var resultMessage = om.writeValueAsString(value);
+JSONAssert.assertEquals(getResourceAsString(successKey), resultKey, true);
+JSONAssert.assertEquals(getResourceAsString(successMessage), resultMessage, true);
+
+final var entity = commandJpaRepository.findByCommandGuid(uuid).get();
+
+Assertions.assertAll(
+() -> assertThat(entity.getOrderId()).isEqualTo("test_starfish24_erp_guid"),
+() -> assertThat(entity.isSendStatus()).isEqualTo(true)
+);
+disposable.dispose();
+}
+
+private OrderShipPermissionDto getDtoWithSortedDocumentItems(OrderShipPermissionDto source) {
+final var sortedDocumentItems = source.getDocumentItems().stream()
+.sorted(Comparator.comparing(OrderItemShortData::getPositionCode))
+.collect(Collectors.toList());
+
+return OrderShipPermissionDto.builder()
+.commandGuid(source.getCommandGuid())
+.documentStatus(source.getDocumentStatus())
+.documentItems(sortedDocumentItems)
+.erpGuid(source.getErpGuid())
+.build();
+}
+}
+
+
+File: /evrazropos/EMI_evraz_oms_aggregation_service/src/test/java/ru/liga/evraz/aggregation/module/command/CreateOrderSignPipelineTest.java
+Content:
+package ru.liga.evraz.aggregation.module.command;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
+import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import reactor.core.Disposable;
+import reactor.kafka.receiver.KafkaReceiver;
+import reactor.kafka.receiver.ReceiverRecord;
+import ru.liga.evraz.aggregation.adapter.db.CommandJpaRepository;
